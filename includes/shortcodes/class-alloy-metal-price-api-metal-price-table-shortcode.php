@@ -210,7 +210,7 @@ class Alloy_Metal_Price_API_14K_Gold_Price_Table_Shortcode {
 				id="k14pgtbl"
 				class="aur:w-full aur:max-w-180 aur:overflow-hidden aur:rounded-2xl aur:bg-white aur:px-4 aur:py-4 aur:shadow-[0_4px_16px_rgba(0,0,0,0.06)] aur:sm:px-6"
 				aria-labelledby="k14pgtbl-title">
-				<h2 id="k14pgtbl-title" class="aur:mb-3 aur:text-center aur:text-base aur:font-semibold aur:text-primary">
+				<h2 id="k14pgtbl-title" class="aur:mb-3 aur:text-center aur:text-base! aur:font-semibold! aur:text-primary!">
 					<?php echo esc_html($title); ?>
 				</h2>
 

@@ -427,6 +427,10 @@
     font-size: var(--aur-text-base);
     line-height: var(--tw-leading, var(--aur-text-base--line-height));
   }
+  .aur\:text-base\! {
+    font-size: var(--aur-text-base) !important;
+    line-height: var(--tw-leading, var(--aur-text-base--line-height)) !important;
+  }
   .aur\:text-sm {
     font-size: var(--aur-text-sm);
     line-height: var(--tw-leading, var(--aur-text-sm--line-height));
@@ -477,11 +481,18 @@
     --tw-font-weight: var(--aur-font-weight-semibold);
     font-weight: var(--aur-font-weight-semibold);
   }
+  .aur\:font-semibold\! {
+    --tw-font-weight: var(--aur-font-weight-semibold) !important;
+    font-weight: var(--aur-font-weight-semibold) !important;
+  }
   .aur\:text-emerald-600 {
     color: var(--aur-color-emerald-600);
   }
   .aur\:text-primary {
     color: var(--aur-color-primary);
+  }
+  .aur\:text-primary\! {
+    color: var(--aur-color-primary) !important;
   }
   .aur\:text-red-600 {
     color: var(--aur-color-red-600);
