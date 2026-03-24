@@ -107,14 +107,20 @@ class Alloy_Metal_Price_API_Metal_Price_Shortcode {
 		$this->assets->enqueue_frontend_assets();
 
 		$formatted_price = (string) round($this->convert_price_unit($price, $unit), 2);
+		$symbol_slug     = strtolower($symbol);
 
-		return sprintf(
-			'<span class="%1$s" data-metal-symbol="%2$s" data-metal-unit="%3$s">%4$s</span>',
-			esc_attr('aur-inline-flex aur-items-center aur-rounded-full aur-border aur-border-secondary aur-bg-primary aur-px-3 aur-py-1 aur-font-sans aur-font-semibold aur-leading-none aur-text-white'),
-			esc_attr(strtolower($symbol)),
-			esc_attr($unit),
-			esc_html($formatted_price)
-		);
+		ob_start();
+		?>
+		<span
+			class="aur:text-base aur:font-sans"
+			data-metal-symbol="<?php echo esc_attr($symbol_slug); ?>"
+			data-metal-unit="<?php echo esc_attr($unit); ?>"
+		>
+			<?php echo esc_html($formatted_price); ?>
+		</span>
+		<?php
+
+		return trim((string) ob_get_clean());
 	}
 
 	/**

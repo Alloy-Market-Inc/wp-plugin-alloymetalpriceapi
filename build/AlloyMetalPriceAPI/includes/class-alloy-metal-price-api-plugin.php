@@ -13,6 +13,9 @@ require_once ALLOY_METAL_PRICE_API_PLUGIN_DIR . 'includes/class-alloy-metal-pric
 require_once ALLOY_METAL_PRICE_API_PLUGIN_DIR . 'includes/class-alloy-metal-price-api-client.php';
 require_once ALLOY_METAL_PRICE_API_PLUGIN_DIR . 'includes/class-alloy-metal-price-api-assets.php';
 require_once ALLOY_METAL_PRICE_API_PLUGIN_DIR . 'includes/shortcodes/class-alloy-metal-price-api-metal-price-shortcode.php';
+require_once ALLOY_METAL_PRICE_API_PLUGIN_DIR . 'includes/shortcodes/class-alloy-metal-price-api-metal-price-table-shortcode.php';
+require_once ALLOY_METAL_PRICE_API_PLUGIN_DIR . 'includes/shortcodes/class-alloy-metal-price-api-metal-calculator-shortcode.php';
+require_once ALLOY_METAL_PRICE_API_PLUGIN_DIR . 'includes/shortcodes/class-alloy-metal-price-api-metal-offer-card-shortcode.php';
 
 class Alloy_Metal_Price_API_Plugin {
 	/**
@@ -95,6 +98,9 @@ class Alloy_Metal_Price_API_Plugin {
 	public function register_shortcodes() {
 		$this->shortcodes = array(
 			new Alloy_Metal_Price_API_Metal_Price_Shortcode($this->api_client, $this->assets),
+			new Alloy_Metal_Price_API_14K_Gold_Price_Table_Shortcode($this->api_client, $this->assets),
+			new Alloy_Metal_Price_API_Alloy_Calculator_Shortcode($this->api_client, $this->assets),
+			new Alloy_Metal_Price_API_Metal_Offer_Card_Shortcode($this->api_client, $this->assets),
 		);
 
 		foreach ($this->shortcodes as $shortcode) {

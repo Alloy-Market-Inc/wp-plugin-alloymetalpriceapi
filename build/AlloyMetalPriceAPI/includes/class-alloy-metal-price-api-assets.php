@@ -25,6 +25,13 @@ class Alloy_Metal_Price_API_Assets {
 	const STYLE_HANDLE = 'alloy-metal-price-api-frontend';
 
 	/**
+	 * Shared frontend script handle.
+	 *
+	 * @var string
+	 */
+	const SCRIPT_HANDLE = 'alloy-metal-price-api-frontend';
+
+	/**
 	 * Register plugin frontend assets.
 	 *
 	 * @return void
@@ -43,6 +50,14 @@ class Alloy_Metal_Price_API_Assets {
 			array(self::FONT_HANDLE),
 			$this->get_asset_version('assets/dist/css/plugin.css')
 		);
+
+		wp_register_script(
+			self::SCRIPT_HANDLE,
+			ALLOY_METAL_PRICE_API_PLUGIN_URL . 'assets/dist/js/alloy-calculator.js',
+			array(),
+			$this->get_asset_version('assets/dist/js/alloy-calculator.js'),
+			true
+		);
 	}
 
 	/**
@@ -56,6 +71,28 @@ class Alloy_Metal_Price_API_Assets {
 		}
 
 		wp_enqueue_style(self::STYLE_HANDLE);
+	}
+
+	/**
+	 * Enqueue plugin frontend scripts.
+	 *
+	 * @return void
+	 */
+	public function enqueue_frontend_scripts() {
+		if (! wp_script_is(self::SCRIPT_HANDLE, 'registered')) {
+			$this->register_assets();
+		}
+
+		wp_localize_script(
+			self::SCRIPT_HANDLE,
+			'alloyMetalPriceApi',
+			array(
+				'ajaxUrl'      => admin_url('admin-ajax.php'),
+				'refreshNonce' => wp_create_nonce('alloy_metal_price_api_refresh'),
+			)
+		);
+
+		wp_enqueue_script(self::SCRIPT_HANDLE);
 	}
 
 	/**
