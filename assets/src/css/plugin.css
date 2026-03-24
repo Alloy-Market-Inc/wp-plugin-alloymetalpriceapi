@@ -1,0 +1,11 @@
+@import 'tailwindcss' prefix(aur);
+
+@theme {
+	--color-primary: #1b98b9;
+	--color-secondary: #f17f51;
+	--color-table-row-alt: #f9f9f9;
+	--font-sans: 'Lexend Deca', sans-serif;
+}
+
+@source "../../../alloy-metal-price-api.php";
+@source "../../../includes";
