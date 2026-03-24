@@ -83,6 +83,15 @@ class Alloy_Metal_Price_API_Assets {
 			$this->register_assets();
 		}
 
+		wp_localize_script(
+			self::SCRIPT_HANDLE,
+			'alloyMetalPriceApi',
+			array(
+				'ajaxUrl'      => admin_url('admin-ajax.php'),
+				'refreshNonce' => wp_create_nonce('alloy_metal_price_api_refresh'),
+			)
+		);
+
 		wp_enqueue_script(self::SCRIPT_HANDLE);
 	}
 

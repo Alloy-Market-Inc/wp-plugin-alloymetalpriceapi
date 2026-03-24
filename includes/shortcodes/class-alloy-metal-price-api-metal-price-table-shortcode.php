@@ -1,7 +1,7 @@
 <?php
 
 /**
- * [gold_price_table] shortcode handler.
+ * [metal_price_table] shortcode handler.
  *
  * @package AlloyMetalPriceAPI
  */
@@ -16,7 +16,7 @@ class Alloy_Metal_Price_API_14K_Gold_Price_Table_Shortcode {
 	 *
 	 * @var string
 	 */
-	const TAG = 'gold_price_table';
+	const TAG = 'metal_price_table';
 
 	/**
 	 * Grams in a troy ounce.
@@ -208,7 +208,7 @@ class Alloy_Metal_Price_API_14K_Gold_Price_Table_Shortcode {
 		<div class="aur:flex aur:w-full aur:justify-center aur:font-sans">
 			<section
 				id="k14pgtbl"
-				class="aur:w-full aur:max-w-180 aur:overflow-hidden aur:rounded-2xl aur:border aur:border-slate-900 aur:bg-white aur:px-4 aur:py-4 aur:shadow-[0_4px_16px_rgba(0,0,0,0.06)] sm:aur:px-6"
+				class="aur:w-full aur:max-w-180 aur:overflow-hidden aur:rounded-2xl aur:bg-white aur:px-4 aur:py-4 aur:shadow-[0_4px_16px_rgba(0,0,0,0.06)] aur:sm:px-6"
 				aria-labelledby="k14pgtbl-title">
 				<h2 id="k14pgtbl-title" class="aur:mb-3 aur:text-center aur:text-base aur:font-semibold aur:text-primary">
 					<?php echo esc_html($title); ?>
