@@ -24,6 +24,7 @@ The plugin currently fetches prices from:
 - `[metal_offer_card]`
 - `[metal_price_calc]`
 - `[metal_payout_comparison]`
+- `[metal_spot_ticker]`
 
 ## Installation
 
@@ -44,6 +45,7 @@ Shortcodes that enqueue CSS:
 - `metal_price_table`
 - `metal_calculator`
 - `metal_payout_comparison`
+- `metal_spot_ticker`
 - `metal_offer_card`
 
 Shortcodes that enqueue JS:
@@ -370,6 +372,57 @@ Refresh behavior:
 - The top-right refresh button reloads the current page
 - The card body remains linked to the configured `link_url`
 
+### `[metal_spot_ticker]`
+
+Outputs a compact live spot-metal ticker card showing ounce and gram pricing.
+
+Default usage:
+
+```text
+[metal_spot_ticker]
+```
+
+Default behavior:
+
+- `metal="gold"`
+- `purity="24K"`
+- `pill_text=""`
+
+Supported attributes:
+
+- `metal`
+  - Supported values: `gold`, `silver`, `platinum`, `palladium`
+  - Invalid values fall back to `gold`
+- `purity`
+  - Accepts `1K` through `24K`
+  - `K` suffix optional
+  - Invalid values fall back to `24`
+- `pill_text`
+  - Optional custom pill label
+  - If omitted, the pill label is generated from `metal` and `purity`
+
+What the card shows:
+
+- Live spot price in `USD/oz`
+- Live spot price in `USD/g`
+- Updated time label
+
+Examples:
+
+```text
+[metal_spot_ticker]
+[metal_spot_ticker metal="gold" purity="24K"]
+[metal_spot_ticker metal="gold" purity="14K"]
+[metal_spot_ticker metal="silver" purity="24K"]
+[metal_spot_ticker metal="platinum" purity="18K" pill_text="Live Spot Platinum"]
+```
+
+API failure behavior:
+
+- The card still renders
+- Both values show `Unavailable`
+- The status line changes to `Updating…`
+
 ### `[metal_price_calc]`
 
 Outputs a server-rendered formatted currency value in a `<span>` using calculator-style math from shortcode attributes.
@@ -473,6 +526,7 @@ The plugin makes live API requests on page render or refresh. Different shortcod
 - `[metal_calculator]` renders with base price `0`
 - `[metal_offer_card]` renders unavailable values
 - `[metal_payout_comparison]` renders an unavailable comparison table
+- `[metal_spot_ticker]` renders an unavailable ticker card
 - `[metal_price_calc]` returns `<span>Unavailable</span>`
 
 ## File Map
@@ -495,6 +549,7 @@ Shortcodes:
 - [`includes/shortcodes/class-alloy-metal-price-api-metal-calculator-shortcode.php`](/Users/jamescook/REPOS/LOCAL-SITES/alloy-marcom/app/public/wp-content/plugins/AlloyMetalPriceAPI/includes/shortcodes/class-alloy-metal-price-api-metal-calculator-shortcode.php)
 - [`includes/shortcodes/class-alloy-metal-price-api-metal-offer-card-shortcode.php`](/Users/jamescook/REPOS/LOCAL-SITES/alloy-marcom/app/public/wp-content/plugins/AlloyMetalPriceAPI/includes/shortcodes/class-alloy-metal-price-api-metal-offer-card-shortcode.php)
 - [`includes/shortcodes/class-alloy-metal-price-api-metal-payout-comparison-shortcode.php`](/Users/jamescook/REPOS/LOCAL-SITES/alloy-marcom/app/public/wp-content/plugins/AlloyMetalPriceAPI/includes/shortcodes/class-alloy-metal-price-api-metal-payout-comparison-shortcode.php)
+- [`includes/shortcodes/class-alloy-metal-price-api-metal-spot-ticker-shortcode.php`](/Users/jamescook/REPOS/LOCAL-SITES/alloy-marcom/app/public/wp-content/plugins/AlloyMetalPriceAPI/includes/shortcodes/class-alloy-metal-price-api-metal-spot-ticker-shortcode.php)
 - [`includes/shortcodes/class-alloy-metal-price-api-metal-price-calc-shortcode.php`](/Users/jamescook/REPOS/LOCAL-SITES/alloy-marcom/app/public/wp-content/plugins/AlloyMetalPriceAPI/includes/shortcodes/class-alloy-metal-price-api-metal-price-calc-shortcode.php)
 
 ## Quick Copy/Paste Examples
@@ -527,6 +582,12 @@ Payout comparison card:
 
 ```text
 [metal_payout_comparison]
+```
+
+Spot gold ticker card:
+
+```text
+[metal_spot_ticker]
 ```
 
 Inline melt value:
