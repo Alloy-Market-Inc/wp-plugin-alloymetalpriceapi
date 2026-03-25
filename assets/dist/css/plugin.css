@@ -45,6 +45,7 @@
     --aur-font-weight-bold: 700;
     --aur-tracking-wide: 0.025em;
     --aur-leading-tight: 1.25;
+    --aur-radius-md: 0.375rem;
     --aur-radius-lg: 0.5rem;
     --aur-radius-xl: 0.75rem;
     --aur-radius-2xl: 1rem;
@@ -388,6 +389,9 @@
   .aur\:gap-5 {
     gap: calc(var(--aur-spacing) * 5);
   }
+  .aur\:gap-6 {
+    gap: calc(var(--aur-spacing) * 6);
+  }
   .aur\:gap-8 {
     gap: calc(var(--aur-spacing) * 8);
   }
@@ -405,6 +409,9 @@
   }
   .aur\:rounded-lg {
     border-radius: var(--aur-radius-lg);
+  }
+  .aur\:rounded-md\! {
+    border-radius: var(--aur-radius-md) !important;
   }
   .aur\:rounded-xl {
     border-radius: var(--aur-radius-xl);
@@ -502,6 +509,9 @@
   .aur\:px-4 {
     padding-inline: calc(var(--aur-spacing) * 4);
   }
+  .aur\:px-6 {
+    padding-inline: calc(var(--aur-spacing) * 6);
+  }
   .aur\:px-7 {
     padding-inline: calc(var(--aur-spacing) * 7);
   }
@@ -514,6 +524,9 @@
   .aur\:py-3 {
     padding-block: calc(var(--aur-spacing) * 3);
   }
+  .aur\:py-3\! {
+    padding-block: calc(var(--aur-spacing) * 3) !important;
+  }
   .aur\:py-4 {
     padding-block: calc(var(--aur-spacing) * 4);
   }
@@ -522,6 +535,9 @@
   }
   .aur\:py-6 {
     padding-block: calc(var(--aur-spacing) * 6);
+  }
+  .aur\:py-6\! {
+    padding-block: calc(var(--aur-spacing) * 6) !important;
   }
   .aur\:pt-4 {
     padding-top: calc(var(--aur-spacing) * 4);
