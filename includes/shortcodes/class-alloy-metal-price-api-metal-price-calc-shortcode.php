@@ -1,7 +1,7 @@
 <?php
 
 /**
- * [metal-price-calc] shortcode handler.
+ * [metal_price_calc] shortcode handler.
  *
  * @package AlloyMetalPriceAPI
  */
@@ -16,7 +16,14 @@ class Alloy_Metal_Price_API_Metal_Price_Calc_Shortcode {
 	 *
 	 * @var string
 	 */
-	const TAG = 'metal-price-calc';
+	const TAG = 'metal_price_calc';
+
+	/**
+	 * Legacy shortcode tag kept for backward compatibility.
+	 *
+	 * @var string
+	 */
+	const LEGACY_TAG = 'metal-price-calc';
 
 	/**
 	 * Shared API client.
@@ -41,6 +48,7 @@ class Alloy_Metal_Price_API_Metal_Price_Calc_Shortcode {
 	 */
 	public function register() {
 		add_shortcode(self::TAG, array($this, 'render'));
+		add_shortcode(self::LEGACY_TAG, array($this, 'render'));
 	}
 
 	/**
