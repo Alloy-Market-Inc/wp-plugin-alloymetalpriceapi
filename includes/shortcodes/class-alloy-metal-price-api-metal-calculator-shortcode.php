@@ -90,7 +90,7 @@ class Alloy_Metal_Price_API_Alloy_Calculator_Shortcode {
 				class="js-alloy-calculator aur:mx-auto aur:w-full aur:max-w-130 aur:rounded-3xl aur:bg-white aur:p-5 aur:font-sans aur:shadow-[0_8px_24px_rgba(0,0,0,0.06)] aur:sm:p-6"
 				data-base-price="<?php echo esc_attr((string) $spot_price_per_gram); ?>"
 				data-default-karat="<?php echo esc_attr((string) $purity_karat); ?>">
-				<h2 class="aur:mb-5 aur:text-center aur:text-2xl aur:font-semibold aur:text-primary">
+				<h2 class="aur:mb-5 aur:text-center aur:text-2xl! aur:font-semibold aur:text-primary">
 					<?php echo esc_html($title); ?>
 				</h2>
 
@@ -104,7 +104,7 @@ class Alloy_Metal_Price_API_Alloy_Calculator_Shortcode {
 						</div>
 					</div>
 
-					<div class="aur:grid aur:gap-4 aur:md:grid-cols-2">
+					<div class="aur:grid aur:gap-4">
 						<div>
 							<label for="<?php echo esc_attr($instance_id . '-karat'); ?>" class="aur:mb-1 aur:block aur:text-sm aur:font-medium aur:text-slate-700">
 								<?php esc_html_e('Gold Karat:', 'alloy-metal-price-api'); ?>
@@ -149,23 +149,23 @@ class Alloy_Metal_Price_API_Alloy_Calculator_Shortcode {
 						</button>
 					</div>
 
-					<div class="js-alloy-calculator-results aur:hidden aur:gap-3 aur:lg:grid-cols-3">
+					<div class="js-alloy-calculator-results aur:hidden aur:gap-3">
 						<div class="aur:rounded-2xl aur:border aur:border-slate-200 aur:bg-slate-50 aur:p-4">
-							<h3 class="aur:mb-2 aur:text-base aur:font-semibold aur:text-slate-900"><?php esc_html_e('Current Market Value:', 'alloy-metal-price-api'); ?></h3>
+							<h3 class="aur:mb-2 aur:text-base! aur:font-semibold aur:text-slate-900!"><?php esc_html_e('Current Market Value:', 'alloy-metal-price-api'); ?></h3>
 							<p class="js-alloy-calculator-market-value aur:m-0 aur:text-2xl aur:font-semibold aur:text-primary">$0.00</p>
 						</div>
 						<div class="aur:rounded-2xl aur:border aur:border-red-200 aur:bg-red-50 aur:p-4">
-							<h3 class="aur:mb-2 aur:text-base aur:font-semibold aur:text-slate-900"><?php esc_html_e('Average Pawn Shop Offer:', 'alloy-metal-price-api'); ?></h3>
+							<h3 class="aur:mb-2 aur:text-base! aur:font-semibold aur:text-slate-900!"><?php esc_html_e('Average Pawn Shop Offer:', 'alloy-metal-price-api'); ?></h3>
 							<p class="js-alloy-calculator-pawn-value aur:m-0 aur:text-2xl aur:font-semibold aur:text-red-600">$0.00</p>
 						</div>
 						<div class="aur:rounded-2xl aur:border aur:border-emerald-200 aur:bg-emerald-50 aur:p-4">
-							<h3 class="aur:mb-2 aur:text-base aur:font-semibold aur:text-slate-900"><?php esc_html_e('Alloy\'s Estimated Offer:', 'alloy-metal-price-api'); ?></h3>
+							<h3 class="aur:mb-2 aur:text-base! aur:font-semibold aur:text-slate-900!"><?php esc_html_e('Alloy\'s Estimated Offer:', 'alloy-metal-price-api'); ?></h3>
 							<p class="js-alloy-calculator-alloy-value aur:m-0 aur:text-2xl aur:font-semibold aur:text-emerald-600">$0.00</p>
 						</div>
 					</div>
 
 					<div class="js-alloy-calculator-cta aur:hidden">
-						<a class="aur:inline-flex aur:w-full aur:justify-center aur:rounded-xl aur:border aur:border-secondary aur:bg-secondary aur:px-4 aur:py-5 aur:text-base aur:font-semibold aur:text-white! aur:no-underline! aur:transition-all aur:ease-in-out aur:hover:bg-white aur:hover:text-secondary! aur:hover:border-primary" href="https://thealloymarket.com/request-a-kit/?referral_trigger=checked&amp;referral_code=GOLDCALC">
+						<a class="aur:inline-flex aur:w-full aur:justify-center aur:rounded-xl aur:border aur:border-secondary aur:bg-secondary! aur:px-4 aur:py-5 aur:text-base aur:font-semibold aur:text-white! aur:no-underline! aur:transition-all aur:ease-in-out aur:hover:bg-white! aur:hover:text-secondary! aur:hover:border-secondary" href="https://thealloymarket.com/request-a-kit/?referral_trigger=checked&amp;referral_code=GOLDCALC">
 							<?php esc_html_e('Get A Free Alloy Kit', 'alloy-metal-price-api'); ?>
 						</a>
 					</div>

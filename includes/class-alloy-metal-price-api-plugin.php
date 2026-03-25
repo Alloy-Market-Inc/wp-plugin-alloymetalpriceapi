@@ -15,6 +15,7 @@ require_once ALLOY_METAL_PRICE_API_PLUGIN_DIR . 'includes/class-alloy-metal-pric
 require_once ALLOY_METAL_PRICE_API_PLUGIN_DIR . 'includes/shortcodes/class-alloy-metal-price-api-metal-price-shortcode.php';
 require_once ALLOY_METAL_PRICE_API_PLUGIN_DIR . 'includes/shortcodes/class-alloy-metal-price-api-metal-price-table-shortcode.php';
 require_once ALLOY_METAL_PRICE_API_PLUGIN_DIR . 'includes/shortcodes/class-alloy-metal-price-api-metal-calculator-shortcode.php';
+require_once ALLOY_METAL_PRICE_API_PLUGIN_DIR . 'includes/shortcodes/class-alloy-metal-price-api-metal-price-calc-shortcode.php';
 require_once ALLOY_METAL_PRICE_API_PLUGIN_DIR . 'includes/shortcodes/class-alloy-metal-price-api-metal-offer-card-shortcode.php';
 
 class Alloy_Metal_Price_API_Plugin {
@@ -78,6 +79,7 @@ class Alloy_Metal_Price_API_Plugin {
 
 		add_action('plugins_loaded', array($this, 'configure_dev_error_logging'), 1);
 		add_action('wp_enqueue_scripts', array($this->assets, 'register_assets'));
+		add_action('wp_enqueue_scripts', array($this->assets, 'maybe_enqueue_shortcode_assets'), 20);
 		add_action('init', array($this, 'register_shortcodes'));
 	}
 
@@ -100,6 +102,7 @@ class Alloy_Metal_Price_API_Plugin {
 			new Alloy_Metal_Price_API_Metal_Price_Shortcode($this->api_client, $this->assets),
 			new Alloy_Metal_Price_API_14K_Gold_Price_Table_Shortcode($this->api_client, $this->assets),
 			new Alloy_Metal_Price_API_Alloy_Calculator_Shortcode($this->api_client, $this->assets),
+			new Alloy_Metal_Price_API_Metal_Price_Calc_Shortcode($this->api_client),
 			new Alloy_Metal_Price_API_Metal_Offer_Card_Shortcode($this->api_client, $this->assets),
 		);
 
