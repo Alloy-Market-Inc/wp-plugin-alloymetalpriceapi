@@ -148,7 +148,8 @@
 		}
 
 		if (calculateButton) {
-			calculateButton.addEventListener("click", function () {
+			calculateButton.addEventListener("click", function (event) {
+				event.preventDefault();
 				calculate(container);
 			});
 		}
