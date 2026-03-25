@@ -21,6 +21,7 @@ The plugin currently fetches prices from:
 - `[metalpriceapi]`
 - `[metal_price_table]`
 - `[metal_calculator]`
+- `[metal_calculator_layout]`
 - `[metal_offer_card]`
 - `[metal_price_calc]`
 - `[metal_payout_comparison]`
@@ -44,6 +45,7 @@ Shortcodes that enqueue CSS:
 - `metalpriceapi`
 - `metal_price_table`
 - `metal_calculator`
+- `metal_calculator_layout`
 - `metal_payout_comparison`
 - `metal_spot_ticker`
 - `metal_offer_card`
@@ -51,6 +53,7 @@ Shortcodes that enqueue CSS:
 Shortcodes that enqueue JS:
 
 - `metal_calculator`
+- `metal_calculator_layout`
 - `metal_offer_card`
 
 `[metal_price_calc]` returns a plain `<span>` and does not rely on the plugin stylesheet or script.
@@ -253,6 +256,57 @@ API failure behavior:
 - If the live gold price request fails, the calculator still renders
 - Base price becomes `0`
 - Calculated values start from zero until refreshed page content gets valid data
+
+Implementation note:
+
+- `[metal_calculator]` and `[metal_calculator_layout]` both use the same shared calculator renderer so calculator markup can be updated in one place
+
+### `[metal_calculator_layout]`
+
+Outputs a two-column layout that includes the shared calculator, a current gold prices widget, and a gold karat marking guide.
+
+Default usage:
+
+```text
+[metal_calculator_layout]
+```
+
+Default behavior:
+
+- `title="Cash for Gold Calculator"`
+- `purity="24K"`
+
+Supported attributes:
+
+- `title`
+  - Sets the calculator heading
+- `purity`
+  - Sets the default selected karat in the shared calculator
+  - Accepts `1K` through `24K`
+  - Invalid values fall back to `24`
+
+What the layout shows:
+
+- Shared calculator UI
+- Current gold prices for:
+  - per gram
+  - per ounce
+  - per kilo
+- Gold karat marking guide
+
+Examples:
+
+```text
+[metal_calculator_layout]
+[metal_calculator_layout purity="14K"]
+[metal_calculator_layout title="Cash for Gold Calculator" purity="18K"]
+```
+
+API failure behavior:
+
+- The layout still renders
+- Shared calculator starts from `0`
+- Price widget values render as `$0.00`
 
 ### `[metal_offer_card]`
 
@@ -525,6 +579,7 @@ The plugin makes live API requests on page render or refresh. Different shortcod
 - `[metalpriceapi]` returns an empty string on failure
 - `[metal_price_table]` renders an unavailable table
 - `[metal_calculator]` renders with base price `0`
+- `[metal_calculator_layout]` renders with zero-value calculator and price widget values
 - `[metal_offer_card]` renders unavailable values
 - `[metal_payout_comparison]` renders an unavailable comparison table
 - `[metal_spot_ticker]` renders an unavailable ticker card
@@ -547,7 +602,9 @@ Shortcodes:
 
 - [`includes/shortcodes/class-alloy-metal-price-api-metal-price-shortcode.php`](/Users/jamescook/REPOS/LOCAL-SITES/alloy-marcom/app/public/wp-content/plugins/AlloyMetalPriceAPI/includes/shortcodes/class-alloy-metal-price-api-metal-price-shortcode.php)
 - [`includes/shortcodes/class-alloy-metal-price-api-metal-price-table-shortcode.php`](/Users/jamescook/REPOS/LOCAL-SITES/alloy-marcom/app/public/wp-content/plugins/AlloyMetalPriceAPI/includes/shortcodes/class-alloy-metal-price-api-metal-price-table-shortcode.php)
+- [`includes/shortcodes/class-alloy-metal-price-api-calculator-renderer.php`](/Users/jamescook/REPOS/LOCAL-SITES/alloy-marcom/app/public/wp-content/plugins/AlloyMetalPriceAPI/includes/shortcodes/class-alloy-metal-price-api-calculator-renderer.php)
 - [`includes/shortcodes/class-alloy-metal-price-api-metal-calculator-shortcode.php`](/Users/jamescook/REPOS/LOCAL-SITES/alloy-marcom/app/public/wp-content/plugins/AlloyMetalPriceAPI/includes/shortcodes/class-alloy-metal-price-api-metal-calculator-shortcode.php)
+- [`includes/shortcodes/class-alloy-metal-price-api-metal-calculator-layout-shortcode.php`](/Users/jamescook/REPOS/LOCAL-SITES/alloy-marcom/app/public/wp-content/plugins/AlloyMetalPriceAPI/includes/shortcodes/class-alloy-metal-price-api-metal-calculator-layout-shortcode.php)
 - [`includes/shortcodes/class-alloy-metal-price-api-metal-offer-card-shortcode.php`](/Users/jamescook/REPOS/LOCAL-SITES/alloy-marcom/app/public/wp-content/plugins/AlloyMetalPriceAPI/includes/shortcodes/class-alloy-metal-price-api-metal-offer-card-shortcode.php)
 - [`includes/shortcodes/class-alloy-metal-price-api-metal-payout-comparison-shortcode.php`](/Users/jamescook/REPOS/LOCAL-SITES/alloy-marcom/app/public/wp-content/plugins/AlloyMetalPriceAPI/includes/shortcodes/class-alloy-metal-price-api-metal-payout-comparison-shortcode.php)
 - [`includes/shortcodes/class-alloy-metal-price-api-metal-spot-ticker-shortcode.php`](/Users/jamescook/REPOS/LOCAL-SITES/alloy-marcom/app/public/wp-content/plugins/AlloyMetalPriceAPI/includes/shortcodes/class-alloy-metal-price-api-metal-spot-ticker-shortcode.php)
@@ -571,6 +628,12 @@ Current gold price per ounce: [metalpriceapi symbol="XAU" unit="ounce"]
 
 ```text
 [metal_calculator title="14K Gold Calculator" purity="14K"]
+```
+
+Two-column calculator layout:
+
+```text
+[metal_calculator_layout purity="24K"]
 ```
 
 14K offer card:
