@@ -23,6 +23,7 @@ The plugin currently fetches prices from:
 - `[metal_calculator]`
 - `[metal_offer_card]`
 - `[metal_price_calc]`
+- `[metal_payout_comparison]`
 
 ## Installation
 
@@ -42,6 +43,7 @@ Shortcodes that enqueue CSS:
 - `metalpriceapi`
 - `metal_price_table`
 - `metal_calculator`
+- `metal_payout_comparison`
 - `metal_offer_card`
 
 Shortcodes that enqueue JS:
@@ -308,6 +310,66 @@ API failure behavior:
 
 - Spot, pawn, and alloy values render as `Unavailable`
 
+### `[metal_payout_comparison]`
+
+Outputs a linked payout comparison card showing spot, pawn-shop, and Alloy-estimated offers by karat.
+
+Default usage:
+
+```text
+[metal_payout_comparison]
+```
+
+Default behavior:
+
+- `title="Pawn Shop Payout per Gram Karat Comparison"`
+- `link_url="https://thealloymarket.com/request-a-kit"`
+
+Supported attributes:
+
+- `title`
+  - Sets the card heading text
+- `link_url`
+  - Sets the destination URL for the whole card
+
+What the card shows:
+
+- `24K`, `22K`, `18K`, `14K`, and `10K` rows
+- Spot price per gram
+- Pawn shop offer per gram
+- Alloy estimated offer per gram
+- Top-right refresh button
+- Footnote text below the table
+- Hidden current gold ounce-price output for reference
+
+Offer logic:
+
+- Spot = `24K spot × purity factor`
+- Pawn = `spot × 0.4`
+- Alloy =
+  - `spot × 0.85` for `22K` and `24K`
+  - `spot × 0.7` for all other karats
+
+Examples:
+
+```text
+[metal_payout_comparison]
+[metal_payout_comparison title="Gold Payout Comparison by Karat"]
+[metal_payout_comparison link_url="https://thealloymarket.com/request-a-kit"]
+[metal_payout_comparison title="Compare Gold Offers" link_url="https://thealloymarket.com/request-a-kit"]
+```
+
+API failure behavior:
+
+- The card still renders
+- All payout values show `Unavailable`
+- The footnote changes to a temporary unavailable message
+
+Refresh behavior:
+
+- The top-right refresh button reloads the current page
+- The card body remains linked to the configured `link_url`
+
 ### `[metal_price_calc]`
 
 Outputs a server-rendered formatted currency value in a `<span>` using calculator-style math from shortcode attributes.
@@ -410,6 +472,7 @@ The plugin makes live API requests on page render or refresh. Different shortcod
 - `[metal_price_table]` renders an unavailable table
 - `[metal_calculator]` renders with base price `0`
 - `[metal_offer_card]` renders unavailable values
+- `[metal_payout_comparison]` renders an unavailable comparison table
 - `[metal_price_calc]` returns `<span>Unavailable</span>`
 
 ## File Map
@@ -431,6 +494,7 @@ Shortcodes:
 - [`includes/shortcodes/class-alloy-metal-price-api-metal-price-table-shortcode.php`](/Users/jamescook/REPOS/LOCAL-SITES/alloy-marcom/app/public/wp-content/plugins/AlloyMetalPriceAPI/includes/shortcodes/class-alloy-metal-price-api-metal-price-table-shortcode.php)
 - [`includes/shortcodes/class-alloy-metal-price-api-metal-calculator-shortcode.php`](/Users/jamescook/REPOS/LOCAL-SITES/alloy-marcom/app/public/wp-content/plugins/AlloyMetalPriceAPI/includes/shortcodes/class-alloy-metal-price-api-metal-calculator-shortcode.php)
 - [`includes/shortcodes/class-alloy-metal-price-api-metal-offer-card-shortcode.php`](/Users/jamescook/REPOS/LOCAL-SITES/alloy-marcom/app/public/wp-content/plugins/AlloyMetalPriceAPI/includes/shortcodes/class-alloy-metal-price-api-metal-offer-card-shortcode.php)
+- [`includes/shortcodes/class-alloy-metal-price-api-metal-payout-comparison-shortcode.php`](/Users/jamescook/REPOS/LOCAL-SITES/alloy-marcom/app/public/wp-content/plugins/AlloyMetalPriceAPI/includes/shortcodes/class-alloy-metal-price-api-metal-payout-comparison-shortcode.php)
 - [`includes/shortcodes/class-alloy-metal-price-api-metal-price-calc-shortcode.php`](/Users/jamescook/REPOS/LOCAL-SITES/alloy-marcom/app/public/wp-content/plugins/AlloyMetalPriceAPI/includes/shortcodes/class-alloy-metal-price-api-metal-price-calc-shortcode.php)
 
 ## Quick Copy/Paste Examples
@@ -457,6 +521,12 @@ Current gold price per ounce: [metalpriceapi symbol="XAU" unit="ounce"]
 
 ```text
 [metal_offer_card purity="14K"]
+```
+
+Payout comparison card:
+
+```text
+[metal_payout_comparison]
 ```
 
 Inline melt value:

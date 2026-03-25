@@ -19,6 +19,7 @@ class Alloy_Metal_Price_API_Assets {
 		'metalpriceapi',
 		'metal_price_table',
 		'metal_calculator',
+		'metal_payout_comparison',
 		'metal_offer_card',
 	);
 
