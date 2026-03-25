@@ -183,7 +183,7 @@
 		}
 	}
 
-	document.addEventListener("DOMContentLoaded", function () {
+	function initializeAlloyMetalPriceApi() {
 		document.querySelectorAll(".js-alloy-calculator").forEach(function (container) {
 			initialize(container);
 		});
@@ -191,5 +191,11 @@
 		document.querySelectorAll(".js-metal-offer-card").forEach(function (card) {
 			initializeOfferCard(card);
 		});
-	});
+	}
+
+	if (document.readyState === "loading") {
+		document.addEventListener("DOMContentLoaded", initializeAlloyMetalPriceApi);
+	} else {
+		initializeAlloyMetalPriceApi();
+	}
 })();
