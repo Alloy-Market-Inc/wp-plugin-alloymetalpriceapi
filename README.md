@@ -229,6 +229,7 @@ Calculator UI includes:
   - Current Market Value
   - Average Pawn Shop Offer
   - Alloy's Estimated Offer
+- Live recalculation as fields change
 
 Offer logic:
 

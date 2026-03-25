@@ -153,6 +153,24 @@
 				calculate(container);
 			});
 		}
+
+		if (karatSelect) {
+			karatSelect.addEventListener("change", function () {
+				calculate(container);
+			});
+		}
+
+		if (weightUnitSelect) {
+			weightUnitSelect.addEventListener("change", function () {
+				calculate(container);
+			});
+		}
+
+		if (weightInput) {
+			weightInput.addEventListener("input", function () {
+				calculate(container);
+			});
+		}
 	}
 
 	function initializeOfferCard(card) {
