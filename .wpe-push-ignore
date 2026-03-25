@@ -1,0 +1,8 @@
+assets/src
+node_modules
+scripts
+build
+package.json
+package-lock.json
+postcss.config.js
+tailwind.config.js
