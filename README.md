@@ -26,6 +26,9 @@ The plugin currently fetches prices from:
 - `[metal_price_calc]`
 - `[metal_payout_comparison]`
 - `[metal_spot_ticker]`
+- `[metal_goldbar_live_melt_table]`
+- `[metal_fractional_goldbar_module]`
+- `[metal_standard_goldbar_module]`
 
 ## Installation
 
@@ -48,6 +51,9 @@ Shortcodes that enqueue CSS:
 - `metal_calculator_layout`
 - `metal_payout_comparison`
 - `metal_spot_ticker`
+- `metal_goldbar_live_melt_table`
+- `metal_fractional_goldbar_module`
+- `metal_standard_goldbar_module`
 - `metal_offer_card`
 
 Shortcodes that enqueue JS:
@@ -508,6 +514,159 @@ API failure behavior:
 - Both values show `Unavailable`
 - The status line changes to `Updating…`
 
+### `[metal_goldbar_live_melt_table]`
+
+Outputs a responsive live gold bar melt-value component with a desktop table and a mobile card layout.
+
+Default usage:
+
+```text
+[metal_goldbar_live_melt_table]
+```
+
+Default behavior:
+
+- No attributes are required
+- The desktop table is shown on tablet-sized screens and up
+- The mobile card layout is shown on smaller screens
+- All values are based on live `24K` gold spot pricing with `.9999` purity
+
+What the shortcode shows:
+
+- Desktop view:
+  - a four-column table with gold bar size, weight, purity, and live melt value
+- Mobile view:
+  - one card per gold bar size
+  - melt value shown at the top of each card
+  - separate rows for grams, troy ounces, and purity
+
+Included bar sizes:
+
+- `1 g`
+- `2.5 g`
+- `5 g`
+- `10 g`
+- `20 g`
+- `1 oz`
+- `50 g`
+- `100 g`
+- `5 oz`
+- `10 oz`
+- `250 g`
+- `500 g`
+- `1 kg`
+- `400 oz`
+
+Examples:
+
+```text
+[metal_goldbar_live_melt_table]
+```
+
+API failure behavior:
+
+- The shortcode still renders
+- Melt values show `Unavailable`
+- The hidden spot-price source also renders an unavailable value
+
+### `[metal_fractional_goldbar_module]`
+
+Outputs a responsive fractional gold bar melt-value module with a live spot-price header, a desktop table, and a mobile card layout.
+
+Default usage:
+
+```text
+[metal_fractional_goldbar_module]
+```
+
+Default behavior:
+
+- No attributes are required
+- The header shows the current spot price in `USD / troy oz`
+- The desktop table is shown on tablet-sized screens and up
+- The mobile card layout is shown on smaller screens
+- All melt values are based on live `24K` gold spot pricing with `.9999` purity
+
+What the shortcode shows:
+
+- Header:
+  - module title
+  - live spot price in `USD / troy oz`
+- Desktop view:
+  - a four-column table with bar size, grams, troy ounces, and live melt value
+- Mobile view:
+  - one card per bar size
+  - melt value shown at the top of each card
+  - separate rows for grams, troy ounces, and purity
+
+Included bar sizes:
+
+- `1 g`
+- `2.5 g`
+- `5 g`
+- `10 g`
+- `20 g`
+
+Examples:
+
+```text
+[metal_fractional_goldbar_module]
+```
+
+API failure behavior:
+
+- The shortcode still renders
+- The spot-price header shows `Unavailable`
+- Melt values show `Unavailable`
+
+### `[metal_standard_goldbar_module]`
+
+Outputs a responsive standard gold bar melt-value module with a live spot-price header, a desktop table, and a mobile card layout.
+
+Default usage:
+
+```text
+[metal_standard_goldbar_module]
+```
+
+Default behavior:
+
+- No attributes are required
+- The header shows the current spot price in `USD / troy oz`
+- The desktop table is shown on tablet-sized screens and up
+- The mobile card layout is shown on smaller screens
+- All melt values are based on live `24K` gold spot pricing with `.9999` purity
+
+What the shortcode shows:
+
+- Header:
+  - module title
+  - live spot price in `USD / troy oz`
+- Desktop view:
+  - a four-column table with bar size, grams, troy ounces, and live melt value
+- Mobile view:
+  - one card per bar size
+  - melt value shown at the top of each card
+  - separate rows for grams, troy ounces, and purity
+
+Included bar sizes:
+
+- `50 g`
+- `100 g`
+- `5 oz`
+
+Examples:
+
+```text
+[metal_standard_goldbar_module]
+```
+
+API failure behavior:
+
+- The shortcode still renders
+- The spot-price header shows `Unavailable`
+- Melt values show `Unavailable`
+
 ### `[metal_price_calc]`
 
 Outputs a server-rendered formatted currency value in a `<span>` using calculator-style math from shortcode attributes.
@@ -556,7 +715,10 @@ Supported attributes:
     - `alloy`
     - `alloy_offer`
     - `alloy_estimated_offer`
+    - `melt`
+    - `melt_value`
   - Invalid values fall back to `market`
+  - `melt` always calculates using `.9999` purity
 
 Examples:
 
@@ -564,6 +726,7 @@ Examples:
 [metal_price_calc purity="14K" weight="10" weight_unit="grams" output="market"]
 [metal_price_calc purity="14K" weight="10" weight_unit="grams" output="pawn"]
 [metal_price_calc purity="14K" weight="10" weight_unit="grams" output="alloy"]
+[metal_price_calc weight="10" weight_unit="grams" output="melt"]
 [metal_price_calc purity="18K" weight="0.5" weight_unit="ounces" output="market_value"]
 [metal_price_calc purity="24K" weight="4" weight_unit="dwt" output="alloy_offer"]
 ```
@@ -638,6 +801,9 @@ Shortcodes:
 - [`includes/shortcodes/class-alloy-metal-price-api-metal-offer-card-shortcode.php`](/Users/jamescook/REPOS/LOCAL-SITES/alloy-marcom/app/public/wp-content/plugins/AlloyMetalPriceAPI/includes/shortcodes/class-alloy-metal-price-api-metal-offer-card-shortcode.php)
 - [`includes/shortcodes/class-alloy-metal-price-api-metal-payout-comparison-shortcode.php`](/Users/jamescook/REPOS/LOCAL-SITES/alloy-marcom/app/public/wp-content/plugins/AlloyMetalPriceAPI/includes/shortcodes/class-alloy-metal-price-api-metal-payout-comparison-shortcode.php)
 - [`includes/shortcodes/class-alloy-metal-price-api-metal-spot-ticker-shortcode.php`](/Users/jamescook/REPOS/LOCAL-SITES/alloy-marcom/app/public/wp-content/plugins/AlloyMetalPriceAPI/includes/shortcodes/class-alloy-metal-price-api-metal-spot-ticker-shortcode.php)
+- [`includes/shortcodes/class-alloy-metal-price-api-metal-goldbar-live-melt-table-shortcode.php`](/Users/jamescook/REPOS/LOCAL-SITES/alloy-marcom/app/public/wp-content/plugins/AlloyMetalPriceAPI/includes/shortcodes/class-alloy-metal-price-api-metal-goldbar-live-melt-table-shortcode.php)
+- [`includes/shortcodes/class-alloy-metal-price-api-metal-fractional-goldbar-module-shortcode.php`](/Users/jamescook/REPOS/LOCAL-SITES/alloy-marcom/app/public/wp-content/plugins/AlloyMetalPriceAPI/includes/shortcodes/class-alloy-metal-price-api-metal-fractional-goldbar-module-shortcode.php)
+- [`includes/shortcodes/class-alloy-metal-price-api-metal-standard-goldbar-module-shortcode.php`](/Users/jamescook/REPOS/LOCAL-SITES/alloy-marcom/app/public/wp-content/plugins/AlloyMetalPriceAPI/includes/shortcodes/class-alloy-metal-price-api-metal-standard-goldbar-module-shortcode.php)
 - [`includes/shortcodes/class-alloy-metal-price-api-metal-price-calc-shortcode.php`](/Users/jamescook/REPOS/LOCAL-SITES/alloy-marcom/app/public/wp-content/plugins/AlloyMetalPriceAPI/includes/shortcodes/class-alloy-metal-price-api-metal-price-calc-shortcode.php)
 
 ## Quick Copy/Paste Examples

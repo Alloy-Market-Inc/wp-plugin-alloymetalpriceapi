@@ -58,6 +58,7 @@ class Alloy_Metal_Price_API_Metal_Price_Calc_Shortcode {
 	 * - market
 	 * - pawn
 	 * - alloy
+	 * - melt
 	 *
 	 * @param array<string, mixed> $atts Shortcode attributes.
 	 * @return string
@@ -89,10 +90,12 @@ class Alloy_Metal_Price_API_Metal_Price_Calc_Shortcode {
 		$market_value    = $spot_price * $purity_factor * $weight_in_grams;
 		$pawn_value      = $market_value * 0.4;
 		$alloy_value     = $market_value * $this->get_alloy_offer_rate($purity_karat);
+		$melt_value      = $spot_price * 0.9999 * $weight_in_grams;
 		$values          = array(
 			'market' => $market_value,
 			'pawn'   => $pawn_value,
 			'alloy'  => $alloy_value,
+			'melt'   => $melt_value,
 		);
 
 		return sprintf(
@@ -175,6 +178,8 @@ class Alloy_Metal_Price_API_Metal_Price_Calc_Shortcode {
 			'alloy'                => 'alloy',
 			'alloy_offer'          => 'alloy',
 			'alloy_estimated_offer' => 'alloy',
+			'melt'                 => 'melt',
+			'melt_value'           => 'melt',
 		);
 
 		if (isset($aliases[ $output ])) {
