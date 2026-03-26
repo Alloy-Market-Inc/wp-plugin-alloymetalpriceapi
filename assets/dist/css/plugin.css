@@ -240,6 +240,9 @@
   .aur\:my-7 {
     margin-block: calc(var(--aur-spacing) * 7);
   }
+  .aur\:mt-2 {
+    margin-top: calc(var(--aur-spacing) * 2);
+  }
   .aur\:mt-3 {
     margin-top: calc(var(--aur-spacing) * 3);
   }
@@ -653,6 +656,14 @@
   .aur\:leading-5 {
     --tw-leading: calc(var(--aur-spacing) * 5);
     line-height: calc(var(--aur-spacing) * 5);
+  }
+  .aur\:leading-6 {
+    --tw-leading: calc(var(--aur-spacing) * 6);
+    line-height: calc(var(--aur-spacing) * 6);
+  }
+  .aur\:leading-7 {
+    --tw-leading: calc(var(--aur-spacing) * 7);
+    line-height: calc(var(--aur-spacing) * 7);
   }
   .aur\:leading-none {
     --tw-leading: 1;

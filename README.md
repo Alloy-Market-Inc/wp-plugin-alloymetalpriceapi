@@ -275,6 +275,7 @@ Default behavior:
 
 - `title="Cash for Gold Calculator"`
 - `purity="24K"`
+- `right="default"`
 
 Supported attributes:
 
@@ -284,21 +285,30 @@ Supported attributes:
   - Sets the default selected karat in the shared calculator
   - Accepts `1K` through `24K`
   - Invalid values fall back to `24`
+- `right`
+  - Controls the content boxes in the right column
+  - Supported values:
+    - `default`
+    - `14K`
+  - Invalid values fall back to `default`
 
 What the layout shows:
 
 - Shared calculator UI
-- Current gold prices for:
-  - per gram
-  - per ounce
-  - per kilo
-- Gold karat marking guide
+- One of two right-column content sets:
+  - `default`
+    - current gold prices widget
+    - general gold karat marking guide
+  - `14K`
+    - 14K-specific current price widget
+    - 14K-specific jewelry marking guide
 
 Examples:
 
 ```text
 [metal_calculator_layout]
 [metal_calculator_layout purity="14K"]
+[metal_calculator_layout purity="14K" right="14K"]
 [metal_calculator_layout title="Cash for Gold Calculator" purity="18K"]
 ```
 
