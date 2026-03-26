@@ -277,7 +277,7 @@ class Alloy_Metal_Price_API_14K_Gold_Price_Table_Shortcode {
 	}
 
 	/**
-	 * Build a table configuration for the current data variant.
+	 * Build a table configuration for the current data test variant.
 	 *
 	 * @param string $title Current shortcode title value.
 	 * @param string $default_title Default shortcode title value.
