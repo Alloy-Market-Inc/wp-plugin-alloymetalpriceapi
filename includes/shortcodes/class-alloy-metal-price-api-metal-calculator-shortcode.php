@@ -71,6 +71,7 @@ class Alloy_Metal_Price_API_Alloy_Calculator_Shortcode {
 			array(
 				'title'  => __('Gold Calculator', 'alloy-metal-price-api'),
 				'purity' => '14K',
+				'metal'  => 'gold',
 			),
 			$atts,
 			self::TAG
@@ -80,8 +81,9 @@ class Alloy_Metal_Price_API_Alloy_Calculator_Shortcode {
 		$this->assets->enqueue_frontend_scripts();
 
 		$title               = sanitize_text_field((string) $atts['title']);
-		$purity_karat        = $this->parse_purity_karat($atts['purity']);
-		$spot_price_per_gram = $this->api_client->get_metal_price('gold');
+		$metal               = $this->normalize_metal($atts['metal']);
+		$purity_value        = $this->parse_purity_value($atts['purity'], $metal);
+		$spot_price_per_gram = $this->api_client->get_metal_price($metal);
 
 		if (is_wp_error($spot_price_per_gram)) {
 			$spot_price_per_gram = 0;
@@ -90,7 +92,8 @@ class Alloy_Metal_Price_API_Alloy_Calculator_Shortcode {
 		return $this->calculator_renderer->render(
 			array(
 				'title'               => $title,
-				'purity_karat'        => $purity_karat,
+				'metal'               => $metal,
+				'purity_value'        => $purity_value,
 				'base_price_per_gram' => $spot_price_per_gram,
 				'wrapper_class'       => 'aur:flex aur:w-full aur:justify-center aur:font-sans',
 			)
@@ -98,12 +101,19 @@ class Alloy_Metal_Price_API_Alloy_Calculator_Shortcode {
 	}
 
 	/**
-	 * Parse a purity attribute into a karat integer.
+	 * Parse a purity attribute into a karat integer or decimal purity value.
 	 *
 	 * @param mixed $purity Raw shortcode purity value.
-	 * @return int
+	 * @param string $metal Normalized metal key.
+	 * @return int|float
 	 */
-	protected function parse_purity_karat($purity) {
+	protected function parse_purity_value($purity, $metal) {
+		if ('gold' !== $metal) {
+			$purity = is_numeric($purity) ? (float) $purity : 0.9999;
+
+			return max(0, min(1, $purity));
+		}
+
 		$purity = strtoupper(sanitize_text_field((string) $purity));
 
 		if (preg_match('/^([1-9]|1[0-9]|2[0-4])K?$/', $purity, $matches)) {
@@ -111,5 +121,21 @@ class Alloy_Metal_Price_API_Alloy_Calculator_Shortcode {
 		}
 
 		return 14;
+	}
+
+	/**
+	 * Normalize the metal attribute to a supported API metal type.
+	 *
+	 * @param mixed $metal Raw metal attribute value.
+	 * @return string
+	 */
+	protected function normalize_metal($metal) {
+		$metal = strtolower(sanitize_text_field((string) $metal));
+
+		if (in_array($metal, array('gold', 'silver', 'platinum', 'palladium'), true)) {
+			return $metal;
+		}
+
+		return 'gold';
 	}
 }

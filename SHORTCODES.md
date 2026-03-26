@@ -124,13 +124,30 @@ Popular examples:
 ```text
 [metal_calculator purity="14K"]
 [metal_calculator purity="24K"]
+[metal_calculator metal="silver" purity="0.925"]
+[metal_calculator metal="platinum" purity="0.950"]
+[metal_calculator metal="palladium" purity="0.9995"]
 [metal_calculator title="14K Gold Calculator" purity="14K"]
 ```
 
 How to use it:
 
 - `title` changes the calculator heading
-- `purity` sets the default karat shown when the calculator loads
+- `purity` sets the default purity shown when the calculator loads
+- `metal` chooses the metal price used in the calculator
+
+`metal` options:
+
+- `gold`
+- `silver`
+- `platinum`
+- `palladium`
+
+Purity note:
+
+- For `gold`, use karats like `14K` or `24K`
+- For `silver` and `palladium`, use a decimal purity like `0.925` or `0.9995`
+- For `platinum`, use the built-in selector options: `999.5`, `999`, `950`, `900`, or `850`
 
 Best for:
 
@@ -151,6 +168,9 @@ Popular examples:
 
 ```text
 [metal_calculator_layout purity="14K"]
+[metal_calculator_layout metal="silver" purity="0.925"]
+[metal_calculator_layout metal="platinum" purity="0.950"]
+[metal_calculator_layout metal="palladium" purity="0.9995"]
 [metal_calculator_layout purity="14K" right="14K"]
 [metal_calculator_layout title="Cash for Gold Calculator" purity="18K"]
 ```
@@ -158,13 +178,34 @@ Popular examples:
 How to use it:
 
 - `title` changes the calculator heading
-- `purity` sets the default karat in the calculator
+- `purity` sets the default purity in the calculator
+- `metal` chooses the metal price used in the calculator and right-side price box
 - `right` controls the content boxes shown in the right column
 
 `right` options:
 
 - `right="default"` shows the standard gold price and marking boxes
 - `right="14K"` shows the 14K-specific right-column content
+
+`metal` options:
+
+- `gold`
+- `silver`
+- `platinum`
+- `palladium`
+
+Purity note:
+
+- For `gold`, use karats like `14K` or `24K`
+- For `silver` and `palladium`, use a decimal purity like `0.925` or `0.9995`
+- For `platinum`, use the built-in selector options: `999.5`, `999`, `950`, `900`, or `850`
+
+Notes:
+
+- Gold keeps the standard gold content boxes
+- `right="14K"` is for gold only
+- Platinum uses a platinum fineness box in the bottom-right area
+- Silver and Palladium currently use a placeholder bottom-right box until their custom content is added
 
 Best for:
 
@@ -404,11 +445,14 @@ Popular examples:
 [metal_price_calc purity="18K" weight="0.75" weight_unit="ounces" output="pawn"]
 [metal_price_calc purity="24K" weight="10" weight_unit="pennyweight" output="alloy"]
 [metal_price_calc weight="10" weight_unit="grams" output="melt"]
+[metal_price_calc metal="silver" purity="0.925" weight="10" weight_unit="grams" output="market"]
+[metal_price_calc metal="platinum" purity="0.950" weight="10" weight_unit="grams" output="alloy"]
 ```
 
 How to use it:
 
-- `purity` sets the karat
+- `metal` chooses the metal price used in the calculation
+- `purity` sets the purity
 - `weight` is the item weight
 - `weight_unit` can be `grams`, `ounces`, or `pennyweight`
 - `output` decides which value to print
@@ -423,6 +467,8 @@ How to use it:
 Note:
 
 - `melt` always calculates using `.9999` purity
+- For `gold`, use karats like `14K` or `24K`
+- For `silver`, `platinum`, and `palladium`, use a decimal purity like `0.925`, `0.950`, or `0.9995`
 
 Best for:
 

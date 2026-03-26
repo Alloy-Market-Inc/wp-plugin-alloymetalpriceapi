@@ -66,6 +66,7 @@ class Alloy_Metal_Price_API_Metal_Price_Calc_Shortcode {
 	public function render($atts) {
 		$atts = shortcode_atts(
 			array(
+				'metal'       => 'gold',
 				'purity'      => '14K',
 				'weight'      => '0',
 				'weight_unit' => 'grams',
@@ -75,21 +76,22 @@ class Alloy_Metal_Price_API_Metal_Price_Calc_Shortcode {
 			self::TAG
 		);
 
-		$purity_karat = $this->parse_purity_karat($atts['purity']);
+		$metal        = $this->normalize_metal($atts['metal']);
+		$purity_value = $this->parse_purity_value($atts['purity'], $metal);
 		$weight       = $this->parse_weight($atts['weight']);
 		$weight_unit  = $this->normalize_weight_unit($atts['weight_unit']);
 		$output       = $this->normalize_output($atts['output']);
-		$spot_price   = $this->api_client->get_metal_price('gold');
+		$spot_price   = $this->api_client->get_metal_price($metal);
 
 		if (is_wp_error($spot_price)) {
 			return '<span>' . esc_html__('Unavailable', 'alloy-metal-price-api') . '</span>';
 		}
 
 		$weight_in_grams = $this->convert_weight_to_grams($weight, $weight_unit);
-		$purity_factor   = $purity_karat / 24;
+		$purity_factor   = 'gold' === $metal ? ((int) $purity_value / 24) : (float) $purity_value;
 		$market_value    = $spot_price * $purity_factor * $weight_in_grams;
 		$pawn_value      = $market_value * 0.4;
-		$alloy_value     = $market_value * $this->get_alloy_offer_rate($purity_karat);
+		$alloy_value     = $market_value * $this->get_alloy_offer_rate($metal, $purity_value);
 		$melt_value      = $spot_price * 0.9999 * $weight_in_grams;
 		$values          = array(
 			'market' => $market_value,
@@ -105,12 +107,19 @@ class Alloy_Metal_Price_API_Metal_Price_Calc_Shortcode {
 	}
 
 	/**
-	 * Parse a purity attribute into a karat integer.
+	 * Parse a purity attribute into a karat integer or decimal purity value.
 	 *
 	 * @param mixed $purity Raw shortcode purity value.
-	 * @return int
+	 * @param string $metal Normalized metal key.
+	 * @return int|float
 	 */
-	protected function parse_purity_karat($purity) {
+	protected function parse_purity_value($purity, $metal) {
+		if ('gold' !== $metal) {
+			$purity = is_numeric($purity) ? (float) $purity : 0.9999;
+
+			return max(0, min(1, $purity));
+		}
+
 		$purity = strtoupper(sanitize_text_field((string) $purity));
 
 		if (preg_match('/^([1-9]|1[0-9]|2[0-4])K?$/', $purity, $matches)) {
@@ -118,6 +127,22 @@ class Alloy_Metal_Price_API_Metal_Price_Calc_Shortcode {
 		}
 
 		return 14;
+	}
+
+	/**
+	 * Normalize the metal attribute to a supported API metal type.
+	 *
+	 * @param mixed $metal Raw metal attribute value.
+	 * @return string
+	 */
+	protected function normalize_metal($metal) {
+		$metal = strtolower(sanitize_text_field((string) $metal));
+
+		if (in_array($metal, array('gold', 'silver', 'platinum', 'palladium'), true)) {
+			return $metal;
+		}
+
+		return 'gold';
 	}
 
 	/**
@@ -209,13 +234,14 @@ class Alloy_Metal_Price_API_Metal_Price_Calc_Shortcode {
 	}
 
 	/**
-	 * Get the Alloy offer multiplier for a karat value.
+	 * Get the Alloy offer multiplier for the selected metal and purity.
 	 *
-	 * @param int $purity_karat Purity karat value.
+	 * @param string    $metal Normalized metal key.
+	 * @param int|float $purity_value Purity input value.
 	 * @return float
 	 */
-	protected function get_alloy_offer_rate($purity_karat) {
-		if (22 === (int) $purity_karat || 24 === (int) $purity_karat) {
+	protected function get_alloy_offer_rate($metal, $purity_value) {
+		if ('gold' === $metal && (22 === (int) $purity_value || 24 === (int) $purity_value)) {
 			return 0.85;
 		}
 

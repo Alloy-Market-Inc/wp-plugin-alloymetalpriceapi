@@ -32,7 +32,8 @@
 
 	function calculate(container) {
 		const pricePerGram = parseFloat(container.dataset.basePrice || "0");
-		const karatSelect = container.querySelector(".js-alloy-calculator-karat");
+		const metal = container.dataset.metal || "gold";
+		const purityField = container.querySelector(".js-alloy-calculator-purity");
 		const weightUnitSelect = container.querySelector(".js-alloy-calculator-weight-unit");
 		const weightInput = container.querySelector(".js-alloy-calculator-weight");
 		const marketValue = container.querySelector(".js-alloy-calculator-market-value");
@@ -41,15 +42,17 @@
 		const results = container.querySelector(".js-alloy-calculator-results");
 		const cta = container.querySelector(".js-alloy-calculator-cta");
 
-		const karat = parseFloat(karatSelect ? karatSelect.value : "24");
+		const purityRaw = parseFloat(purityField ? purityField.value : "0");
 		const weight = parseFloat(weightInput ? weightInput.value : "0");
 		const weightUnit = weightUnitSelect ? weightUnitSelect.value : "grams";
 		const weightInGrams = convertWeightToGrams(Number.isFinite(weight) ? weight : 0, weightUnit);
-		const purity = karat / 24;
+		const purity = metal === "gold"
+			? (Number.isFinite(purityRaw) ? purityRaw : 24) / 24
+			: Math.min(1, Math.max(0, Number.isFinite(purityRaw) ? purityRaw : 0.9999));
 		const totalValue = pricePerGram * purity * weightInGrams;
 		const currentMarketValue = totalValue;
 		const averagePawnShopOffer = totalValue * 0.4;
-		const alloyEstimatedOffer = totalValue * getAlloyOfferRate(karat);
+		const alloyEstimatedOffer = totalValue * (metal === "gold" ? getAlloyOfferRate(purityRaw) : 0.7);
 
 		if (marketValue) {
 			marketValue.textContent = toCurrency(currentMarketValue);
@@ -129,11 +132,11 @@
 	}
 
 	function initialize(container) {
-		const karatSelect = container.querySelector(".js-alloy-calculator-karat");
-		const defaultKarat = container.dataset.defaultKarat;
+		const purityField = container.querySelector(".js-alloy-calculator-purity");
+		const defaultPurity = container.dataset.defaultPurity;
 
-		if (karatSelect && defaultKarat) {
-			karatSelect.value = defaultKarat;
+		if (purityField && defaultPurity) {
+			purityField.value = defaultPurity;
 		}
 	}
 
@@ -202,7 +205,7 @@
 	});
 
 	document.addEventListener("change", function (event) {
-		const field = event.target.closest(".js-alloy-calculator-karat, .js-alloy-calculator-weight-unit");
+		const field = event.target.closest(".js-alloy-calculator-purity, .js-alloy-calculator-weight-unit");
 
 		if (!field) {
 			return;
@@ -216,7 +219,7 @@
 	});
 
 	document.addEventListener("input", function (event) {
-		const field = event.target.closest(".js-alloy-calculator-weight");
+		const field = event.target.closest(".js-alloy-calculator-weight, .js-alloy-calculator-purity");
 
 		if (!field) {
 			return;

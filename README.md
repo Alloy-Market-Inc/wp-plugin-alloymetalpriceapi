@@ -235,20 +235,26 @@ Default behavior:
 
 - `title="Gold Calculator"`
 - `purity="14K"`
+- `metal="gold"`
 
 Supported attributes:
 
 - `title`
   - Sets the calculator heading
 - `purity`
-  - Sets the default selected karat
-  - Accepts `1K` through `24K`
-  - Invalid values fall back to `14`
+  - For `gold`, accepts `1K` through `24K`
+  - For `silver` and `palladium`, use a decimal purity like `0.925` or `0.9995`
+  - For `platinum`, the calculator uses preset fineness options: `999.5`, `999`, `950`, `900`, and `850`
+  - Invalid gold values fall back to `14`
+  - Invalid non-gold values fall back to `0.9999`
+- `metal`
+  - Supported values: `gold`, `silver`, `platinum`, `palladium`
+  - Invalid values fall back to `gold`
 
 Calculator UI includes:
 
-- Live base gold price per gram
-- Karat selector
+- Live base metal price per gram
+- Purity selector
 - Weight unit selector
   - `grams`
   - `ounces`
@@ -259,6 +265,12 @@ Calculator UI includes:
   - Average Pawn Shop Offer
   - Alloy's Estimated Offer
 - Live recalculation as fields change
+
+Metal behavior:
+
+- `gold` keeps the gold-specific karat labeling
+- `silver` and `palladium` use the selected `metal` price and a decimal purity input field
+- `platinum` uses the selected `metal` price and a preset purity selector
 
 Offer logic:
 
@@ -273,6 +285,9 @@ Examples:
 ```text
 [metal_calculator]
 [metal_calculator purity="24K"]
+[metal_calculator metal="silver" purity="0.925"]
+[metal_calculator metal="platinum" purity="0.950"]
+[metal_calculator metal="palladium" purity="0.9995"]
 [metal_calculator title="14K Gold Melt Value Calculator" purity="14K"]
 [metal_calculator title="18K Gold Calculator" purity="18"]
 ```
@@ -301,6 +316,7 @@ Default behavior:
 
 - `title="Cash for Gold Calculator"`
 - `purity="24K"`
+- `metal="gold"`
 - `right="default"`
 
 Supported attributes:
@@ -308,9 +324,14 @@ Supported attributes:
 - `title`
   - Sets the calculator heading
 - `purity`
-  - Sets the default selected karat in the shared calculator
-  - Accepts `1K` through `24K`
-  - Invalid values fall back to `24`
+  - For `gold`, accepts `1K` through `24K`
+  - For `silver` and `palladium`, use a decimal purity like `0.925` or `0.9995`
+  - For `platinum`, the calculator uses preset fineness options: `999.5`, `999`, `950`, `900`, and `850`
+  - Invalid gold values fall back to `24`
+  - Invalid non-gold values fall back to `0.9999`
+- `metal`
+  - Supported values: `gold`, `silver`, `platinum`, `palladium`
+  - Invalid values fall back to `gold`
 - `right`
   - Controls the content boxes in the right column
   - Supported values:
@@ -322,18 +343,36 @@ What the layout shows:
 
 - Shared calculator UI
 - One of two right-column content sets:
-  - `default`
+  - `gold` + `default`
     - current gold prices widget
     - general gold karat marking guide
-  - `14K`
+  - `gold` + `14K`
     - 14K-specific current price widget
     - 14K-specific jewelry marking guide
+  - `platinum`
+    - current platinum prices widget
+    - platinum fineness markings
+  - `silver`
+    - current silver prices widget
+    - placeholder bottom-right content block
+  - `palladium`
+    - current palladium prices widget
+    - placeholder bottom-right content block
+
+Layout behavior notes:
+
+- The top-right price box always updates to the selected `metal`
+- The `right="14K"` variant is only used for gold
+- For non-gold metals, the bottom-right box switches to metal-specific or placeholder content automatically
 
 Examples:
 
 ```text
 [metal_calculator_layout]
 [metal_calculator_layout purity="14K"]
+[metal_calculator_layout metal="silver" purity="0.925"]
+[metal_calculator_layout metal="platinum" purity="0.950"]
+[metal_calculator_layout metal="palladium" purity="0.9995"]
 [metal_calculator_layout purity="14K" right="14K"]
 [metal_calculator_layout title="Cash for Gold Calculator" purity="18K"]
 ```
@@ -681,6 +720,7 @@ Default usage:
 
 Default behavior:
 
+- `metal="gold"`
 - `purity="14K"`
 - `weight="0"`
 - `weight_unit="grams"`
@@ -688,10 +728,15 @@ Default behavior:
 
 Supported attributes:
 
+- `metal`
+  - Supported values: `gold`, `silver`, `platinum`, `palladium`
+  - Invalid values fall back to `gold`
 - `purity`
-  - Accepts `1K` through `24K`
-  - `K` suffix optional
-  - Invalid values fall back to `14`
+  - For `gold`, accepts `1K` through `24K`
+  - `K` suffix optional for gold
+  - For `silver`, `platinum`, and `palladium`, use a decimal purity like `0.925`, `0.950`, or `0.9995`
+  - Invalid gold values fall back to `14`
+  - Invalid non-gold values fall back to `0.9999`
 - `weight`
   - Any numeric value
   - Negative or invalid values are coerced to `0`
@@ -727,6 +772,8 @@ Examples:
 [metal_price_calc purity="14K" weight="10" weight_unit="grams" output="pawn"]
 [metal_price_calc purity="14K" weight="10" weight_unit="grams" output="alloy"]
 [metal_price_calc weight="10" weight_unit="grams" output="melt"]
+[metal_price_calc metal="silver" purity="0.925" weight="10" weight_unit="grams" output="market"]
+[metal_price_calc metal="platinum" purity="0.950" weight="10" weight_unit="grams" output="alloy"]
 [metal_price_calc purity="18K" weight="0.5" weight_unit="ounces" output="market_value"]
 [metal_price_calc purity="24K" weight="4" weight_unit="dwt" output="alloy_offer"]
 ```
