@@ -129,28 +129,11 @@
 	}
 
 	function initialize(container) {
-		const form = container.querySelector(".js-alloy-calculator-form");
 		const karatSelect = container.querySelector(".js-alloy-calculator-karat");
-		const weightUnitSelect = container.querySelector(".js-alloy-calculator-weight-unit");
-		const weightInput = container.querySelector(".js-alloy-calculator-weight");
-		const calculateButton = container.querySelector(".js-alloy-calculator-calculate");
 		const defaultKarat = container.dataset.defaultKarat;
 
 		if (karatSelect && defaultKarat) {
 			karatSelect.value = defaultKarat;
-		}
-
-		if (form) {
-			form.addEventListener("submit", function (event) {
-				event.preventDefault();
-				calculate(container);
-			});
-		}
-
-		if (calculateButton) {
-			calculateButton.addEventListener("click", function () {
-				calculate(container);
-			});
 		}
 	}
 
@@ -164,7 +147,7 @@
 		}
 	}
 
-	document.addEventListener("DOMContentLoaded", function () {
+	function initializeAlloyMetalPriceApi() {
 		document.querySelectorAll(".js-alloy-calculator").forEach(function (container) {
 			initialize(container);
 		});
@@ -172,5 +155,83 @@
 		document.querySelectorAll(".js-metal-offer-card").forEach(function (card) {
 			initializeOfferCard(card);
 		});
+	}
+
+	document.addEventListener("submit", function (event) {
+		const form = event.target.closest(".js-alloy-calculator-form");
+
+		if (!form) {
+			return;
+		}
+
+		event.preventDefault();
+
+		const container = form.closest(".js-alloy-calculator");
+
+		if (container) {
+			calculate(container);
+		}
 	});
+
+	document.addEventListener("click", function (event) {
+		const calculateButton = event.target.closest(".js-alloy-calculator-calculate");
+
+		if (calculateButton) {
+			event.preventDefault();
+
+			const container = calculateButton.closest(".js-alloy-calculator");
+
+			if (container) {
+				calculate(container);
+			}
+
+			return;
+		}
+
+		const refreshButton = event.target.closest(".js-metal-offer-card-refresh");
+
+		if (!refreshButton) {
+			return;
+		}
+
+		const card = refreshButton.closest(".js-metal-offer-card");
+
+		if (card) {
+			refreshOfferCard(card);
+		}
+	});
+
+	document.addEventListener("change", function (event) {
+		const field = event.target.closest(".js-alloy-calculator-karat, .js-alloy-calculator-weight-unit");
+
+		if (!field) {
+			return;
+		}
+
+		const container = field.closest(".js-alloy-calculator");
+
+		if (container) {
+			calculate(container);
+		}
+	});
+
+	document.addEventListener("input", function (event) {
+		const field = event.target.closest(".js-alloy-calculator-weight");
+
+		if (!field) {
+			return;
+		}
+
+		const container = field.closest(".js-alloy-calculator");
+
+		if (container) {
+			calculate(container);
+		}
+	});
+
+	if (document.readyState === "loading") {
+		document.addEventListener("DOMContentLoaded", initializeAlloyMetalPriceApi);
+	} else {
+		initializeAlloyMetalPriceApi();
+	}
 })();

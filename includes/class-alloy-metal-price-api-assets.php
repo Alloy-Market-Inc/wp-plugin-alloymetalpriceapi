@@ -11,6 +11,32 @@ if (! defined('ABSPATH')) {
 
 class Alloy_Metal_Price_API_Assets {
 	/**
+	 * Shortcodes that require the frontend stylesheet.
+	 *
+	 * @var array<int, string>
+	 */
+	const STYLE_SHORTCODES = array(
+		'metalpriceapi',
+		'metal_price_table',
+		'metal_calculator',
+		'metal_calculator_layout',
+		'metal_payout_comparison',
+		'metal_spot_ticker',
+		'metal_offer_card',
+	);
+
+	/**
+	 * Shortcodes that require the frontend script bundle.
+	 *
+	 * @var array<int, string>
+	 */
+	const SCRIPT_SHORTCODES = array(
+		'metal_calculator',
+		'metal_calculator_layout',
+		'metal_offer_card',
+	);
+
+	/**
 	 * Shared frontend font stylesheet handle.
 	 *
 	 * @var string
@@ -61,6 +87,31 @@ class Alloy_Metal_Price_API_Assets {
 	}
 
 	/**
+	 * Conditionally enqueue plugin assets for singular content that uses supported shortcodes.
+	 *
+	 * @return void
+	 */
+	public function maybe_enqueue_shortcode_assets() {
+		if (! is_singular()) {
+			return;
+		}
+
+		$post = get_queried_object();
+
+		if (! ($post instanceof WP_Post)) {
+			return;
+		}
+
+		if ($this->post_has_any_shortcode($post->post_content, self::STYLE_SHORTCODES)) {
+			$this->enqueue_frontend_assets();
+		}
+
+		if ($this->post_has_any_shortcode($post->post_content, self::SCRIPT_SHORTCODES)) {
+			$this->enqueue_frontend_scripts();
+		}
+	}
+
+	/**
 	 * Enqueue plugin frontend styles.
 	 *
 	 * @return void
@@ -93,6 +144,23 @@ class Alloy_Metal_Price_API_Assets {
 		);
 
 		wp_enqueue_script(self::SCRIPT_HANDLE);
+	}
+
+	/**
+	 * Determine whether post content contains any shortcode from a list.
+	 *
+	 * @param string            $content Post content.
+	 * @param array<int, string> $shortcodes Shortcode tags to check.
+	 * @return bool
+	 */
+	protected function post_has_any_shortcode($content, array $shortcodes) {
+		foreach ($shortcodes as $shortcode) {
+			if (has_shortcode($content, $shortcode)) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	/**
