@@ -155,6 +155,7 @@ Default behavior:
 
 - `title="Gold Price Table"`
 - `purity="24K"`
+- `data="default"`
 - `show_live_box="false"`
 
 Supported attributes:
@@ -165,6 +166,11 @@ Supported attributes:
   - Supported values: `1K` through `24K`
   - `K` suffix is optional
   - Invalid values fall back to `24`
+- `data`
+  - Default value: `default`
+  - `default` shows the standard purity-based rows
+  - `gold bars` switches the table data to five `24K` gold bar spot-price rows
+  - Common variations like `gold-bar`, `gold_bars`, `bars`, and `bar` are also accepted
 - `show_live_box`
   - Boolean-like values accepted: `true`, `1`, `yes`, `on`
   - Any other value is treated as `false`
@@ -179,12 +185,26 @@ What the table shows:
 - Footer showing current `24K` spot price per gram
 - Updated time label using the site time format
 
+Gold bar data mode:
+
+- Keeps the same table layout and styling
+- Replaces the default rows with:
+  - `1 oz Gold Bar`
+  - `5 oz Gold Bar`
+  - `10 oz Gold Bar`
+  - `100 g Gold Bar`
+  - `1 kg Gold Bar`
+- Uses live `24K` spot pricing for each row
+- If the default title is still in use, it changes to `24K Gold Bar Spot Prices`
+
 Examples:
 
 ```text
 [metal_price_table]
 [metal_price_table purity="14K"]
 [metal_price_table purity="18" title="18K Gold Price Table"]
+[metal_price_table data="gold bars"]
+[metal_price_table data="gold-bar" show_live_box="true"]
 [metal_price_table purity="14K" show_live_box="true"]
 [metal_price_table purity="10K" title="10K Gold Value" show_live_box="yes"]
 ```
@@ -632,6 +652,12 @@ Current gold price per ounce: [metalpriceapi symbol="XAU" unit="ounce"]
 
 ```text
 [metal_price_table purity="14K" title="14K Gold Price Today" show_live_box="true"]
+```
+
+24K gold bar spot table:
+
+```text
+[metal_price_table data="gold bars"]
 ```
 
 14K interactive calculator:
