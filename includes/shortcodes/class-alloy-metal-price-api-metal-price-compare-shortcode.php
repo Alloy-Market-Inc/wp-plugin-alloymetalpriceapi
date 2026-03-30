@@ -92,8 +92,8 @@ class Alloy_Metal_Price_API_Metal_Price_Compare_Shortcode {
 
 		$metal_a       = $this->normalize_metal($atts['metal_a']);
 		$metal_b       = $this->normalize_metal($atts['metal_b']);
-		$metal_a_label = self::METAL_LABELS[ $metal_a ];
-		$metal_b_label = self::METAL_LABELS[ $metal_b ];
+		$metal_a_label = self::METAL_LABELS[$metal_a];
+		$metal_b_label = self::METAL_LABELS[$metal_b];
 		$title         = sanitize_text_field((string) $atts['title']);
 
 		if ('' === $title) {
@@ -131,10 +131,10 @@ class Alloy_Metal_Price_API_Metal_Price_Compare_Shortcode {
 	 */
 	protected function render_card($title, $metal_a_label, $price_a, $metal_b_label, $price_b, $updated_label) {
 		ob_start();
-		?>
+?>
 		<div class="aur:flex aur:w-full aur:justify-center aur:font-sans">
-			<div class="aur:w-full aur:rounded-2xl aur:border aur:border-slate-900 aur:bg-white aur:p-6 aur:shadow-[0_4px_16px_rgba(0,0,0,0.06)]">
-				<div class="aur:mb-5 aur:text-center aur:text-2xl! aur:font-semibold aur:text-primary!">
+			<div class="aur:w-full aur:rounded-2xl aur:max-w-180 aur:mx-auto aur:border aur:border-slate-900 aur:bg-white aur:p-6 aur:shadow-[0_4px_16px_rgba(0,0,0,0.06)]">
+				<div class="aur:mb-5 aur:text-center aur:text-xl! aur:font-semibold aur:text-primary!">
 					<?php echo esc_html($title); ?>
 				</div>
 
@@ -156,7 +156,7 @@ class Alloy_Metal_Price_API_Metal_Price_Compare_Shortcode {
 				</div>
 			</div>
 		</div>
-		<?php
+<?php
 
 		return trim((string) ob_get_clean());
 	}
@@ -200,7 +200,7 @@ class Alloy_Metal_Price_API_Metal_Price_Compare_Shortcode {
 	protected function normalize_metal($metal) {
 		$metal = strtolower(sanitize_text_field((string) $metal));
 
-		if (isset(self::METAL_LABELS[ $metal ])) {
+		if (isset(self::METAL_LABELS[$metal])) {
 			return $metal;
 		}
 
