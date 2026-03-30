@@ -121,6 +121,8 @@ Purity note:
 
 - For `gold`, use karats like `14K` or `24K`
 - For `silver`, `platinum`, and `palladium`, use a decimal purity like `0.925`, `0.950`, or `0.9995`
+- If `purity` is omitted, the table still uses its default purity for calculations but leaves the purity text out of the visible labels
+- If `purity` is omitted, the summary card subtext is also hidden
 
 `data` options:
 

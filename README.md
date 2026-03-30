@@ -180,6 +180,8 @@ Supported attributes:
   - For `silver`, `platinum`, and `palladium`, use a decimal purity like `0.925`, `0.950`, or `0.9995`
   - Invalid gold values fall back to `24`
   - Invalid non-gold values fall back to `0.9999`
+  - If `purity` is omitted, the default purity is still used for calculations but the purity label is left out of the visible row text
+  - If `purity` is omitted, the live summary card subtext is also hidden
 - `data`
   - Default value: `default`
   - `default` shows the standard purity-based rows
