@@ -100,7 +100,7 @@ class Alloy_Metal_Price_API_14K_Gold_Price_Table_Shortcode {
 		$this->assets->enqueue_frontend_assets();
 
 		$metal               = $this->normalize_metal($atts['metal']);
-		$metal_label         = self::METAL_LABELS[ $metal ];
+		$metal_label         = self::METAL_LABELS[$metal];
 		$default_title       = sprintf(
 			/* translators: %s: metal label like Gold or Silver. */
 			__('%s Price Table', 'alloy-metal-price-api'),
@@ -184,7 +184,7 @@ class Alloy_Metal_Price_API_14K_Gold_Price_Table_Shortcode {
 				'pill'        => sprintf(
 					/* translators: 1: purity label like 14K or 95%, 2: metal label like Gold or Platinum. */
 					__('LIVE %1$s %2$s PRICE (PER GRAM)', 'alloy-metal-price-api'),
-					'default' === $data_variant ? $purity_label : ('Gold' === $metal_label ? '24K' : __('Spot', 'alloy-metal-price-api')),
+					'default' === $data_variant ? '' : ('Gold' === $metal_label ? '24K' : __('Spot', 'alloy-metal-price-api')),
 					strtoupper($metal_label)
 				),
 				'price'       => __('Unavailable', 'alloy-metal-price-api'),
@@ -216,7 +216,7 @@ class Alloy_Metal_Price_API_14K_Gold_Price_Table_Shortcode {
 			<div class="aur:flex aur:w-full aur:flex-col aur:items-center aur:gap-8 aur:lg:flex-row aur:lg:items-stretch aur:lg:justify-center">
 				<?php if (is_array($live_box)) : ?>
 					<aside class="aur:flex aur:w-full aur:flex-col aur:items-center aur:justify-center aur:gap-5 aur:rounded-2xl aur:border aur:border-slate-900 aur:bg-white aur:p-5 aur:text-center aur:shadow-[0_4px_16px_rgba(0,0,0,0.06)] aur:lg:max-w-80">
-						<div class="aur:inline-flex aur:rounded-full aur:bg-secondary aur:px-4 aur:py-2 aur:text-xs aur:font-semibold aur:tracking-wide aur:text-white">
+						<div class="aur:inline-flex aur:rounded-lg aur:bg-primary aur:px-4 aur:py-2 aur:text-xs aur:font-semibold aur:tracking-wide aur:text-white">
 							<?php echo esc_html($live_box['pill']); ?>
 						</div>
 						<div class="aur:text-5xl aur:font-semibold <?php echo esc_attr($live_box['price_class']); ?>">
@@ -313,7 +313,7 @@ class Alloy_Metal_Price_API_14K_Gold_Price_Table_Shortcode {
 	protected function normalize_metal($metal) {
 		$metal = strtolower(sanitize_text_field((string) $metal));
 
-		if (isset(self::METAL_LABELS[ $metal ])) {
+		if (isset(self::METAL_LABELS[$metal])) {
 			return $metal;
 		}
 
