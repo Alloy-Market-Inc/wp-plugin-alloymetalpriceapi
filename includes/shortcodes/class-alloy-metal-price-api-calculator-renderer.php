@@ -229,23 +229,23 @@ class Alloy_Metal_Price_API_Calculator_Renderer {
 	protected function get_platinum_purity_options() {
 		return array(
 			array(
-				'value' => '.9995',
+				'value' => '0.9995',
 				'label' => '999.5',
 			),
 			array(
-				'value' => '.999',
+				'value' => '0.999',
 				'label' => '999',
 			),
 			array(
-				'value' => '.95',
+				'value' => '0.95',
 				'label' => '950',
 			),
 			array(
-				'value' => '.9',
+				'value' => '0.9',
 				'label' => '900',
 			),
 			array(
-				'value' => '.85',
+				'value' => '0.85',
 				'label' => '850',
 			),
 		);

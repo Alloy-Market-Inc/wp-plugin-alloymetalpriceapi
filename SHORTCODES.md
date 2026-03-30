@@ -16,6 +16,22 @@ If you only need the short version:
 - Use `[metal_standard_goldbar_module]` for a standard gold bar module with a live spot-price header
 - Use `[metal_price_calc]` to print one calculated value inline in text
 
+## Quick Reference
+
+```text
+[metalpriceapi symbol="" unit=""]
+[metal_price_table title="" purity="" data="" show_live_box=""]
+[metal_calculator title="" purity="" metal=""]
+[metal_calculator_layout title="" purity="" metal="" right=""]
+[metal_offer_card title="" purity=""]
+[metal_payout_comparison title="" link_url=""]
+[metal_spot_ticker metal="" purity="" pill_text=""]
+[metal_goldbar_live_melt_table]
+[metal_fractional_goldbar_module]
+[metal_standard_goldbar_module]
+[metal_price_calc metal="" purity="" weight="" weight_unit="" output=""]
+```
+
 ## General Tips
 
 - Always use underscores in shortcode tags, not dashes
