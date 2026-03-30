@@ -20,6 +20,7 @@ class Alloy_Metal_Price_API_Assets {
 		'metal_price_table',
 		'metal_calculator',
 		'metal_calculator_layout',
+		'conversion_rate_calculator',
 		'metal_price_compare',
 		'metal_payout_comparison',
 		'metal_spot_ticker',
@@ -37,6 +38,7 @@ class Alloy_Metal_Price_API_Assets {
 	const SCRIPT_SHORTCODES = array(
 		'metal_calculator',
 		'metal_calculator_layout',
+		'conversion_rate_calculator',
 		'metal_offer_card',
 	);
 

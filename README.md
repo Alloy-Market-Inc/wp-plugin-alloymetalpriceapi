@@ -30,6 +30,7 @@ The plugin currently fetches prices from:
 - `[metal_goldbar_live_melt_table]`
 - `[metal_fractional_goldbar_module]`
 - `[metal_standard_goldbar_module]`
+- `[conversion_rate_calculator]`
 
 ## Installation
 
@@ -56,6 +57,7 @@ Shortcodes that enqueue CSS:
 - `metal_goldbar_live_melt_table`
 - `metal_fractional_goldbar_module`
 - `metal_standard_goldbar_module`
+- `conversion_rate_calculator`
 - `metal_offer_card`
 
 Shortcodes that enqueue JS:
@@ -769,6 +771,60 @@ API failure behavior:
 - The spot-price header shows `Unavailable`
 - Melt values show `Unavailable`
 
+### `[conversion_rate_calculator]`
+
+Outputs an interactive conversion rate calculator with one number input and two range sliders.
+
+Default usage:
+
+```text
+[conversion_rate_calculator]
+```
+
+Default behavior:
+
+- `title="Advanced Conversion Rate Calculator"`
+- `sale_amount="1000"`
+- `hard_cost="25"`
+- `profit_margin="20"`
+
+Supported attributes:
+
+- `title`
+  - Sets the calculator heading
+- `sale_amount`
+  - Sets the initial sale amount
+  - Minimum effective value is `50`
+- `hard_cost`
+  - Sets the initial internal hard cost slider value
+  - Clamped to `1` through `100`
+- `profit_margin`
+  - Sets the initial profit margin slider value
+  - Clamped to `1` through `50`
+
+What the calculator shows:
+
+- Sale amount number input
+- Internal hard cost range slider
+- Profit margin range slider
+- Calculate button
+- Result box showing:
+  - Sale Amount
+  - Required Conversion Rate
+  - Profit per Sale
+  - Internal Hard Cost
+  - Affiliate Commission per Sale
+  - Total Cost per Lead
+  - Total Profit
+
+Examples:
+
+```text
+[conversion_rate_calculator]
+[conversion_rate_calculator title="Advanced Conversion Rate Calculator"]
+[conversion_rate_calculator sale_amount="1500" hard_cost="35" profit_margin="25"]
+```
+
 ### `[metal_price_calc]`
 
 Outputs a server-rendered formatted currency value in a `<span>` using calculator-style math from shortcode attributes.
@@ -887,6 +943,7 @@ The plugin makes live API requests on page render or refresh. Different shortcod
 - `[metal_price_compare]` renders a comparison card with unavailable rows and `Feed error`
 - `[metal_payout_comparison]` renders an unavailable comparison table
 - `[metal_spot_ticker]` renders an unavailable ticker card
+- `[conversion_rate_calculator]` still renders because it performs calculations locally in the browser
 - `[metal_price_calc]` returns `<span>Unavailable</span>`
 
 ## File Map
@@ -916,6 +973,7 @@ Shortcodes:
 - [`includes/shortcodes/class-alloy-metal-price-api-metal-goldbar-live-melt-table-shortcode.php`](/Users/jamescook/REPOS/LOCAL-SITES/alloy-marcom/app/public/wp-content/plugins/AlloyMetalPriceAPI/includes/shortcodes/class-alloy-metal-price-api-metal-goldbar-live-melt-table-shortcode.php)
 - [`includes/shortcodes/class-alloy-metal-price-api-metal-fractional-goldbar-module-shortcode.php`](/Users/jamescook/REPOS/LOCAL-SITES/alloy-marcom/app/public/wp-content/plugins/AlloyMetalPriceAPI/includes/shortcodes/class-alloy-metal-price-api-metal-fractional-goldbar-module-shortcode.php)
 - [`includes/shortcodes/class-alloy-metal-price-api-metal-standard-goldbar-module-shortcode.php`](/Users/jamescook/REPOS/LOCAL-SITES/alloy-marcom/app/public/wp-content/plugins/AlloyMetalPriceAPI/includes/shortcodes/class-alloy-metal-price-api-metal-standard-goldbar-module-shortcode.php)
+- [`includes/shortcodes/class-alloy-metal-price-api-conversion-rate-calculator-shortcode.php`](/Users/jamescook/REPOS/LOCAL-SITES/alloy-marcom/app/public/wp-content/plugins/AlloyMetalPriceAPI/includes/shortcodes/class-alloy-metal-price-api-conversion-rate-calculator-shortcode.php)
 - [`includes/shortcodes/class-alloy-metal-price-api-metal-price-calc-shortcode.php`](/Users/jamescook/REPOS/LOCAL-SITES/alloy-marcom/app/public/wp-content/plugins/AlloyMetalPriceAPI/includes/shortcodes/class-alloy-metal-price-api-metal-price-calc-shortcode.php)
 
 ## Quick Copy/Paste Examples

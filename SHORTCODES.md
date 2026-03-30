@@ -15,6 +15,7 @@ If you only need the short version:
 - Use `[metal_fractional_goldbar_module]` for a fractional gold bar module with a live spot-price header
 - Use `[metal_standard_goldbar_module]` for a standard gold bar module with a live spot-price header
 - Use `[metal_price_compare]` for a two-metal live price comparison card
+- Use `[conversion_rate_calculator]` for the advanced conversion rate calculator with two range sliders
 - Use `[metal_price_calc]` to print one calculated value inline in text
 
 ## Quick Reference
@@ -31,6 +32,7 @@ If you only need the short version:
 [metal_goldbar_live_melt_table]
 [metal_fractional_goldbar_module]
 [metal_standard_goldbar_module]
+[conversion_rate_calculator title="" sale_amount="" hard_cost="" profit_margin=""]
 [metal_price_calc metal="" purity="" weight="" weight_unit="" output=""]
 ```
 
@@ -319,6 +321,44 @@ Best for:
 - Quick comparison sections
 - Commodity overview pages
 - Side-by-side price callouts
+
+## `[conversion_rate_calculator]`
+
+Use this when you want an interactive calculator for break-even conversion rate and lead-cost modeling.
+
+Basic example:
+
+```text
+[conversion_rate_calculator]
+```
+
+Popular examples:
+
+```text
+[conversion_rate_calculator]
+[conversion_rate_calculator title="Advanced Conversion Rate Calculator"]
+[conversion_rate_calculator sale_amount="1500" hard_cost="35" profit_margin="25"]
+```
+
+How to use it:
+
+- `title` changes the calculator heading
+- `sale_amount` sets the starting sale amount
+- `hard_cost` sets the starting internal hard cost slider value
+- `profit_margin` sets the starting profit margin slider value
+
+Interface notes:
+
+- `sale_amount` is a number input
+- `hard_cost` is a range slider
+- `profit_margin` is a range slider
+- visitors click `Calculate` to update the results
+
+Best for:
+
+- Affiliate economics pages
+- Lead-cost planning tools
+- Internal ROI and margin content
 
 ## `[metal_payout_comparison]`
 
