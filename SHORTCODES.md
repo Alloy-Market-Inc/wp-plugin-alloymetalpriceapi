@@ -583,9 +583,11 @@ Popular examples:
 [metal_price_calc purity="14K" weight="12.5" weight_unit="grams" output="market"]
 [metal_price_calc purity="18K" weight="0.75" weight_unit="ounces" output="pawn"]
 [metal_price_calc purity="24K" weight="10" weight_unit="pennyweight" output="alloy"]
+[metal_price_calc purity="14K" weight="10" weight_unit="grams" output="melt"]
 [metal_price_calc weight="10" weight_unit="grams" output="melt"]
 [metal_price_calc metal="silver" purity="0.925" weight="10" weight_unit="grams" output="market"]
 [metal_price_calc metal="platinum" purity="0.950" weight="10" weight_unit="grams" output="alloy"]
+[metal_price_calc metal="platinum" purity="950" weight="10" weight_unit="grams" output="market"]
 ```
 
 How to use it:
@@ -605,9 +607,10 @@ How to use it:
 
 Note:
 
-- `melt` always calculates using `.9999` purity
+- `melt` uses the passed `purity` when `purity` is explicitly set
+- If `purity` is omitted, `melt` falls back to `.9999` for backward compatibility
 - For `gold`, use karats like `14K` or `24K`
-- For `silver`, `platinum`, and `palladium`, use a decimal purity like `0.925`, `0.950`, or `0.9995`
+- For `silver`, `platinum`, and `palladium`, use either a decimal purity like `0.925`, `0.950`, or `0.9995`, or fineness-style values like `925`, `950`, `999`, or `999.5`
 
 Best for:
 

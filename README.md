@@ -872,7 +872,7 @@ Supported attributes:
 - `purity`
   - For `gold`, accepts `1K` through `24K`
   - `K` suffix optional for gold
-  - For `silver`, `platinum`, and `palladium`, use a decimal purity like `0.925`, `0.950`, or `0.9995`
+  - For `silver`, `platinum`, and `palladium`, use either a decimal purity like `0.925`, `0.950`, or `0.9995`, or fineness-style values like `925`, `950`, `999`, or `999.5`
   - Invalid gold values fall back to `14`
   - Invalid non-gold values fall back to `0.9999`
 - `weight`
@@ -898,10 +898,11 @@ Supported attributes:
     - `alloy`
     - `alloy_offer`
     - `alloy_estimated_offer`
-    - `melt`
-    - `melt_value`
+  - `melt`
+  - `melt_value`
   - Invalid values fall back to `market`
-  - `melt` always calculates using `.9999` purity
+  - `melt` uses the passed `purity` when `purity` is explicitly set
+  - If `purity` is omitted, `melt` falls back to `.9999` for backward compatibility
 
 Examples:
 
@@ -909,9 +910,11 @@ Examples:
 [metal_price_calc purity="14K" weight="10" weight_unit="grams" output="market"]
 [metal_price_calc purity="14K" weight="10" weight_unit="grams" output="pawn"]
 [metal_price_calc purity="14K" weight="10" weight_unit="grams" output="alloy"]
+[metal_price_calc purity="14K" weight="10" weight_unit="grams" output="melt"]
 [metal_price_calc weight="10" weight_unit="grams" output="melt"]
 [metal_price_calc metal="silver" purity="0.925" weight="10" weight_unit="grams" output="market"]
 [metal_price_calc metal="platinum" purity="0.950" weight="10" weight_unit="grams" output="alloy"]
+[metal_price_calc metal="platinum" purity="950" weight="10" weight_unit="grams" output="market"]
 [metal_price_calc purity="18K" weight="0.5" weight_unit="ounces" output="market_value"]
 [metal_price_calc purity="24K" weight="4" weight_unit="dwt" output="alloy_offer"]
 ```

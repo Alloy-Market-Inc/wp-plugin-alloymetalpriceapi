@@ -64,6 +64,8 @@ class Alloy_Metal_Price_API_Metal_Price_Calc_Shortcode {
 	 * @return string
 	 */
 	public function render($atts) {
+		$raw_atts = is_array($atts) ? $atts : array();
+
 		$atts = shortcode_atts(
 			array(
 				'metal'       => 'gold',
@@ -78,6 +80,7 @@ class Alloy_Metal_Price_API_Metal_Price_Calc_Shortcode {
 
 		$metal        = $this->normalize_metal($atts['metal']);
 		$purity_value = $this->parse_purity_value($atts['purity'], $metal);
+		$has_manual_purity = array_key_exists('purity', $raw_atts);
 		$weight       = $this->parse_weight($atts['weight']);
 		$weight_unit  = $this->normalize_weight_unit($atts['weight_unit']);
 		$output       = $this->normalize_output($atts['output']);
@@ -89,10 +92,11 @@ class Alloy_Metal_Price_API_Metal_Price_Calc_Shortcode {
 
 		$weight_in_grams = $this->convert_weight_to_grams($weight, $weight_unit);
 		$purity_factor   = 'gold' === $metal ? ((int) $purity_value / 24) : (float) $purity_value;
+		$melt_purity_factor = $has_manual_purity ? $purity_factor : 0.9999;
 		$market_value    = $spot_price * $purity_factor * $weight_in_grams;
 		$pawn_value      = $market_value * 0.4;
 		$alloy_value     = $market_value * $this->get_alloy_offer_rate($metal, $purity_value);
-		$melt_value      = $spot_price * 0.9999 * $weight_in_grams;
+		$melt_value      = $spot_price * $melt_purity_factor * $weight_in_grams;
 		$values          = array(
 			'market' => $market_value,
 			'pawn'   => $pawn_value,
@@ -116,6 +120,14 @@ class Alloy_Metal_Price_API_Metal_Price_Calc_Shortcode {
 	protected function parse_purity_value($purity, $metal) {
 		if ('gold' !== $metal) {
 			$purity = is_numeric($purity) ? (float) $purity : 0.9999;
+
+			if ($purity > 1 && $purity <= 100) {
+				$purity /= 100;
+			} elseif ($purity > 100 && $purity <= 1000) {
+				$purity /= 1000;
+			} elseif ($purity > 1000 && $purity <= 10000) {
+				$purity /= 10000;
+			}
 
 			return max(0, min(1, $purity));
 		}
