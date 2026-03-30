@@ -20,6 +20,7 @@ class Alloy_Metal_Price_API_Assets {
 		'metal_price_table',
 		'metal_calculator',
 		'metal_calculator_layout',
+		'metal_price_compare',
 		'metal_payout_comparison',
 		'metal_spot_ticker',
 		'metal_goldbar_live_melt_table',

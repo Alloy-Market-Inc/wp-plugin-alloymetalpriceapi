@@ -23,6 +23,7 @@ The plugin currently fetches prices from:
 - `[metal_calculator]`
 - `[metal_calculator_layout]`
 - `[metal_offer_card]`
+- `[metal_price_compare]`
 - `[metal_price_calc]`
 - `[metal_payout_comparison]`
 - `[metal_spot_ticker]`
@@ -49,6 +50,7 @@ Shortcodes that enqueue CSS:
 - `metal_price_table`
 - `metal_calculator`
 - `metal_calculator_layout`
+- `metal_price_compare`
 - `metal_payout_comparison`
 - `metal_spot_ticker`
 - `metal_goldbar_live_melt_table`
@@ -149,7 +151,7 @@ Output notes:
 
 ### `[metal_price_table]`
 
-Outputs a gold price table based on live `24K` spot price and a selected purity.
+Outputs a live metal price table based on the selected `metal` and `purity`.
 
 Default usage:
 
@@ -160,6 +162,7 @@ Default usage:
 Default behavior:
 
 - `title="Gold Price Table"`
+- `metal="gold"`
 - `purity="24K"`
 - `data="default"`
 - `show_live_box="false"`
@@ -168,10 +171,15 @@ Supported attributes:
 
 - `title`
   - Sets the table heading text
+- `metal`
+  - Supported values: `gold`, `silver`, `platinum`, `palladium`
+  - Invalid values fall back to `gold`
 - `purity`
-  - Supported values: `1K` through `24K`
-  - `K` suffix is optional
-  - Invalid values fall back to `24`
+  - For `gold`, supported values are `1K` through `24K`
+  - `K` suffix is optional for gold
+  - For `silver`, `platinum`, and `palladium`, use a decimal purity like `0.925`, `0.950`, or `0.9995`
+  - Invalid gold values fall back to `24`
+  - Invalid non-gold values fall back to `0.9999`
 - `data`
   - Default value: `default`
   - `default` shows the standard purity-based rows
@@ -188,28 +196,31 @@ What the table shows:
 - Price per ounce
 - Price per troy ounce
 - Price per kilo
-- Footer showing current `24K` spot price per gram
+- Footer showing the current spot price per gram for the selected metal
 - Updated time label using the site time format
 
 Gold bar data mode:
 
 - Keeps the same table layout and styling
 - Replaces the default rows with:
-  - `1 oz Gold Bar`
-  - `5 oz Gold Bar`
-  - `10 oz Gold Bar`
-  - `100 g Gold Bar`
-  - `1 kg Gold Bar`
-- Uses live `24K` spot pricing for each row
-- If the default title is still in use, it changes to `24K Gold Bar Spot Prices`
+  - `1 oz <metal> Bar`
+  - `5 oz <metal> Bar`
+  - `10 oz <metal> Bar`
+  - `100 g <metal> Bar`
+  - `1 kg <metal> Bar`
+- Uses live spot pricing for the selected metal
+- If the default title is still in use, it changes to `<metal> Bar Spot Prices`
 
 Examples:
 
 ```text
 [metal_price_table]
 [metal_price_table purity="14K"]
+[metal_price_table metal="silver" purity="0.925"]
+[metal_price_table metal="platinum" purity="0.950" show_live_box="true"]
 [metal_price_table purity="18" title="18K Gold Price Table"]
 [metal_price_table data="gold bars"]
+[metal_price_table metal="silver" purity="0.999" data="gold bars"]
 [metal_price_table data="gold-bar" show_live_box="true"]
 [metal_price_table purity="14K" show_live_box="true"]
 [metal_price_table purity="10K" title="10K Gold Value" show_live_box="yes"]
@@ -441,6 +452,56 @@ Refresh behavior:
 API failure behavior:
 
 - Spot, pawn, and alloy values render as `Unavailable`
+
+### `[metal_price_compare]`
+
+Outputs a compact live comparison card showing two metal prices per troy ounce.
+
+Default usage:
+
+```text
+[metal_price_compare]
+```
+
+Default behavior:
+
+- `metal_a="platinum"`
+- `metal_b="gold"`
+- `title=""`
+- If no title is provided, the shortcode generates one like `Platinum vs Gold Price Today (Per Troy Ounce)`
+
+Supported attributes:
+
+- `metal_a`
+  - Supported values: `gold`, `silver`, `platinum`, `palladium`
+  - Invalid values fall back to `gold`
+- `metal_b`
+  - Supported values: `gold`, `silver`, `platinum`, `palladium`
+  - Invalid values fall back to `gold`
+- `title`
+  - Optional custom heading for the comparison card
+
+What the card shows:
+
+- Title line
+- First metal row with live `USD / troy oz` price
+- Second metal row with live `USD / troy oz` price
+- Updated status line
+
+Examples:
+
+```text
+[metal_price_compare]
+[metal_price_compare metal_a="silver" metal_b="gold"]
+[metal_price_compare metal_a="palladium" metal_b="platinum"]
+[metal_price_compare metal_a="platinum" metal_b="gold" title="Platinum vs Gold Price Today (Per Troy Ounce)"]
+```
+
+API failure behavior:
+
+- The card still renders
+- Unavailable rows display as `$—`
+- The status line shows `Feed error`
 
 ### `[metal_payout_comparison]`
 
@@ -821,6 +882,7 @@ The plugin makes live API requests on page render or refresh. Different shortcod
 - `[metal_calculator]` renders with base price `0`
 - `[metal_calculator_layout]` renders with zero-value calculator and price widget values
 - `[metal_offer_card]` renders unavailable values
+- `[metal_price_compare]` renders a comparison card with unavailable rows and `Feed error`
 - `[metal_payout_comparison]` renders an unavailable comparison table
 - `[metal_spot_ticker]` renders an unavailable ticker card
 - `[metal_price_calc]` returns `<span>Unavailable</span>`
@@ -846,6 +908,7 @@ Shortcodes:
 - [`includes/shortcodes/class-alloy-metal-price-api-metal-calculator-shortcode.php`](/Users/jamescook/REPOS/LOCAL-SITES/alloy-marcom/app/public/wp-content/plugins/AlloyMetalPriceAPI/includes/shortcodes/class-alloy-metal-price-api-metal-calculator-shortcode.php)
 - [`includes/shortcodes/class-alloy-metal-price-api-metal-calculator-layout-shortcode.php`](/Users/jamescook/REPOS/LOCAL-SITES/alloy-marcom/app/public/wp-content/plugins/AlloyMetalPriceAPI/includes/shortcodes/class-alloy-metal-price-api-metal-calculator-layout-shortcode.php)
 - [`includes/shortcodes/class-alloy-metal-price-api-metal-offer-card-shortcode.php`](/Users/jamescook/REPOS/LOCAL-SITES/alloy-marcom/app/public/wp-content/plugins/AlloyMetalPriceAPI/includes/shortcodes/class-alloy-metal-price-api-metal-offer-card-shortcode.php)
+- [`includes/shortcodes/class-alloy-metal-price-api-metal-price-compare-shortcode.php`](/Users/jamescook/REPOS/LOCAL-SITES/alloy-marcom/app/public/wp-content/plugins/AlloyMetalPriceAPI/includes/shortcodes/class-alloy-metal-price-api-metal-price-compare-shortcode.php)
 - [`includes/shortcodes/class-alloy-metal-price-api-metal-payout-comparison-shortcode.php`](/Users/jamescook/REPOS/LOCAL-SITES/alloy-marcom/app/public/wp-content/plugins/AlloyMetalPriceAPI/includes/shortcodes/class-alloy-metal-price-api-metal-payout-comparison-shortcode.php)
 - [`includes/shortcodes/class-alloy-metal-price-api-metal-spot-ticker-shortcode.php`](/Users/jamescook/REPOS/LOCAL-SITES/alloy-marcom/app/public/wp-content/plugins/AlloyMetalPriceAPI/includes/shortcodes/class-alloy-metal-price-api-metal-spot-ticker-shortcode.php)
 - [`includes/shortcodes/class-alloy-metal-price-api-metal-goldbar-live-melt-table-shortcode.php`](/Users/jamescook/REPOS/LOCAL-SITES/alloy-marcom/app/public/wp-content/plugins/AlloyMetalPriceAPI/includes/shortcodes/class-alloy-metal-price-api-metal-goldbar-live-melt-table-shortcode.php)

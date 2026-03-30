@@ -33,6 +33,18 @@ class Alloy_Metal_Price_API_14K_Gold_Price_Table_Shortcode {
 	const OUNCE_IN_GRAMS = 28.3495;
 
 	/**
+	 * Supported metal labels.
+	 *
+	 * @var array<string, string>
+	 */
+	const METAL_LABELS = array(
+		'gold'      => 'Gold',
+		'silver'    => 'Silver',
+		'platinum'  => 'Platinum',
+		'palladium' => 'Palladium',
+	);
+
+	/**
 	 * Shared API client.
 	 *
 	 * @var Alloy_Metal_Price_API_Client
@@ -73,11 +85,10 @@ class Alloy_Metal_Price_API_14K_Gold_Price_Table_Shortcode {
 	 * @return string
 	 */
 	public function render($atts) {
-		$default_title = __('Gold Price Table', 'alloy-metal-price-api');
-
 		$atts = shortcode_atts(
 			array(
-				'title'         => $default_title,
+				'title'         => '',
+				'metal'         => 'gold',
 				'purity'        => '24K',
 				'data'          => 'default',
 				'show_live_box' => 'false',
@@ -88,16 +99,23 @@ class Alloy_Metal_Price_API_14K_Gold_Price_Table_Shortcode {
 
 		$this->assets->enqueue_frontend_assets();
 
-		$title               = sanitize_text_field((string) $atts['title']);
-		$purity_karat        = $this->parse_purity_karat($atts['purity']);
-		$purity_label        = $this->format_purity_label($purity_karat);
-		$purity_multiplier   = $purity_karat / 24;
+		$metal               = $this->normalize_metal($atts['metal']);
+		$metal_label         = self::METAL_LABELS[ $metal ];
+		$default_title       = sprintf(
+			/* translators: %s: metal label like Gold or Silver. */
+			__('%s Price Table', 'alloy-metal-price-api'),
+			$metal_label
+		);
+		$title               = sanitize_text_field('' === trim((string) $atts['title']) ? $default_title : (string) $atts['title']);
+		$purity_value        = $this->parse_purity_value($atts['purity'], $metal);
+		$purity_label        = $this->format_purity_label($purity_value, $metal);
+		$purity_multiplier   = 'gold' === $metal ? ((int) $purity_value / 24) : (float) $purity_value;
 		$data_variant        = $this->normalize_data_variant($atts['data']);
 		$show_live_box       = $this->parse_boolean_att($atts['show_live_box']);
-		$spot_price_per_gram = $this->api_client->get_metal_price('gold');
+		$spot_price_per_gram = $this->api_client->get_metal_price($metal);
 
 		if (is_wp_error($spot_price_per_gram)) {
-			return $this->render_unavailable_table($title, $purity_label, $show_live_box, $data_variant, $default_title);
+			return $this->render_unavailable_table($title, $metal_label, $purity_label, $show_live_box, $data_variant, $default_title);
 		}
 
 		$price_per_gram       = $spot_price_per_gram * $purity_multiplier;
@@ -107,6 +125,8 @@ class Alloy_Metal_Price_API_14K_Gold_Price_Table_Shortcode {
 		$table_config         = $this->build_table_config(
 			$title,
 			$default_title,
+			$metal,
+			$metal_label,
 			$data_variant,
 			$purity_label,
 			$price_per_gram,
@@ -123,14 +143,16 @@ class Alloy_Metal_Price_API_14K_Gold_Price_Table_Shortcode {
 			$this->get_updated_label(),
 			$show_live_box ? array(
 				'pill'        => sprintf(
-					/* translators: %s: purity label like 14K. */
-					__('LIVE %s GOLD PRICE (PER GRAM)', 'alloy-metal-price-api'),
-					'default' === $data_variant ? $purity_label : '24K'
+					/* translators: 1: purity label like 14K or 95%, 2: metal label like Gold or Platinum. */
+					__('LIVE %1$s %2$s PRICE (PER GRAM)', 'alloy-metal-price-api'),
+					'default' === $data_variant ? $purity_label : ('gold' === $metal ? '24K' : __('Spot', 'alloy-metal-price-api')),
+					strtoupper($metal_label)
 				),
 				'price'       => $this->format_currency('default' === $data_variant ? $price_per_gram : $spot_price_per_gram),
 				'subtext'     => sprintf(
-					/* translators: %s: 24K spot price per gram. */
-					__('Based on 24K spot price: %s/g', 'alloy-metal-price-api'),
+					/* translators: 1: metal label like Gold or Platinum, 2: current spot price per gram. */
+					__('Based on %1$s spot price: %2$s/g', 'alloy-metal-price-api'),
+					$metal_label,
 					$this->format_currency($spot_price_per_gram)
 				),
 				'updated'     => $this->get_updated_label(),
@@ -143,14 +165,15 @@ class Alloy_Metal_Price_API_14K_Gold_Price_Table_Shortcode {
 	 * Render the unavailable state table.
 	 *
 	 * @param string $title Table title.
-	 * @param string $purity_label Purity label like 14K.
+	 * @param string $metal_label Metal label like Gold or Platinum.
+	 * @param string $purity_label Purity label like 14K or 95%.
 	 * @param bool   $show_live_box Whether to render the optional summary box.
 	 * @param string $data_variant Table data variant.
 	 * @param string $default_title Default shortcode title.
 	 * @return string
 	 */
-	protected function render_unavailable_table($title, $purity_label, $show_live_box = false, $data_variant = 'default', $default_title = '') {
-		$table_config = $this->build_unavailable_table_config($title, $default_title, $data_variant, $purity_label);
+	protected function render_unavailable_table($title, $metal_label, $purity_label, $show_live_box = false, $data_variant = 'default', $default_title = '') {
+		$table_config = $this->build_unavailable_table_config($title, $default_title, $metal_label, $data_variant, $purity_label);
 
 		return $this->render_table(
 			$table_config['title'],
@@ -159,12 +182,17 @@ class Alloy_Metal_Price_API_14K_Gold_Price_Table_Shortcode {
 			__('Updating…', 'alloy-metal-price-api'),
 			$show_live_box ? array(
 				'pill'        => sprintf(
-					/* translators: %s: purity label like 14K. */
-					__('LIVE %s GOLD PRICE (PER GRAM)', 'alloy-metal-price-api'),
-					'default' === $data_variant ? $purity_label : '24K'
+					/* translators: 1: purity label like 14K or 95%, 2: metal label like Gold or Platinum. */
+					__('LIVE %1$s %2$s PRICE (PER GRAM)', 'alloy-metal-price-api'),
+					'default' === $data_variant ? $purity_label : ('Gold' === $metal_label ? '24K' : __('Spot', 'alloy-metal-price-api')),
+					strtoupper($metal_label)
 				),
 				'price'       => __('Unavailable', 'alloy-metal-price-api'),
-				'subtext'     => __('Based on 24K spot price: Unavailable', 'alloy-metal-price-api'),
+				'subtext'     => sprintf(
+					/* translators: %s: metal label like Gold or Platinum. */
+					__('Based on %s spot price: Unavailable', 'alloy-metal-price-api'),
+					$metal_label
+				),
 				'updated'     => __('Updating…', 'alloy-metal-price-api'),
 				'price_class' => 'aur:text-slate-500',
 			) : null
@@ -277,10 +305,68 @@ class Alloy_Metal_Price_API_14K_Gold_Price_Table_Shortcode {
 	}
 
 	/**
+	 * Normalize the metal attribute to a supported API metal type.
+	 *
+	 * @param mixed $metal Raw metal attribute value.
+	 * @return string
+	 */
+	protected function normalize_metal($metal) {
+		$metal = strtolower(sanitize_text_field((string) $metal));
+
+		if (isset(self::METAL_LABELS[ $metal ])) {
+			return $metal;
+		}
+
+		return 'gold';
+	}
+
+	/**
+	 * Parse a purity attribute into a karat integer or decimal purity value.
+	 *
+	 * @param mixed  $purity Raw shortcode purity value.
+	 * @param string $metal Normalized metal key.
+	 * @return int|float
+	 */
+	protected function parse_purity_value($purity, $metal) {
+		if ('gold' !== $metal) {
+			$purity = is_numeric($purity) ? (float) $purity : 0.9999;
+
+			return max(0, min(1, $purity));
+		}
+
+		$purity = strtoupper(sanitize_text_field((string) $purity));
+
+		if (preg_match('/^([1-9]|1[0-9]|2[0-4])K?$/', $purity, $matches)) {
+			return (int) $matches[1];
+		}
+
+		return 24;
+	}
+
+	/**
+	 * Format the purity label used in table row text.
+	 *
+	 * @param int|float $purity_value Parsed purity value.
+	 * @param string    $metal Normalized metal key.
+	 * @return string
+	 */
+	protected function format_purity_label($purity_value, $metal) {
+		if ('gold' === $metal) {
+			return absint($purity_value) . 'K';
+		}
+
+		$percent = round(((float) $purity_value) * 100, 1);
+
+		return (0 === fmod($percent, 1.0) ? number_format_i18n($percent, 0) : number_format_i18n($percent, 1)) . '%';
+	}
+
+	/**
 	 * Build a table configuration for the current data test variant.
 	 *
 	 * @param string $title Current shortcode title value.
 	 * @param string $default_title Default shortcode title value.
+	 * @param string $metal Normalized metal key.
+	 * @param string $metal_label Human-readable metal label.
 	 * @param string $data_variant Normalized data variant.
 	 * @param string $purity_label Current purity label.
 	 * @param float  $price_per_gram Purity-adjusted price per gram.
@@ -290,35 +376,60 @@ class Alloy_Metal_Price_API_14K_Gold_Price_Table_Shortcode {
 	 * @param float  $spot_price_per_gram Current 24K spot price per gram.
 	 * @return array<string, mixed>
 	 */
-	protected function build_table_config($title, $default_title, $data_variant, $purity_label, $price_per_gram, $price_per_ounce, $price_per_troy_ounce, $price_per_kilo, $spot_price_per_gram) {
+	protected function build_table_config($title, $default_title, $metal, $metal_label, $data_variant, $purity_label, $price_per_gram, $price_per_ounce, $price_per_troy_ounce, $price_per_kilo, $spot_price_per_gram) {
 		if ('gold_bars' === $data_variant) {
 			return array(
-				'title'       => $default_title === $title ? __('24K Gold Bar Spot Prices', 'alloy-metal-price-api') : $title,
+				'title'       => $default_title === $title ? sprintf(
+					/* translators: %s: metal label like Gold or Silver. */
+					__('%s Bar Spot Prices', 'alloy-metal-price-api'),
+					$metal_label
+				) : $title,
 				'rows'        => array(
 					array(
-						'label' => __('1 oz Gold Bar', 'alloy-metal-price-api'),
+						'label' => sprintf(
+							/* translators: %s: metal label like Gold or Silver. */
+							__('1 oz %s Bar', 'alloy-metal-price-api'),
+							$metal_label
+						),
 						'value' => $this->format_currency($spot_price_per_gram * self::TROY_OUNCE_IN_GRAMS),
 					),
 					array(
-						'label' => __('5 oz Gold Bar', 'alloy-metal-price-api'),
+						'label' => sprintf(
+							/* translators: %s: metal label like Gold or Silver. */
+							__('5 oz %s Bar', 'alloy-metal-price-api'),
+							$metal_label
+						),
 						'value' => $this->format_currency($spot_price_per_gram * self::TROY_OUNCE_IN_GRAMS * 5),
 					),
 					array(
-						'label' => __('10 oz Gold Bar', 'alloy-metal-price-api'),
+						'label' => sprintf(
+							/* translators: %s: metal label like Gold or Silver. */
+							__('10 oz %s Bar', 'alloy-metal-price-api'),
+							$metal_label
+						),
 						'value' => $this->format_currency($spot_price_per_gram * self::TROY_OUNCE_IN_GRAMS * 10),
 					),
 					array(
-						'label' => __('100 g Gold Bar', 'alloy-metal-price-api'),
+						'label' => sprintf(
+							/* translators: %s: metal label like Gold or Silver. */
+							__('100 g %s Bar', 'alloy-metal-price-api'),
+							$metal_label
+						),
 						'value' => $this->format_currency($spot_price_per_gram * 100),
 					),
 					array(
-						'label' => __('1 kg Gold Bar', 'alloy-metal-price-api'),
+						'label' => sprintf(
+							/* translators: %s: metal label like Gold or Silver. */
+							__('1 kg %s Bar', 'alloy-metal-price-api'),
+							$metal_label
+						),
 						'value' => $this->format_currency($spot_price_per_gram * 1000),
 					),
 				),
 				'footer_left' => sprintf(
-					/* translators: %s: 24K gold spot price per gram. */
-					__('24K spot price %s per gram', 'alloy-metal-price-api'),
+					/* translators: 1: metal label like Gold or Silver, 2: current spot price per gram. */
+					__('%1$s spot price %2$s per gram', 'alloy-metal-price-api'),
+					$metal_label,
 					$this->format_currency($spot_price_per_gram)
 				),
 			);
@@ -330,39 +441,44 @@ class Alloy_Metal_Price_API_14K_Gold_Price_Table_Shortcode {
 				array(
 					'label' => sprintf(
 						/* translators: %s: purity label like 14K. */
-						__('%s Gold Price Per Gram', 'alloy-metal-price-api'),
-						$purity_label
+						__('%1$s %2$s Price Per Gram', 'alloy-metal-price-api'),
+						$purity_label,
+						$metal_label
 					),
 					'value' => $this->format_currency($price_per_gram),
 				),
 				array(
 					'label' => sprintf(
 						/* translators: %s: purity label like 14K. */
-						__('%s Gold Price Per Ounce', 'alloy-metal-price-api'),
-						$purity_label
+						__('%1$s %2$s Price Per Ounce', 'alloy-metal-price-api'),
+						$purity_label,
+						$metal_label
 					),
 					'value' => $this->format_currency($price_per_ounce),
 				),
 				array(
 					'label' => sprintf(
 						/* translators: %s: purity label like 14K. */
-						__('%s Gold Price Per Troy Ounce', 'alloy-metal-price-api'),
-						$purity_label
+						__('%1$s %2$s Price Per Troy Ounce', 'alloy-metal-price-api'),
+						$purity_label,
+						$metal_label
 					),
 					'value' => $this->format_currency($price_per_troy_ounce),
 				),
 				array(
 					'label' => sprintf(
 						/* translators: %s: purity label like 14K. */
-						__('%s Gold Price Per Kilo', 'alloy-metal-price-api'),
-						$purity_label
+						__('%1$s %2$s Price Per Kilo', 'alloy-metal-price-api'),
+						$purity_label,
+						$metal_label
 					),
 					'value' => $this->format_currency($price_per_kilo),
 				),
 			),
 			'footer_left' => sprintf(
-				/* translators: %s: 24K gold spot price per gram. */
-				__('24K spot price %s per gram', 'alloy-metal-price-api'),
+				/* translators: 1: metal label like Gold or Silver, 2: current spot price per gram. */
+				__('%1$s spot price %2$s per gram', 'alloy-metal-price-api'),
+				$metal_label,
 				$this->format_currency($spot_price_per_gram)
 			),
 		);
@@ -373,37 +489,46 @@ class Alloy_Metal_Price_API_14K_Gold_Price_Table_Shortcode {
 	 *
 	 * @param string $title Current shortcode title value.
 	 * @param string $default_title Default shortcode title value.
+	 * @param string $metal_label Human-readable metal label.
 	 * @param string $data_variant Normalized data variant.
 	 * @param string $purity_label Current purity label.
 	 * @return array<string, mixed>
 	 */
-	protected function build_unavailable_table_config($title, $default_title, $data_variant, $purity_label) {
+	protected function build_unavailable_table_config($title, $default_title, $metal_label, $data_variant, $purity_label) {
 		if ('gold_bars' === $data_variant) {
 			return array(
-				'title'       => $default_title === $title ? __('24K Gold Bar Spot Prices', 'alloy-metal-price-api') : $title,
+				'title'       => $default_title === $title ? sprintf(
+					/* translators: %s: metal label like Gold or Silver. */
+					__('%s Bar Spot Prices', 'alloy-metal-price-api'),
+					$metal_label
+				) : $title,
 				'rows'        => array(
 					array(
-						'label' => __('1 oz Gold Bar', 'alloy-metal-price-api'),
+						'label' => sprintf(__('1 oz %s Bar', 'alloy-metal-price-api'), $metal_label),
 						'value' => __('Unavailable', 'alloy-metal-price-api'),
 					),
 					array(
-						'label' => __('5 oz Gold Bar', 'alloy-metal-price-api'),
+						'label' => sprintf(__('5 oz %s Bar', 'alloy-metal-price-api'), $metal_label),
 						'value' => __('Unavailable', 'alloy-metal-price-api'),
 					),
 					array(
-						'label' => __('10 oz Gold Bar', 'alloy-metal-price-api'),
+						'label' => sprintf(__('10 oz %s Bar', 'alloy-metal-price-api'), $metal_label),
 						'value' => __('Unavailable', 'alloy-metal-price-api'),
 					),
 					array(
-						'label' => __('100 g Gold Bar', 'alloy-metal-price-api'),
+						'label' => sprintf(__('100 g %s Bar', 'alloy-metal-price-api'), $metal_label),
 						'value' => __('Unavailable', 'alloy-metal-price-api'),
 					),
 					array(
-						'label' => __('1 kg Gold Bar', 'alloy-metal-price-api'),
+						'label' => sprintf(__('1 kg %s Bar', 'alloy-metal-price-api'), $metal_label),
 						'value' => __('Unavailable', 'alloy-metal-price-api'),
 					),
 				),
-				'footer_left' => __('24K spot price unavailable', 'alloy-metal-price-api'),
+				'footer_left' => sprintf(
+					/* translators: %s: metal label like Gold or Silver. */
+					__('%s spot price unavailable', 'alloy-metal-price-api'),
+					$metal_label
+				),
 			);
 		}
 
@@ -412,38 +537,46 @@ class Alloy_Metal_Price_API_14K_Gold_Price_Table_Shortcode {
 			'rows'        => array(
 				array(
 					'label' => sprintf(
-						/* translators: %s: purity label like 14K. */
-						__('%s Gold Price Per Gram', 'alloy-metal-price-api'),
-						$purity_label
+						/* translators: 1: purity label like 14K or 95%, 2: metal label like Gold or Silver. */
+						__('%1$s %2$s Price Per Gram', 'alloy-metal-price-api'),
+						$purity_label,
+						$metal_label
 					),
 					'value' => __('Unavailable', 'alloy-metal-price-api'),
 				),
 				array(
 					'label' => sprintf(
-						/* translators: %s: purity label like 14K. */
-						__('%s Gold Price Per Ounce', 'alloy-metal-price-api'),
-						$purity_label
+						/* translators: 1: purity label like 14K or 95%, 2: metal label like Gold or Silver. */
+						__('%1$s %2$s Price Per Ounce', 'alloy-metal-price-api'),
+						$purity_label,
+						$metal_label
 					),
 					'value' => __('Unavailable', 'alloy-metal-price-api'),
 				),
 				array(
 					'label' => sprintf(
-						/* translators: %s: purity label like 14K. */
-						__('%s Gold Price Per Troy Ounce', 'alloy-metal-price-api'),
-						$purity_label
+						/* translators: 1: purity label like 14K or 95%, 2: metal label like Gold or Silver. */
+						__('%1$s %2$s Price Per Troy Ounce', 'alloy-metal-price-api'),
+						$purity_label,
+						$metal_label
 					),
 					'value' => __('Unavailable', 'alloy-metal-price-api'),
 				),
 				array(
 					'label' => sprintf(
-						/* translators: %s: purity label like 14K. */
-						__('%s Gold Price Per Kilo', 'alloy-metal-price-api'),
-						$purity_label
+						/* translators: 1: purity label like 14K or 95%, 2: metal label like Gold or Silver. */
+						__('%1$s %2$s Price Per Kilo', 'alloy-metal-price-api'),
+						$purity_label,
+						$metal_label
 					),
 					'value' => __('Unavailable', 'alloy-metal-price-api'),
 				),
 			),
-			'footer_left' => __('24K spot price unavailable', 'alloy-metal-price-api'),
+			'footer_left' => sprintf(
+				/* translators: %s: metal label like Gold or Silver. */
+				__('%s spot price unavailable', 'alloy-metal-price-api'),
+				$metal_label
+			),
 		);
 	}
 
@@ -457,32 +590,6 @@ class Alloy_Metal_Price_API_14K_Gold_Price_Table_Shortcode {
 		$value = strtolower(sanitize_text_field((string) $value));
 
 		return in_array($value, array('1', 'true', 'yes', 'on'), true);
-	}
-
-	/**
-	 * Parse a purity attribute into a karat integer.
-	 *
-	 * @param mixed $purity Raw shortcode purity value.
-	 * @return int
-	 */
-	protected function parse_purity_karat($purity) {
-		$purity = strtoupper(sanitize_text_field((string) $purity));
-
-		if (preg_match('/^([1-9]|1[0-9]|2[0-4])K?$/', $purity, $matches)) {
-			return (int) $matches[1];
-		}
-
-		return 24;
-	}
-
-	/**
-	 * Format a karat integer as a purity label.
-	 *
-	 * @param int $karat Purity karat value.
-	 * @return string
-	 */
-	protected function format_purity_label($karat) {
-		return absint($karat) . 'K';
 	}
 
 	/**

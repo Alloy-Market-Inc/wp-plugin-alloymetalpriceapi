@@ -14,16 +14,18 @@ If you only need the short version:
 - Use `[metal_goldbar_live_melt_table]` for a responsive gold bar melt-value table
 - Use `[metal_fractional_goldbar_module]` for a fractional gold bar module with a live spot-price header
 - Use `[metal_standard_goldbar_module]` for a standard gold bar module with a live spot-price header
+- Use `[metal_price_compare]` for a two-metal live price comparison card
 - Use `[metal_price_calc]` to print one calculated value inline in text
 
 ## Quick Reference
 
 ```text
 [metalpriceapi symbol="" unit=""]
-[metal_price_table title="" purity="" data="" show_live_box=""]
+[metal_price_table title="" metal="" purity="" data="" show_live_box=""]
 [metal_calculator title="" purity="" metal=""]
 [metal_calculator_layout title="" purity="" metal="" right=""]
 [metal_offer_card title="" purity=""]
+[metal_price_compare metal_a="" metal_b="" title=""]
 [metal_payout_comparison title="" link_url=""]
 [metal_spot_ticker metal="" purity="" pill_text=""]
 [metal_goldbar_live_melt_table]
@@ -93,6 +95,8 @@ Popular examples:
 
 ```text
 [metal_price_table purity="14K"]
+[metal_price_table metal="silver" purity="0.925"]
+[metal_price_table metal="platinum" purity="0.950" show_live_box="true"]
 [metal_price_table purity="18K" title="18K Gold Price Table"]
 [metal_price_table purity="14K" show_live_box="true"]
 [metal_price_table data="gold bars"]
@@ -101,14 +105,27 @@ Popular examples:
 How to use it:
 
 - `title` changes the heading
-- `purity` changes the gold purity used for the standard table
+- `metal` chooses the metal price used for the table
+- `purity` changes the purity used for the standard table
 - `show_live_box="true"` adds the summary card beside the table
 - `data` changes which row set is shown
+
+`metal` options:
+
+- `gold`
+- `silver`
+- `platinum`
+- `palladium`
+
+Purity note:
+
+- For `gold`, use karats like `14K` or `24K`
+- For `silver`, `platinum`, and `palladium`, use a decimal purity like `0.925`, `0.950`, or `0.9995`
 
 `data` options:
 
 - `data="default"` shows the normal gold price rows
-- `data="gold bars"` shows gold bar rows
+- `data="gold bars"` shows bar rows for the selected metal
 - Variations like `gold-bar`, `gold_bars`, `bars`, and `bar` also work
 
 Good use cases:
@@ -123,6 +140,12 @@ Good use cases:
 
 ```text
 [metal_price_table data="gold bars"]
+```
+
+- A page about platinum pricing:
+
+```text
+[metal_price_table metal="platinum" purity="0.950" show_live_box="true"]
 ```
 
 ## `[metal_calculator]`
@@ -256,6 +279,44 @@ Best for:
 - Sidebars
 - Landing page sections
 - Supporting content near forms or CTAs
+
+## `[metal_price_compare]`
+
+Use this when you want a simple card comparing two live metal prices per troy ounce.
+
+Basic example:
+
+```text
+[metal_price_compare]
+```
+
+Popular examples:
+
+```text
+[metal_price_compare]
+[metal_price_compare metal_a="silver" metal_b="gold"]
+[metal_price_compare metal_a="palladium" metal_b="platinum"]
+[metal_price_compare metal_a="platinum" metal_b="gold" title="Platinum vs Gold Price Today (Per Troy Ounce)"]
+```
+
+How to use it:
+
+- `metal_a` sets the first metal row
+- `metal_b` sets the second metal row
+- `title` lets you replace the default comparison heading
+
+`metal_a` and `metal_b` options:
+
+- `gold`
+- `silver`
+- `platinum`
+- `palladium`
+
+Best for:
+
+- Quick comparison sections
+- Commodity overview pages
+- Side-by-side price callouts
 
 ## `[metal_payout_comparison]`
 
