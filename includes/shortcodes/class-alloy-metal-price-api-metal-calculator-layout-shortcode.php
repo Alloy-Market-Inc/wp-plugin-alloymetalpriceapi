@@ -88,10 +88,11 @@ class Alloy_Metal_Price_API_Metal_Calculator_Layout_Shortcode {
 	public function render($atts) {
 		$atts = shortcode_atts(
 			array(
-				'title'  => __('Cash for Gold Calculator', 'alloy-metal-price-api'),
-				'purity' => '24K',
-				'metal'  => 'gold',
-				'right'  => 'default',
+				'title'     => __('Cash for Gold Calculator', 'alloy-metal-price-api'),
+				'purity'    => '24K',
+				'metal'     => 'gold',
+				'right'     => 'default',
+				'classring' => 'false',
 			),
 			$atts,
 			self::TAG
@@ -105,6 +106,7 @@ class Alloy_Metal_Price_API_Metal_Calculator_Layout_Shortcode {
 		$metal_label         = self::METAL_LABELS[$metal];
 		$purity_value        = $this->parse_purity_value($atts['purity'], $metal);
 		$right_variant       = $this->normalize_right_variant($atts['right']);
+		$classring           = $this->normalize_boolean_attribute($atts['classring']);
 		$spot_price_per_gram = $this->api_client->get_metal_price($metal);
 
 		if (is_wp_error($spot_price_per_gram)) {
@@ -116,6 +118,7 @@ class Alloy_Metal_Price_API_Metal_Calculator_Layout_Shortcode {
 				'title'               => $title,
 				'metal'               => $metal,
 				'purity_value'        => $purity_value,
+				'classring'           => $classring,
 				'base_price_per_gram' => $spot_price_per_gram,
 				'wrapper_class'       => '',
 				'section_class'       => 'aur:w-full aur:rounded-3xl aur:bg-white aur:p-8 aur:font-sans aur:shadow-[0_4px_10px_rgba(0,0,0,0.1)]',
@@ -201,6 +204,16 @@ class Alloy_Metal_Price_API_Metal_Calculator_Layout_Shortcode {
 		}
 
 		return 'gold';
+	}
+
+	/**
+	 * Normalize a text boolean shortcode attribute.
+	 *
+	 * @param mixed $value Raw attribute value.
+	 * @return bool
+	 */
+	protected function normalize_boolean_attribute($value) {
+		return rest_sanitize_boolean($value);
 	}
 
 	/**

@@ -251,6 +251,7 @@ Default behavior:
 - `title="Gold Calculator"`
 - `purity="14K"`
 - `metal="gold"`
+- `classring="false"`
 
 Supported attributes:
 
@@ -265,6 +266,10 @@ Supported attributes:
 - `metal`
   - Supported values: `gold`, `silver`, `platinum`, `palladium`
   - Invalid values fall back to `gold`
+- `classring`
+  - Supported values: `true`, `false`
+  - Default is `false`
+  - When `true`, the calculator shows a stone-material selector for class rings
 
 Calculator UI includes:
 
@@ -275,6 +280,7 @@ Calculator UI includes:
   - `ounces`
   - `pennyweight`
 - Weight input
+- Optional class-ring stone selector with tooltip guidance
 - Computed outputs:
   - Current Market Value
   - Average Pawn Shop Offer
@@ -294,12 +300,18 @@ Offer logic:
 - Alloy estimate:
   - `0.85` for `22K` and `24K`
   - `0.7` for all other karats
+- When `classring="true"` and any stone option other than `No stone (metal-only)` is selected:
+  - deduct `10%` of total weight
+  - with a minimum deduction of `0.5 g`
+  - and a maximum deduction of `3 g`
+  - then calculate all values from the remaining metal-only grams
 
 Examples:
 
 ```text
 [metal_calculator]
 [metal_calculator purity="24K"]
+[metal_calculator purity="10K" classring="true"]
 [metal_calculator metal="silver" purity="0.925"]
 [metal_calculator metal="platinum" purity="0.950"]
 [metal_calculator metal="palladium" purity="0.9995"]
@@ -333,6 +345,7 @@ Default behavior:
 - `purity="24K"`
 - `metal="gold"`
 - `right="default"`
+- `classring="false"`
 
 Supported attributes:
 
@@ -353,6 +366,10 @@ Supported attributes:
     - `default`
     - `14K`
   - Invalid values fall back to `default`
+- `classring`
+  - Supported values: `true`, `false`
+  - Default is `false`
+  - When `true`, the shared calculator shows the class-ring stone selector and deduction metadata
 
 What the layout shows:
 
@@ -379,12 +396,14 @@ Layout behavior notes:
 - The top-right price box always updates to the selected `metal`
 - The `right="14K"` variant is only used for gold
 - For non-gold metals, the bottom-right box switches to metal-specific or placeholder content automatically
+- `classring="true"` applies the same stone deduction logic used by `[metal_calculator]`
 
 Examples:
 
 ```text
 [metal_calculator_layout]
 [metal_calculator_layout purity="14K"]
+[metal_calculator_layout purity="10K" classring="true"]
 [metal_calculator_layout metal="silver" purity="0.925"]
 [metal_calculator_layout metal="platinum" purity="0.950"]
 [metal_calculator_layout metal="palladium" purity="0.9995"]

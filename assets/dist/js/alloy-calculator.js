@@ -30,22 +30,93 @@
 		return 0.7;
 	}
 
+	function formatNumber(value) {
+		const amount = Number.isFinite(value) ? value : 0;
+
+		return (Math.round(amount * 100) / 100).toFixed(2);
+	}
+
+	function getStoneDeduction(weightInGrams, stoneMaterial) {
+		if (stoneMaterial === 'none') {
+			return 0;
+		}
+
+		const percentage = 0.1;
+		const minimumDeduction = 0.5;
+		const maximumDeduction = 3;
+
+		return Math.max(
+			minimumDeduction,
+			Math.min(weightInGrams * percentage, maximumDeduction),
+		);
+	}
+
+	function closeTooltip(container) {
+		const button = container.querySelector('.js-alloy-calculator-tooltip-button');
+		const tooltip = container.querySelector('.js-alloy-calculator-tooltip');
+
+		if (!button || !tooltip) {
+			return;
+		}
+
+		tooltip.classList.add('aur:hidden');
+		button.setAttribute('aria-expanded', 'false');
+	}
+
+	function openTooltip(container) {
+		const button = container.querySelector('.js-alloy-calculator-tooltip-button');
+		const tooltip = container.querySelector('.js-alloy-calculator-tooltip');
+
+		if (!button || !tooltip) {
+			return;
+		}
+
+		tooltip.classList.remove('aur:hidden');
+		button.setAttribute('aria-expanded', 'true');
+	}
+
+	function toggleTooltip(container) {
+		const tooltip = container.querySelector('.js-alloy-calculator-tooltip');
+
+		if (!tooltip) {
+			return;
+		}
+
+		if (tooltip.classList.contains('aur:hidden')) {
+			openTooltip(container);
+			return;
+		}
+
+		closeTooltip(container);
+	}
+
 	function calculate(container) {
 		const pricePerGram = parseFloat(container.dataset.basePrice || '0');
 		const metal = container.dataset.metal || 'gold';
+		const isClassRing = container.dataset.classring === 'true';
 		const purityField = container.querySelector('.js-alloy-calculator-purity');
+		const stoneField = container.querySelector('.js-alloy-calculator-stone');
 		const weightUnitSelect = container.querySelector('.js-alloy-calculator-weight-unit');
 		const weightInput = container.querySelector('.js-alloy-calculator-weight');
 		const marketValue = container.querySelector('.js-alloy-calculator-market-value');
 		const pawnValue = container.querySelector('.js-alloy-calculator-pawn-value');
 		const alloyValue = container.querySelector('.js-alloy-calculator-alloy-value');
+		const metaValue = container.querySelector('.js-alloy-calculator-meta');
 		const results = container.querySelector('.js-alloy-calculator-results');
 		const cta = container.querySelector('.js-alloy-calculator-cta');
 
 		const purityRaw = parseFloat(purityField ? purityField.value : '0');
 		const weight = parseFloat(weightInput ? weightInput.value : '0');
 		const weightUnit = weightUnitSelect ? weightUnitSelect.value : 'grams';
-		const weightInGrams = convertWeightToGrams(Number.isFinite(weight) ? weight : 0, weightUnit);
+		const totalWeightInGrams = convertWeightToGrams(
+			Number.isFinite(weight) ? weight : 0,
+			weightUnit,
+		);
+		const stoneMaterial = stoneField ? stoneField.value : 'none';
+		const stoneDeduction = isClassRing
+			? getStoneDeduction(totalWeightInGrams, stoneMaterial)
+			: 0;
+		const weightInGrams = Math.max(totalWeightInGrams - stoneDeduction, 0);
 		const purity =
 			metal === 'gold'
 				? (Number.isFinite(purityRaw) ? purityRaw : 24) / 24
@@ -66,6 +137,15 @@
 
 		if (alloyValue) {
 			alloyValue.textContent = toCurrency(alloyEstimatedOffer);
+		}
+
+		if (metaValue) {
+			metaValue.textContent =
+				'Assumed stone deduction: ' +
+				formatNumber(stoneDeduction) +
+				' g • Metal-only: ' +
+				formatNumber(weightInGrams) +
+				' g';
 		}
 
 		if (results) {
@@ -193,6 +273,8 @@
 		if (purityField && defaultPurity) {
 			purityField.value = defaultPurity;
 		}
+
+		closeTooltip(container);
 	}
 
 	function initializeConversionCalculator(container) {
@@ -268,6 +350,20 @@
 			return;
 		}
 
+		const tooltipButton = event.target.closest('.js-alloy-calculator-tooltip-button');
+
+		if (tooltipButton) {
+			event.preventDefault();
+
+			const container = tooltipButton.closest('.js-alloy-calculator');
+
+			if (container) {
+				toggleTooltip(container);
+			}
+
+			return;
+		}
+
 		const conversionButton = event.target.closest('.js-conversion-rate-calculate');
 
 		if (conversionButton) {
@@ -285,6 +381,12 @@
 		const refreshButton = event.target.closest('.js-metal-offer-card-refresh');
 
 		if (!refreshButton) {
+			document.querySelectorAll('.js-alloy-calculator').forEach(function (container) {
+				if (!container.contains(event.target)) {
+					closeTooltip(container);
+				}
+			});
+
 			return;
 		}
 
@@ -297,7 +399,7 @@
 
 	document.addEventListener('change', function (event) {
 		const field = event.target.closest(
-			'.js-alloy-calculator-purity, .js-alloy-calculator-weight-unit',
+			'.js-alloy-calculator-purity, .js-alloy-calculator-weight-unit, .js-alloy-calculator-stone',
 		);
 
 		if (!field) {
@@ -337,6 +439,16 @@
 		if (container) {
 			calculate(container);
 		}
+	});
+
+	document.addEventListener('keydown', function (event) {
+		if (event.key !== 'Escape') {
+			return;
+		}
+
+		document.querySelectorAll('.js-alloy-calculator').forEach(function (container) {
+			closeTooltip(container);
+		});
 	});
 
 	if (document.readyState === 'loading') {

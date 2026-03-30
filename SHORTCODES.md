@@ -23,8 +23,8 @@ If you only need the short version:
 ```text
 [metalpriceapi symbol="" unit=""]
 [metal_price_table title="" metal="" purity="" data="" show_live_box=""]
-[metal_calculator title="" purity="" metal=""]
-[metal_calculator_layout title="" purity="" metal="" right=""]
+[metal_calculator title="" purity="" metal="" classring=""]
+[metal_calculator_layout title="" purity="" metal="" right="" classring=""]
 [metal_offer_card title="" purity=""]
 [metal_price_compare metal_a="" metal_b="" title=""]
 [metal_payout_comparison title="" link_url=""]
@@ -167,6 +167,7 @@ Popular examples:
 ```text
 [metal_calculator purity="14K"]
 [metal_calculator purity="24K"]
+[metal_calculator purity="10K" classring="true"]
 [metal_calculator metal="silver" purity="0.925"]
 [metal_calculator metal="platinum" purity="0.950"]
 [metal_calculator metal="palladium" purity="0.9995"]
@@ -178,6 +179,12 @@ How to use it:
 - `title` changes the calculator heading
 - `purity` sets the default purity shown when the calculator loads
 - `metal` chooses the metal price used in the calculator
+- `classring` shows a stone-material selector when set to `true`
+
+`classring` options:
+
+- `false` keeps the standard calculator
+- `true` adds class-ring stone handling with a conservative stone-weight deduction
 
 `metal` options:
 
@@ -191,6 +198,12 @@ Purity note:
 - For `gold`, use karats like `14K` or `24K`
 - For `silver` and `palladium`, use a decimal purity like `0.925` or `0.9995`
 - For `platinum`, use the built-in selector options: `999.5`, `999`, `950`, `900`, or `850`
+
+Class-ring note:
+
+- When `classring="true"`, the calculator adds a stone-material select
+- Any stone option other than `No stone` deducts `10%` of total weight, with a minimum of `0.5 g` and a maximum of `3 g`
+- The calculator then uses the remaining metal-only weight for the value calculation
 
 Best for:
 
@@ -211,6 +224,7 @@ Popular exampless:
 
 ```text
 [metal_calculator_layout purity="14K"]
+[metal_calculator_layout purity="10K" classring="true"]
 [metal_calculator_layout metal="silver" purity="0.925"]
 [metal_calculator_layout metal="platinum" purity="0.950"]
 [metal_calculator_layout metal="palladium" purity="0.9995"]
@@ -224,11 +238,17 @@ How to use it:
 - `purity` sets the default purity in the calculator
 - `metal` chooses the metal price used in the calculator and right-side price box
 - `right` controls the content boxes shown in the right column
+- `classring` shows a stone-material selector inside the shared calculator when set to `true`
 
 `right` options:
 
 - `right="default"` shows the standard gold price and marking boxes
 - `right="14K"` shows the 14K-specific right-column content
+
+`classring` options:
+
+- `classring="false"` keeps the standard calculator
+- `classring="true"` adds class-ring stone handling with the same stone deduction logic as `[metal_calculator]`
 
 `metal` options:
 

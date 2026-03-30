@@ -24,6 +24,7 @@ class Alloy_Metal_Price_API_Calculator_Renderer {
 				'title'                  => __('Gold Calculator', 'alloy-metal-price-api'),
 				'metal'                  => 'gold',
 				'purity_value'           => 14,
+				'classring'              => false,
 				'base_price_per_gram'    => 0,
 				'wrapper_class'          => '',
 				'section_class'          => 'aur:mx-auto aur:w-full aur:max-w-130 aur:rounded-3xl aur:bg-white aur:p-5 aur:font-sans aur:shadow-[0_8px_24px_rgba(0,0,0,0.06)] aur:sm:p-6',
@@ -44,6 +45,7 @@ class Alloy_Metal_Price_API_Calculator_Renderer {
 		$metal             = sanitize_key((string) $args['metal']);
 		$metal_label       = $this->get_metal_label($metal);
 		$purity_value      = 'gold' === $metal ? absint($args['purity_value']) : (float) $args['purity_value'];
+		$classring         = rest_sanitize_boolean($args['classring']);
 		$base_price        = (float) $args['base_price_per_gram'];
 		$wrapper_class     = trim((string) $args['wrapper_class']);
 		$section_class     = trim('js-alloy-calculator ' . (string) $args['section_class']);
@@ -65,6 +67,7 @@ class Alloy_Metal_Price_API_Calculator_Renderer {
 				class="<?php echo esc_attr($section_class); ?>"
 				data-base-price="<?php echo esc_attr((string) $base_price); ?>"
 				data-metal="<?php echo esc_attr($metal); ?>"
+				data-classring="<?php echo $classring ? 'true' : 'false'; ?>"
 				data-default-purity="<?php echo esc_attr((string) $purity_value); ?>">
 				<h2 class="<?php echo esc_attr($heading_class); ?>">
 					<?php echo esc_html($title); ?>
@@ -147,6 +150,45 @@ class Alloy_Metal_Price_API_Calculator_Renderer {
 							class="js-alloy-calculator-weight aur:w-full aur:rounded-md! aur:border aur:border-slate-300 aur:bg-white aur:px-4 aur:py-3! aur:text-base aur:text-slate-900 aur:placeholder:text-slate-400 aur:focus:border-primary aur:focus:outline-none">
 					</div>
 
+					<?php if ($classring) : ?>
+						<div class="js-alloy-calculator-classring aur:relative aur:mb-1">
+							<div class="aur:mb-2 aur:flex aur:items-center aur:gap-2">
+								<label for="<?php echo esc_attr($instance_id . '-stone'); ?>" class="aur:m-0 aur:text-sm aur:font-medium aur:text-primary">
+									<?php esc_html_e('Stone material:', 'alloy-metal-price-api'); ?>
+								</label>
+								<div
+									class="js-alloy-calculator-tooltip-button aur:inline-flex aur:h-5 aur:w-5 aur:items-center aur:justify-center aur:rounded-full! aur:border-0 aur:bg-primary aur:p-0 aur:text-[11px] aur:leading-none aur:font-bold aur:text-white aur:cursor-pointer!"
+									aria-expanded="false"
+									aria-controls="<?php echo esc_attr($instance_id . '-tooltip'); ?>">
+									i
+								</div>
+							</div>
+
+							<div
+								id="<?php echo esc_attr($instance_id . '-tooltip'); ?>"
+								role="tooltip"
+								class="js-alloy-calculator-tooltip aur:absolute aur:left-1/2 aur:top-9 aur:z-30 aur:hidden aur:w-full aur:min-w-60 aur:max-w-85 aur:-translate-x-1/2 aur:rounded-2xl aur:bg-primary aur:px-3 aur:py-3 aur:text-sm aur:leading-5 aur:text-white aur:shadow-[0_6px_18px_rgba(0,0,0,0.18)]">
+								<?php esc_html_e('Not sure which to pick? Try these quick cues:', 'alloy-metal-price-api'); ?>
+								<ul class="aur:mt-2 aur:list-disc aur:space-y-1 aur:pl-4">
+									<li><?php esc_html_e('Most colored class-ring stones: Spinel or Corundum', 'alloy-metal-price-api'); ?></li>
+									<li><?php esc_html_e('Very clear and sparkly: Cubic Zirconia (CZ)', 'alloy-metal-price-api'); ?></li>
+									<li><?php esc_html_e('Opaque or translucent school colors: Glass or Quartz', 'alloy-metal-price-api'); ?></li>
+									<li><?php esc_html_e('Unsure or plain metal: No stone (metal-only)', 'alloy-metal-price-api'); ?></li>
+								</ul>
+							</div>
+
+							<select
+								id="<?php echo esc_attr($instance_id . '-stone'); ?>"
+								class="js-alloy-calculator-stone aur:w-full aur:rounded-md! aur:border aur:border-slate-300 aur:bg-white aur:px-4 aur:py-3! aur:text-base aur:text-slate-900 aur:focus:border-primary aur:focus:outline-none">
+								<option value="none"><?php esc_html_e('No stone (metal-only)', 'alloy-metal-price-api'); ?></option>
+								<option value="quartz"><?php esc_html_e('Quartz / Glass', 'alloy-metal-price-api'); ?></option>
+								<option value="spinel"><?php esc_html_e('Spinel (synthetic)', 'alloy-metal-price-api'); ?></option>
+								<option value="corundum"><?php esc_html_e('Sapphire/Ruby (corundum)', 'alloy-metal-price-api'); ?></option>
+								<option value="cz"><?php esc_html_e('Cubic Zirconia', 'alloy-metal-price-api'); ?></option>
+							</select>
+						</div>
+					<?php endif; ?>
+
 					<div>
 						<button type="submit" class="<?php echo esc_attr($button_class); ?>">
 							<?php esc_html_e('Calculate Value', 'alloy-metal-price-api'); ?>
@@ -166,6 +208,9 @@ class Alloy_Metal_Price_API_Calculator_Renderer {
 							<h3 class="aur:mb-2 aur:text-base! aur:font-semibold aur:text-slate-900!"><?php esc_html_e('Alloy\'s Estimated Offer:', 'alloy-metal-price-api'); ?></h3>
 							<p class="js-alloy-calculator-alloy-value aur:m-0 aur:text-2xl aur:font-semibold aur:text-emerald-600">$0.00</p>
 						</div>
+						<?php if ($classring) : ?>
+							<p class="js-alloy-calculator-meta aur:m-0 aur:text-sm aur:text-slate-600"></p>
+						<?php endif; ?>
 					</div>
 
 					<div class="js-alloy-calculator-cta aur:hidden">
@@ -195,8 +240,8 @@ class Alloy_Metal_Price_API_Calculator_Renderer {
 			'palladium' => __('Palladium', 'alloy-metal-price-api'),
 		);
 
-		if (isset($labels[ $metal ])) {
-			return $labels[ $metal ];
+		if (isset($labels[$metal])) {
+			return $labels[$metal];
 		}
 
 		return $labels['gold'];
