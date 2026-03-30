@@ -11,6 +11,7 @@ If you only need the short version:
 - Use `[metal_offer_card]` for a compact offer comparison box
 - Use `[metal_payout_comparison]` for a multi-row payout comparison card
 - Use `[metal_spot_ticker]` for a small live spot-price box
+- Use `[metal_budget_buy_widget]` for a budget-based metal buying estimate widget
 - Use `[metal_goldbar_live_melt_table]` for a responsive gold bar melt-value table
 - Use `[metal_fractional_goldbar_module]` for a fractional gold bar module with a live spot-price header
 - Use `[metal_standard_goldbar_module]` for a standard gold bar module with a live spot-price header
@@ -29,6 +30,7 @@ If you only need the short version:
 [metal_price_compare metal_a="" metal_b="" title=""]
 [metal_payout_comparison title="" link_url=""]
 [metal_spot_ticker metal="" purity="" pill_text=""]
+[metal_budget_buy_widget title="" metal="" budget="" premium=""]
 [metal_goldbar_live_melt_table]
 [metal_fractional_goldbar_module]
 [metal_standard_goldbar_module]
@@ -379,6 +381,45 @@ Best for:
 - Affiliate economics pages
 - Lead-cost planning tools
 - Internal ROI and margin content
+
+## `[metal_budget_buy_widget]`
+
+Use this when you want to estimate how many ounces of a metal a budget can buy after adding a premium percentage.
+
+Basic example:
+
+```text
+[metal_budget_buy_widget]
+```
+
+Popular examples:
+
+```text
+[metal_budget_buy_widget metal="silver"]
+[metal_budget_buy_widget budget="5000" premium="3"]
+[metal_budget_buy_widget metal="platinum" budget="25000" premium="7.5"]
+[metal_budget_buy_widget title="How much silver will $5,000 buy?" metal="silver" budget="5000"]
+```
+
+How to use it:
+
+- `title` changes the heading
+- `metal` chooses the metal price used in the widget
+- `budget` sets the dollar amount
+- `premium` sets the assumed average premium percent
+
+`metal` options:
+
+- `gold`
+- `silver`
+- `platinum`
+- `palladium`
+
+Best for:
+
+- Buyer education pages
+- Gold and silver investing content
+- Quick budget comparison boxes
 
 ## `[metal_payout_comparison]`
 

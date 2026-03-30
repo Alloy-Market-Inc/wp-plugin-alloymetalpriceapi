@@ -27,6 +27,7 @@ The plugin currently fetches prices from:
 - `[metal_price_calc]`
 - `[metal_payout_comparison]`
 - `[metal_spot_ticker]`
+- `[metal_budget_buy_widget]`
 - `[metal_goldbar_live_melt_table]`
 - `[metal_fractional_goldbar_module]`
 - `[metal_standard_goldbar_module]`
@@ -54,6 +55,7 @@ Shortcodes that enqueue CSS:
 - `metal_price_compare`
 - `metal_payout_comparison`
 - `metal_spot_ticker`
+- `metal_budget_buy_widget`
 - `metal_goldbar_live_melt_table`
 - `metal_fractional_goldbar_module`
 - `metal_standard_goldbar_module`
@@ -65,6 +67,7 @@ Shortcodes that enqueue JS:
 - `metal_calculator`
 - `metal_calculator_layout`
 - `metal_offer_card`
+- `metal_budget_buy_widget`
 
 `[metal_price_calc]` returns a plain `<span>` and does not rely on the plugin stylesheet or script.
 The underscore version is the canonical shortcode tag. The older dashed form is accepted only as a backward-compatible alias.
@@ -844,6 +847,56 @@ Examples:
 [conversion_rate_calculator sale_amount="1500" hard_cost="35" profit_margin="25"]
 ```
 
+### `[metal_budget_buy_widget]`
+
+Outputs a live budget-buy widget that estimates how many ounces of a selected metal a budget can buy after applying a premium percentage.
+
+Default usage:
+
+```text
+[metal_budget_buy_widget]
+```
+
+Default behavior:
+
+- `title=""`
+- `metal="gold"`
+- `budget="10000"`
+- `premium="5"`
+
+Supported attributes:
+
+- `title`
+  - Optional custom widget heading
+  - If omitted, the heading is generated from `budget` and `metal`
+- `metal`
+  - Supported values: `gold`, `silver`, `platinum`, `palladium`
+  - Invalid values fall back to `gold`
+- `budget`
+  - Any non-negative numeric value
+  - Invalid values fall back to `10000`
+- `premium`
+  - Any numeric value from `0` to `30`
+  - Invalid values fall back to `5`
+
+Widget behavior:
+
+- Shows the live spot price per troy ounce for the selected metal
+- Lets the user edit the assumed premium percentage
+- Recalculates the estimated ounces on input
+- Uses the formula:
+  - `budget / (spot per ounce × (1 + premium / 100))`
+
+Examples:
+
+```text
+[metal_budget_buy_widget]
+[metal_budget_buy_widget metal="silver"]
+[metal_budget_buy_widget budget="5000" premium="3"]
+[metal_budget_buy_widget metal="platinum" budget="25000" premium="7.5"]
+[metal_budget_buy_widget title="How much silver will $5,000 buy?" metal="silver" budget="5000"]
+```
+
 ### `[metal_price_calc]`
 
 Outputs a server-rendered formatted currency value in a `<span>` using calculator-style math from shortcode attributes.
@@ -965,6 +1018,7 @@ The plugin makes live API requests on page render or refresh. Different shortcod
 - `[metal_price_compare]` renders a comparison card with unavailable rows and `Feed error`
 - `[metal_payout_comparison]` renders an unavailable comparison table
 - `[metal_spot_ticker]` renders an unavailable ticker card
+- `[metal_budget_buy_widget]` renders with the live spot price at `$0.00`, so the estimated ounces also start at `0.000`
 - `[conversion_rate_calculator]` still renders because it performs calculations locally in the browser
 - `[metal_price_calc]` returns `<span>Unavailable</span>`
 

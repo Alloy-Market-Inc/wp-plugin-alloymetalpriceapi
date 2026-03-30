@@ -28,6 +28,7 @@ class Alloy_Metal_Price_API_Assets {
 		'metal_fractional_goldbar_module',
 		'metal_standard_goldbar_module',
 		'metal_offer_card',
+		'metal_budget_buy_widget',
 	);
 
 	/**
@@ -40,6 +41,7 @@ class Alloy_Metal_Price_API_Assets {
 		'metal_calculator_layout',
 		'conversion_rate_calculator',
 		'metal_offer_card',
+		'metal_budget_buy_widget',
 	);
 
 	/**

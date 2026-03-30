@@ -266,6 +266,25 @@
 		].join('');
 	}
 
+	function calculateBudgetBuyWidget(container) {
+		const premiumField = container.querySelector('.js-metal-budget-buy-premium');
+		const output = container.querySelector('.js-metal-budget-buy-output');
+		const budget = parseFloat(container.dataset.budget || '0');
+		const spotPerOunce = parseFloat(container.dataset.spotOunce || '0');
+		const premium = parseFloat(premiumField ? premiumField.value : '0');
+		const safeBudget = Number.isFinite(budget) ? budget : 0;
+		const safeSpotPerOunce = Number.isFinite(spotPerOunce) ? spotPerOunce : 0;
+		const safePremium = Number.isFinite(premium) ? premium : 0;
+		const denominator = safeSpotPerOunce * (1 + safePremium / 100);
+		const ounces = denominator > 0 ? safeBudget / denominator : null;
+
+		if (!output) {
+			return;
+		}
+
+		output.textContent = Number.isFinite(ounces) ? ounces.toFixed(3) : '--';
+	}
+
 	function initialize(container) {
 		const purityField = container.querySelector('.js-alloy-calculator-purity');
 		const defaultPurity = container.dataset.defaultPurity;
@@ -279,6 +298,10 @@
 
 	function initializeConversionCalculator(container) {
 		updateConversionDisplays(container);
+	}
+
+	function initializeBudgetBuyWidget(container) {
+		calculateBudgetBuyWidget(container);
 	}
 
 	function initializeOfferCard(card) {
@@ -302,6 +325,10 @@
 
 		document.querySelectorAll('.js-conversion-rate-calculator').forEach(function (container) {
 			initializeConversionCalculator(container);
+		});
+
+		document.querySelectorAll('.js-metal-budget-buy-widget').forEach(function (container) {
+			initializeBudgetBuyWidget(container);
 		});
 	}
 
@@ -423,6 +450,18 @@
 
 			if (conversionContainer) {
 				updateConversionDisplays(conversionContainer);
+			}
+
+			return;
+		}
+
+		const budgetBuyField = event.target.closest('.js-metal-budget-buy-premium');
+
+		if (budgetBuyField) {
+			const budgetBuyContainer = budgetBuyField.closest('.js-metal-budget-buy-widget');
+
+			if (budgetBuyContainer) {
+				calculateBudgetBuyWidget(budgetBuyContainer);
 			}
 
 			return;

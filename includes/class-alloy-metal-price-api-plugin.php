@@ -26,6 +26,7 @@ require_once ALLOY_METAL_PRICE_API_PLUGIN_DIR . 'includes/shortcodes/class-alloy
 require_once ALLOY_METAL_PRICE_API_PLUGIN_DIR . 'includes/shortcodes/class-alloy-metal-price-api-metal-fractional-goldbar-module-shortcode.php';
 require_once ALLOY_METAL_PRICE_API_PLUGIN_DIR . 'includes/shortcodes/class-alloy-metal-price-api-metal-standard-goldbar-module-shortcode.php';
 require_once ALLOY_METAL_PRICE_API_PLUGIN_DIR . 'includes/shortcodes/class-alloy-metal-price-api-metal-offer-card-shortcode.php';
+require_once ALLOY_METAL_PRICE_API_PLUGIN_DIR . 'includes/shortcodes/class-alloy-metal-price-api-metal-budget-buy-widget-shortcode.php';
 
 class Alloy_Metal_Price_API_Plugin {
 	/**
@@ -121,6 +122,7 @@ class Alloy_Metal_Price_API_Plugin {
 			new Alloy_Metal_Price_API_Metal_Fractional_Goldbar_Module_Shortcode($this->api_client, $this->assets),
 			new Alloy_Metal_Price_API_Metal_Standard_Goldbar_Module_Shortcode($this->api_client, $this->assets),
 			new Alloy_Metal_Price_API_Metal_Offer_Card_Shortcode($this->api_client, $this->assets),
+			new Alloy_Metal_Price_API_Metal_Budget_Buy_Widget_Shortcode($this->api_client, $this->assets),
 		);
 
 		foreach ($this->shortcodes as $shortcode) {
