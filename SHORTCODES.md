@@ -180,7 +180,7 @@ Basic example:
 [metal_calculator_layout]
 ```
 
-Popular examples:
+Popular exampless:
 
 ```text
 [metal_calculator_layout purity="14K"]
