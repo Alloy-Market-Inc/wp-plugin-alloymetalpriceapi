@@ -122,7 +122,7 @@ class Alloy_Metal_Price_API_Metal_Calculator_Layout_Shortcode {
 				'base_price_per_gram' => $spot_price_per_gram,
 				'wrapper_class'       => '',
 				'section_class'       => 'aur:w-full aur:rounded-3xl aur:bg-white aur:p-8 aur:font-sans aur:shadow-[0_4px_10px_rgba(0,0,0,0.1)]',
-				'heading_class'       => 'aur:mb-10 aur:mt-5 aur:text-center aur:text-2xl! aur:font-semibold aur:text-black',
+				'heading_class'       => 'aur:mb-10! aur:mt-5! aur:text-center! aur:text-2xl! aur:font-semibold! aur:text-black!',
 			)
 		);
 
