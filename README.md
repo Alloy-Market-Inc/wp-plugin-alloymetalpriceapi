@@ -304,7 +304,7 @@ Offer logic:
   - `0.85` for `22K` and `24K`
   - `0.7` for all other karats
 - When `classring="true"` and any stone option other than `No stone (metal-only)` is selected:
-  - deduct `10%` of total weight
+  - deduct `20%` of total weight
   - with a minimum deduction of `0.5 g`
   - and a maximum deduction of `3 g`
   - then calculate all values from the remaining metal-only grams

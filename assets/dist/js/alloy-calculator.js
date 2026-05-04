@@ -41,7 +41,7 @@
 			return 0;
 		}
 
-		const percentage = 0.1;
+		const percentage = 0.2;
 		const minimumDeduction = 0.5;
 		const maximumDeduction = 3;
 

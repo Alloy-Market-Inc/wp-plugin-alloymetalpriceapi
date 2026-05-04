@@ -204,7 +204,7 @@ Purity note:
 Class-ring note:
 
 - When `classring="true"`, the calculator adds a stone-material select
-- Any stone option other than `No stone` deducts `10%` of total weight, with a minimum of `0.5 g` and a maximum of `3 g`
+- Any stone option other than `No stone` deducts `20%` of total weight, with a minimum of `0.5 g` and a maximum of `3 g`
 - The calculator then uses the remaining metal-only weight for the value calculation
 
 Best for:
