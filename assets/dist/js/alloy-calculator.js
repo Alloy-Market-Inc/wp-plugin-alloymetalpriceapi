@@ -90,7 +90,35 @@
 		closeTooltip(container);
 	}
 
-	function calculate(container) {
+	function revealCalculatorResults(container) {
+		const results = container.querySelector('.js-alloy-calculator-results');
+		const cta = container.querySelector('.js-alloy-calculator-cta');
+
+		if (results) {
+			results.classList.remove('aur:hidden');
+			results.classList.add('aur:grid');
+		}
+
+		if (cta) {
+			cta.classList.remove('aur:hidden');
+		}
+	}
+
+	function hideCalculatorResults(container) {
+		const results = container.querySelector('.js-alloy-calculator-results');
+		const cta = container.querySelector('.js-alloy-calculator-cta');
+
+		if (results) {
+			results.classList.add('aur:hidden');
+			results.classList.remove('aur:grid');
+		}
+
+		if (cta) {
+			cta.classList.add('aur:hidden');
+		}
+	}
+
+	function calculate(container, revealResults) {
 		const pricePerGram = parseFloat(container.dataset.basePrice || '0');
 		const metal = container.dataset.metal || 'gold';
 		const isClassRing = container.dataset.classring === 'true';
@@ -102,8 +130,6 @@
 		const pawnValue = container.querySelector('.js-alloy-calculator-pawn-value');
 		const alloyValue = container.querySelector('.js-alloy-calculator-alloy-value');
 		const metaValue = container.querySelector('.js-alloy-calculator-meta');
-		const results = container.querySelector('.js-alloy-calculator-results');
-		const cta = container.querySelector('.js-alloy-calculator-cta');
 
 		const purityRaw = parseFloat(purityField ? purityField.value : '0');
 		const weight = parseFloat(weightInput ? weightInput.value : '0');
@@ -148,13 +174,8 @@
 				' g';
 		}
 
-		if (results) {
-			results.classList.remove('aur:hidden');
-			results.classList.add('aur:grid');
-		}
-
-		if (cta) {
-			cta.classList.remove('aur:hidden');
+		if (revealResults) {
+			revealCalculatorResults(container);
 		}
 	}
 
@@ -294,6 +315,7 @@
 		}
 
 		closeTooltip(container);
+		hideCalculatorResults(container);
 	}
 
 	function initializeConversionCalculator(container) {
@@ -341,7 +363,7 @@
 			const container = form.closest('.js-alloy-calculator');
 
 			if (container) {
-				calculate(container);
+				calculate(container, true);
 			}
 
 			return;
@@ -371,7 +393,7 @@
 			const container = calculateButton.closest('.js-alloy-calculator');
 
 			if (container) {
-				calculate(container);
+				calculate(container, true);
 			}
 
 			return;
@@ -436,7 +458,7 @@
 		const container = field.closest('.js-alloy-calculator');
 
 		if (container) {
-			calculate(container);
+			calculate(container, false);
 		}
 	});
 
@@ -476,7 +498,7 @@
 		const container = field.closest('.js-alloy-calculator');
 
 		if (container) {
-			calculate(container);
+			calculate(container, false);
 		}
 	});
 

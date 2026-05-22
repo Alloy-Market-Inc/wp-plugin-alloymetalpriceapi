@@ -115,7 +115,7 @@ class Alloy_Metal_Price_API_Metal_Offer_Card_Shortcode {
 						</div>
 
 						<div class="aur:min-w-65 aur:flex-1 aur:rounded-2xl aur:border-2 aur:border-primary aur:p-4 aur:text-center">
-							<div class="aur:text-xl aur:font-semibold aur:text-primary"><?php esc_html_e('Alloy’s Estimated Offer', 'alloy-metal-price-api'); ?></div>
+							<div class="aur:text-xl aur:font-semibold aur:text-primary"><?php esc_html_e('Alloy\'s Estimated Offer', 'alloy-metal-price-api'); ?></div>
 							<div class="js-metal-offer-card-alloy aur:text-[22px] aur:text-primary"><?php echo esc_html($pricing['alloy']); ?></div>
 						</div>
 					</div>

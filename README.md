@@ -301,7 +301,8 @@ Calculator UI includes:
   - Current Market Value
   - Average Pawn Shop Offer
   - Alloy's Estimated Offer
-- Live recalculation as fields change
+- Results stay hidden until Calculate Value is clicked
+- After results are shown, values recalculate as fields change
 
 Metal behavior:
 
@@ -339,7 +340,7 @@ API failure behavior:
 
 - If the live gold price request fails, the calculator still renders
 - Base price becomes `0`
-- Calculated values start from zero until refreshed page content gets valid data
+- Calculated values remain hidden until Calculate Value is clicked and start from zero until refreshed page content gets valid data
 
 Implementation note:
 

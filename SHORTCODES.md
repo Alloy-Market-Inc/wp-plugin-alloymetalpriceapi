@@ -212,6 +212,11 @@ Best for:
 - Simple calculator sections
 - Landing pages where the calculator should be the main focus
 
+Behavior note:
+
+- Results stay hidden until Calculate Value is clicked
+- After results are shown, values recalculate as fields change
+
 ## `[metal_calculator_layout]`
 
 Use this when you want the calculator plus the extra content boxes on the right.
@@ -268,6 +273,7 @@ Purity note:
 Notes:
 
 - Gold keeps the standard gold content boxes
+- Calculator results stay hidden until Calculate Value is clicked
 - `right="14K"` is for gold only
 - Platinum uses a platinum fineness box in the bottom-right area
 - Silver and Palladium currently use a placeholder bottom-right box until their custom content is added
