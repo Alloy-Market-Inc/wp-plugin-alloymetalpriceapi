@@ -91,6 +91,8 @@ class Alloy_Metal_Price_API_Plugin {
 		add_action('wp_enqueue_scripts', array($this->assets, 'register_assets'));
 		add_action('wp_enqueue_scripts', array($this->assets, 'maybe_enqueue_shortcode_assets'), 20);
 		add_action('init', array($this, 'register_shortcodes'));
+		add_action('wp_ajax_alloy_metal_price_api_refresh_calculator_price', array($this, 'handle_calculator_price_refresh'));
+		add_action('wp_ajax_nopriv_alloy_metal_price_api_refresh_calculator_price', array($this, 'handle_calculator_price_refresh'));
 	}
 
 	/**
@@ -130,5 +132,39 @@ class Alloy_Metal_Price_API_Plugin {
 				$shortcode->register();
 			}
 		}
+	}
+
+	/**
+	 * Public AJAX handler for calculator live-price hydration.
+	 *
+	 * @return void
+	 */
+	public function handle_calculator_price_refresh() {
+		check_ajax_referer('alloy_metal_price_api_refresh', 'nonce');
+
+		$metal = isset($_POST['metal']) ? sanitize_key(wp_unslash($_POST['metal'])) : 'gold';
+
+		if (! in_array($metal, array('gold', 'silver', 'platinum', 'palladium'), true)) {
+			$metal = 'gold';
+		}
+
+		$price_per_gram = $this->api_client->get_metal_price($metal);
+
+		if (is_wp_error($price_per_gram)) {
+			wp_send_json_error(
+				array(
+					'message' => $price_per_gram->get_error_message(),
+				)
+			);
+		}
+
+		wp_send_json_success(
+			array(
+				'metal'         => $metal,
+				'pricePerGram'  => (float) $price_per_gram,
+				'pricePerOunce' => (float) $price_per_gram * 31.1035,
+				'pricePerKilo'  => (float) $price_per_gram * 1000,
+			)
+		);
 	}
 }

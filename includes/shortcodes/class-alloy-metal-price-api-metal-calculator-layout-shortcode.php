@@ -107,11 +107,11 @@ class Alloy_Metal_Price_API_Metal_Calculator_Layout_Shortcode {
 		$purity_value        = $this->parse_purity_value($atts['purity'], $metal);
 		$right_variant       = $this->normalize_right_variant($atts['right']);
 		$classring           = $this->normalize_boolean_attribute($atts['classring']);
-		$spot_price_per_gram = $this->api_client->get_metal_price($metal);
+		$spot_price_per_gram = $this->api_client->get_cached_metal_price($metal);
+		$spot_price_per_gram = null === $spot_price_per_gram ? 0 : $spot_price_per_gram;
 
-		if (is_wp_error($spot_price_per_gram)) {
-			$spot_price_per_gram = 0;
-		}
+		$layout_id        = wp_unique_id('alloy-calculator-layout-');
+		$layout_skeleton = $layout_id . '-skeleton';
 
 		$calculator_markup = $this->calculator_renderer->render(
 			array(
@@ -120,6 +120,7 @@ class Alloy_Metal_Price_API_Metal_Calculator_Layout_Shortcode {
 				'purity_value'        => $purity_value,
 				'classring'           => $classring,
 				'base_price_per_gram' => $spot_price_per_gram,
+				'show_skeleton'       => false,
 				'wrapper_class'       => '',
 				'section_class'       => 'aur:w-full aur:rounded-3xl aur:bg-white aur:p-8 aur:font-sans aur:shadow-[0_4px_10px_rgba(0,0,0,0.1)]',
 				'heading_class'       => 'aur:mb-10 aur:mt-5 aur:text-center aur:text-2xl! aur:font-semibold aur:text-black',
@@ -128,14 +129,20 @@ class Alloy_Metal_Price_API_Metal_Calculator_Layout_Shortcode {
 
 		ob_start();
 ?>
-		<div class="aur:flex aur:w-full aur:justify-center aur:font-sans">
-			<div class="aur:flex aur:w-full aur:max-w-7xl aur:flex-col aur:gap-15 aur:md:grid aur:md:grid-cols-2 aur:md:items-start">
-				<div class="aur:w-full aur:md:max-w-150">
+		<div class="alloy-calculator-layout-shell">
+			<?php echo $this->render_layout_skeleton($layout_skeleton, $title, $classring); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+			<div
+				id="<?php echo esc_attr($layout_id); ?>"
+				class="alloy-calculator-layout-content aur:flex aur:w-full aur:justify-center aur:font-sans"
+				data-metal="<?php echo esc_attr($metal); ?>"
+				data-alloy-layout-pending="true">
+			<div class="alloy-calculator-layout-grid aur:flex aur:w-full aur:max-w-7xl aur:flex-col aur:gap-15 aur:md:grid aur:md:grid-cols-2 aur:md:items-start">
+				<div class="alloy-calculator-layout-main aur:w-full aur:md:max-w-150">
 					<?php echo $calculator_markup; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped 
 					?>
 				</div>
 
-				<div class="aur:w-full aur:md:max-w-95 aur:space-y-5 aur:justify-self-end">
+				<div class="alloy-calculator-layout-side aur:w-full aur:md:max-w-95 aur:space-y-5 aur:justify-self-end">
 					<?php
 					if ('gold' === $metal && '14k' === $right_variant) {
 						echo $this->render_14k_right_column($spot_price_per_gram); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
@@ -145,10 +152,189 @@ class Alloy_Metal_Price_API_Metal_Calculator_Layout_Shortcode {
 					?>
 				</div>
 			</div>
+			</div>
+			<?php echo $this->render_layout_reveal_script($layout_id, $layout_skeleton); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 		</div>
 	<?php
 
 		return trim((string) ob_get_clean());
+	}
+
+	/**
+	 * Render a two-column first-paint skeleton for the full calculator layout shortcode.
+	 *
+	 * @param string $skeleton_id Skeleton element ID.
+	 * @param string $title       Calculator title.
+	 * @param bool   $classring   Whether the class ring selector will render.
+	 * @return string
+	 */
+	protected function render_layout_skeleton($skeleton_id, $title, $classring) {
+		$rows = $classring ? 4 : 3;
+
+		ob_start();
+	?>
+		<style>
+			@keyframes alloyCalculatorLayoutSkeletonExit {
+				to {
+					opacity: 0;
+					visibility: hidden;
+				}
+			}
+			@keyframes alloyCalculatorLayoutPendingFallback {
+				to {
+					visibility: visible;
+				}
+			}
+			.alloy-calculator-layout-shell {
+				position: relative;
+				width: 100%;
+			}
+			.alloy-calculator-layout-skeleton {
+				position: absolute;
+				top: 0;
+				right: 0;
+				left: 0;
+				z-index: 2;
+				pointer-events: none;
+				animation: alloyCalculatorLayoutSkeletonExit .01s linear 3s forwards;
+			}
+			.alloy-calculator-layout-content[data-alloy-layout-pending="true"] {
+				visibility: hidden;
+				animation: alloyCalculatorLayoutPendingFallback .01s linear 3s forwards;
+			}
+			.alloy-calculator-layout-content[data-alloy-layout-pending="true"] {
+				display: flex;
+				width: 100%;
+				justify-content: center;
+				font-family: "Lexend Deca", Arial, sans-serif;
+			}
+			.alloy-calculator-layout-content[data-alloy-layout-pending="true"] .alloy-calculator-layout-grid {
+				display: grid;
+				width: 100%;
+				max-width: 1280px;
+				gap: 60px;
+			}
+			.alloy-calculator-layout-content[data-alloy-layout-pending="true"] .alloy-calculator-layout-main {
+				width: 100%;
+				max-width: 600px;
+			}
+			.alloy-calculator-layout-content[data-alloy-layout-pending="true"] .js-alloy-calculator {
+				box-sizing: border-box;
+				width: 100%;
+				border-radius: 24px;
+				background: #fff;
+				padding: 32px;
+				font-family: "Lexend Deca", Arial, sans-serif;
+				box-shadow: 0 4px 10px rgba(0,0,0,.1);
+			}
+			.alloy-calculator-layout-content[data-alloy-layout-pending="true"] .js-alloy-calculator form {
+				display: grid;
+				gap: 16px;
+			}
+			.alloy-calculator-layout-content[data-alloy-layout-pending="true"] .js-alloy-calculator label {
+				display: block;
+				margin: 0 0 8px;
+				font-size: 14px;
+				font-weight: 500;
+				color: #334155;
+			}
+			.alloy-calculator-layout-content[data-alloy-layout-pending="true"] .js-alloy-calculator select,
+			.alloy-calculator-layout-content[data-alloy-layout-pending="true"] .js-alloy-calculator input {
+				box-sizing: border-box;
+				width: 100%;
+				min-height: 48px;
+				border: 1px solid #cbd5e1;
+				border-radius: 6px;
+				background: #fff;
+				padding: 12px 16px;
+				font-size: 16px;
+				color: #0f172a;
+			}
+			.alloy-calculator-layout-content[data-alloy-layout-pending="true"] .alloy-calculator-layout-side {
+				display: grid;
+				gap: 20px;
+				width: 100%;
+			}
+			.alloy-calculator-layout-content[data-alloy-layout-pending="true"] .alloy-calculator-layout-side > div {
+				box-sizing: border-box;
+				width: 100%;
+				border-radius: 16px;
+				background: #fff;
+				padding: 20px;
+				box-shadow: 0 4px 10px rgba(0,0,0,.1);
+			}
+			.alloy-calculator-layout-content[data-alloy-layout-pending="true"] .alloy-calculator-layout-side h3 {
+				margin: 0 0 16px;
+				font-size: 24px;
+				line-height: 1.25;
+				text-align: center;
+			}
+			@media (min-width: 768px) {
+				.alloy-calculator-layout-content[data-alloy-layout-pending="true"] .alloy-calculator-layout-grid,
+				.alloy-calculator-layout-skeleton__grid {
+					grid-template-columns: repeat(2, minmax(0, 1fr));
+				}
+				.alloy-calculator-layout-content[data-alloy-layout-pending="true"] .alloy-calculator-layout-side {
+					max-width: 380px;
+					justify-self: end;
+				}
+			}
+		</style>
+		<div id="<?php echo esc_attr($skeleton_id); ?>" class="alloy-calculator-layout-skeleton" aria-hidden="true" style="box-sizing:border-box;width:100%;max-width:1280px;margin:0 auto;font-family:'Lexend Deca',Arial,sans-serif;">
+			<div class="alloy-calculator-layout-skeleton__grid" style="display:grid;gap:60px;width:100%;">
+				<div style="box-sizing:border-box;width:100%;padding:32px;border-radius:24px;background:#fff;box-shadow:0 4px 10px rgba(0,0,0,.1);">
+					<div style="height:32px;width:68%;max-width:380px;margin:20px auto 40px;border-radius:8px;background:#e8edf1;color:transparent;overflow:hidden;"><?php echo esc_html($title); ?></div>
+					<div style="display:grid;gap:24px;">
+						<div style="display:grid;gap:8px;">
+							<div style="width:52%;height:15px;border-radius:6px;background:#edf1f4;"></div>
+							<div style="width:36%;height:32px;border-radius:8px;background:#dfe6eb;"></div>
+						</div>
+						<?php for ($index = 0; $index < $rows; $index++) : ?>
+							<div style="display:grid;gap:8px;">
+								<div style="width:28%;height:14px;border-radius:6px;background:#edf1f4;"></div>
+								<div style="height:50px;border-radius:6px;border:1px solid #d5dbe1;background:#f8fafb;"></div>
+							</div>
+						<?php endfor; ?>
+						<div style="height:50px;border-radius:6px;background:#737a82;"></div>
+					</div>
+				</div>
+				<div style="display:grid;gap:20px;width:100%;">
+					<div style="box-sizing:border-box;width:100%;padding:20px;border-radius:16px;background:#fff;box-shadow:0 4px 10px rgba(0,0,0,.1);">
+						<div style="height:30px;width:70%;margin:0 auto 18px;border-radius:8px;background:#e8edf1;"></div>
+						<div style="display:grid;gap:12px;">
+							<div style="height:50px;border-radius:16px;background:#f1f4f6;"></div>
+							<div style="height:50px;border-radius:16px;background:#f1f4f6;"></div>
+							<div style="height:50px;border-radius:16px;background:#f1f4f6;"></div>
+						</div>
+					</div>
+					<div style="box-sizing:border-box;width:100%;padding:20px;border-radius:16px;background:#fff;box-shadow:0 4px 10px rgba(0,0,0,.1);">
+						<div style="height:30px;width:76%;margin:0 auto 18px;border-radius:8px;background:#e8edf1;"></div>
+						<div style="height:160px;border-radius:16px;background:#f1f4f6;"></div>
+					</div>
+				</div>
+			</div>
+		</div>
+	<?php
+
+		return trim((string) ob_get_clean());
+	}
+
+	/**
+	 * Render a reveal script for the layout-level skeleton.
+	 *
+	 * @param string $layout_id Layout content element ID.
+	 * @param string $skeleton_id Skeleton element ID.
+	 * @return string
+	 */
+	protected function render_layout_reveal_script($layout_id, $skeleton_id) {
+		$layout_id_json   = wp_json_encode($layout_id);
+		$skeleton_id_json = wp_json_encode($skeleton_id);
+
+		return sprintf(
+			'<script>(function(){var layout=document.getElementById(%1$s);var skeleton=document.getElementById(%2$s);if(!layout){return;}var revealed=false;var started=Date.now();function reveal(){if(revealed){return;}revealed=true;layout.removeAttribute("data-alloy-layout-pending");layout.style.visibility="";if(skeleton){skeleton.hidden=true;skeleton.style.display="none";}}function pluginStylesheet(){var links=document.querySelectorAll("link[rel~=\"stylesheet\"]");for(var i=0;i<links.length;i++){var link=links[i];if(link.id==="alloy-metal-price-api-frontend-css"||(link.href&&link.href.indexOf("/assets/dist/css/plugin.css")!==-1)){return link;}}return null;}function ready(link){return !!(link&&link.sheet);}function wait(){var link=pluginStylesheet();if(ready(link)){reveal();return;}if(link){link.addEventListener("load",reveal,{once:true});link.addEventListener("error",reveal,{once:true});}if(Date.now()-started>=3000){reveal();return;}window.setTimeout(wait,50);}wait();})();</script>',
+			$layout_id_json,
+			$skeleton_id_json
+		);
 	}
 
 	/**
@@ -246,15 +432,15 @@ class Alloy_Metal_Price_API_Metal_Calculator_Layout_Shortcode {
 			<div class="aur:space-y-3">
 				<div class="aur:flex aur:items-center aur:justify-between aur:rounded-2xl aur:bg-slate-50 aur:px-4 aur:py-3 aur:text-lg aur:font-bold aur:text-slate-800">
 					<span class="aur:font-normal aur:text-slate-500"><?php esc_html_e('Per Gram:', 'alloy-metal-price-api'); ?></span>
-					<span class="aur:text-slate-800"><?php echo esc_html($this->format_currency($spot_price_per_gram)); ?></span>
+					<span class="js-alloy-metal-price-per-gram aur:text-slate-800"><?php echo esc_html($this->format_currency($spot_price_per_gram)); ?></span>
 				</div>
 				<div class="aur:flex aur:items-center aur:justify-between aur:rounded-2xl aur:bg-slate-50 aur:px-4 aur:py-3 aur:text-lg aur:font-bold aur:text-slate-800">
 					<span class="aur:font-normal aur:text-slate-500"><?php esc_html_e('Per Ounce:', 'alloy-metal-price-api'); ?></span>
-					<span class="aur:text-slate-800"><?php echo esc_html($this->format_currency($price_per_ounce)); ?></span>
+					<span class="js-alloy-metal-price-per-ounce aur:text-slate-800"><?php echo esc_html($this->format_currency($price_per_ounce)); ?></span>
 				</div>
 				<div class="aur:flex aur:items-center aur:justify-between aur:rounded-2xl aur:bg-slate-50 aur:px-4 aur:py-3 aur:text-lg aur:font-bold aur:text-slate-800">
 					<span class="aur:font-normal aur:text-slate-500"><?php esc_html_e('Per Kilo:', 'alloy-metal-price-api'); ?></span>
-					<span class="aur:text-slate-800"><?php echo esc_html($this->format_currency($price_per_kilo)); ?></span>
+					<span class="js-alloy-metal-price-per-kilo aur:text-slate-800"><?php echo esc_html($this->format_currency($price_per_kilo)); ?></span>
 				</div>
 			</div>
 
@@ -405,15 +591,15 @@ class Alloy_Metal_Price_API_Metal_Calculator_Layout_Shortcode {
 			<div class="aur:space-y-3">
 				<div class="aur:flex aur:items-center aur:justify-between aur:rounded-2xl aur:bg-slate-50 aur:px-4 aur:py-3 aur:text-lg aur:font-bold aur:text-slate-800">
 					<span class="aur:font-normal aur:text-slate-500"><?php esc_html_e('Per Gram:', 'alloy-metal-price-api'); ?></span>
-					<span class="aur:text-slate-800"><?php echo esc_html($this->format_currency($price_per_gram)); ?></span>
+					<span class="js-alloy-metal-price-per-gram aur:text-slate-800" data-purity-multiplier="<?php echo esc_attr((string) $purity_multiplier); ?>"><?php echo esc_html($this->format_currency($price_per_gram)); ?></span>
 				</div>
 				<div class="aur:flex aur:items-center aur:justify-between aur:rounded-2xl aur:bg-slate-50 aur:px-4 aur:py-3 aur:text-lg aur:font-bold aur:text-slate-800">
 					<span class="aur:font-normal aur:text-slate-500"><?php esc_html_e('Per Ounce:', 'alloy-metal-price-api'); ?></span>
-					<span class="aur:text-slate-800"><?php echo esc_html($this->format_currency($price_per_ounce)); ?></span>
+					<span class="js-alloy-metal-price-per-ounce aur:text-slate-800" data-purity-multiplier="<?php echo esc_attr((string) $purity_multiplier); ?>"><?php echo esc_html($this->format_currency($price_per_ounce)); ?></span>
 				</div>
 				<div class="aur:flex aur:items-center aur:justify-between aur:rounded-2xl aur:bg-slate-50 aur:px-4 aur:py-3 aur:text-lg aur:font-bold aur:text-slate-800">
 					<span class="aur:font-normal aur:text-slate-500"><?php esc_html_e('Per Kilo:', 'alloy-metal-price-api'); ?></span>
-					<span class="aur:text-slate-800"><?php echo esc_html($this->format_currency($price_per_kilo)); ?></span>
+					<span class="js-alloy-metal-price-per-kilo aur:text-slate-800" data-purity-multiplier="<?php echo esc_attr((string) $purity_multiplier); ?>"><?php echo esc_html($this->format_currency($price_per_kilo)); ?></span>
 				</div>
 			</div>
 
