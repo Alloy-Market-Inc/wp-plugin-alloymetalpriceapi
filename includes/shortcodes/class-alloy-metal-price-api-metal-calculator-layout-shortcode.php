@@ -120,6 +120,7 @@ class Alloy_Metal_Price_API_Metal_Calculator_Layout_Shortcode {
 				'purity_value'        => $purity_value,
 				'classring'           => $classring,
 				'base_price_per_gram' => $spot_price_per_gram,
+				'show_skeleton'       => false,
 				'wrapper_class'       => '',
 				'section_class'       => 'aur:w-full aur:rounded-3xl aur:bg-white aur:p-8 aur:font-sans aur:shadow-[0_4px_10px_rgba(0,0,0,0.1)]',
 				'heading_class'       => 'aur:mb-10 aur:mt-5 aur:text-center aur:text-2xl! aur:font-semibold aur:text-black',
@@ -128,6 +129,7 @@ class Alloy_Metal_Price_API_Metal_Calculator_Layout_Shortcode {
 
 		ob_start();
 ?>
+		<?php echo $this->render_layout_skeleton($title, $classring); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 		<div class="aur:flex aur:w-full aur:justify-center aur:font-sans">
 			<div class="aur:flex aur:w-full aur:max-w-7xl aur:flex-col aur:gap-15 aur:md:grid aur:md:grid-cols-2 aur:md:items-start">
 				<div class="aur:w-full aur:md:max-w-150">
@@ -143,6 +145,77 @@ class Alloy_Metal_Price_API_Metal_Calculator_Layout_Shortcode {
 						echo $this->render_default_right_column($spot_price_per_gram, $metal, $metal_label); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 					}
 					?>
+				</div>
+			</div>
+		</div>
+	<?php
+
+		return trim((string) ob_get_clean());
+	}
+
+	/**
+	 * Render a two-column first-paint skeleton for the full calculator layout shortcode.
+	 *
+	 * @param string $title Calculator title.
+	 * @param bool   $classring Whether the class ring selector will render.
+	 * @return string
+	 */
+	protected function render_layout_skeleton($title, $classring) {
+		$rows = $classring ? 4 : 3;
+
+		ob_start();
+	?>
+		<style>
+			@keyframes alloyCalculatorLayoutSkeletonExit {
+				to {
+					height: 0;
+					margin: 0;
+					padding: 0;
+					opacity: 0;
+					overflow: hidden;
+					visibility: hidden;
+				}
+			}
+			.alloy-calculator-layout-skeleton {
+				animation: alloyCalculatorLayoutSkeletonExit .01s linear .6s forwards;
+			}
+			@media (min-width: 768px) {
+				.alloy-calculator-layout-skeleton__grid {
+					grid-template-columns: minmax(0, 1.55fr) minmax(280px, .95fr);
+				}
+			}
+		</style>
+		<div class="alloy-calculator-layout-skeleton" aria-hidden="true" style="box-sizing:border-box;width:100%;max-width:1280px;margin:0 auto 24px;font-family:'Lexend Deca',Arial,sans-serif;">
+			<div class="alloy-calculator-layout-skeleton__grid" style="display:grid;gap:32px;width:100%;">
+				<div style="box-sizing:border-box;width:100%;padding:32px;border-radius:24px;background:#fff;box-shadow:0 4px 10px rgba(0,0,0,.1);">
+					<div style="height:32px;width:68%;max-width:380px;margin:20px auto 40px;border-radius:8px;background:#e8edf1;color:transparent;overflow:hidden;"><?php echo esc_html($title); ?></div>
+					<div style="display:grid;gap:24px;">
+						<div style="display:grid;gap:8px;">
+							<div style="width:52%;height:15px;border-radius:6px;background:#edf1f4;"></div>
+							<div style="width:36%;height:32px;border-radius:8px;background:#dfe6eb;"></div>
+						</div>
+						<?php for ($index = 0; $index < $rows; $index++) : ?>
+							<div style="display:grid;gap:8px;">
+								<div style="width:28%;height:14px;border-radius:6px;background:#edf1f4;"></div>
+								<div style="height:50px;border-radius:6px;border:1px solid #d5dbe1;background:#f8fafb;"></div>
+							</div>
+						<?php endfor; ?>
+						<div style="height:50px;border-radius:6px;background:#737a82;"></div>
+					</div>
+				</div>
+				<div style="display:grid;gap:20px;width:100%;">
+					<div style="box-sizing:border-box;width:100%;padding:20px;border-radius:16px;background:#fff;box-shadow:0 4px 10px rgba(0,0,0,.1);">
+						<div style="height:30px;width:70%;margin:0 auto 18px;border-radius:8px;background:#e8edf1;"></div>
+						<div style="display:grid;gap:12px;">
+							<div style="height:50px;border-radius:16px;background:#f1f4f6;"></div>
+							<div style="height:50px;border-radius:16px;background:#f1f4f6;"></div>
+							<div style="height:50px;border-radius:16px;background:#f1f4f6;"></div>
+						</div>
+					</div>
+					<div style="box-sizing:border-box;width:100%;padding:20px;border-radius:16px;background:#fff;box-shadow:0 4px 10px rgba(0,0,0,.1);">
+						<div style="height:30px;width:76%;margin:0 auto 18px;border-radius:8px;background:#e8edf1;"></div>
+						<div style="height:160px;border-radius:16px;background:#f1f4f6;"></div>
+					</div>
 				</div>
 			</div>
 		</div>

@@ -26,6 +26,7 @@ class Alloy_Metal_Price_API_Calculator_Renderer {
 				'purity_value'           => 14,
 				'classring'              => false,
 				'base_price_per_gram'    => 0,
+				'show_skeleton'          => true,
 				'wrapper_class'          => '',
 				'section_class'          => 'aur:mx-auto aur:w-full aur:max-w-130 aur:rounded-3xl aur:bg-white aur:p-5 aur:font-sans aur:shadow-[0_8px_24px_rgba(0,0,0,0.06)] aur:sm:p-6',
 				'heading_class'          => 'aur:mb-5 aur:text-center aur:text-xl! aur:font-semibold aur:text-primary',
@@ -48,6 +49,7 @@ class Alloy_Metal_Price_API_Calculator_Renderer {
 		$purity_value      = 'gold' === $metal ? absint($args['purity_value']) : (float) $args['purity_value'];
 		$classring         = rest_sanitize_boolean($args['classring']);
 		$base_price        = (float) $args['base_price_per_gram'];
+		$show_skeleton     = rest_sanitize_boolean($args['show_skeleton']);
 		$wrapper_class     = trim((string) $args['wrapper_class']);
 		$section_class     = trim('js-alloy-calculator ' . (string) $args['section_class']);
 		$heading_class     = trim((string) $args['heading_class']);
@@ -64,7 +66,9 @@ class Alloy_Metal_Price_API_Calculator_Renderer {
 ?>
 		<div class="<?php echo esc_attr($wrapper_class); ?>">
 			<?php echo $this->render_inline_styles(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
-			<?php echo $this->render_skeleton($skeleton_id, $title, $classring); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+			<?php if ($show_skeleton) : ?>
+				<?php echo $this->render_skeleton($skeleton_id, $title, $classring); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+			<?php endif; ?>
 			<section
 				id="<?php echo esc_attr($instance_id); ?>"
 				class="<?php echo esc_attr($section_class); ?>"
@@ -230,7 +234,9 @@ class Alloy_Metal_Price_API_Calculator_Renderer {
 					</div>
 				</form>
 			</section>
-			<?php echo $this->render_reveal_script($instance_id, $skeleton_id); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+			<?php if ($show_skeleton) : ?>
+				<?php echo $this->render_reveal_script($instance_id, $skeleton_id); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+			<?php endif; ?>
 		</div>
 <?php
 
