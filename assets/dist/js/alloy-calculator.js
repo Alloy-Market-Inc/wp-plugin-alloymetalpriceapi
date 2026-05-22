@@ -192,11 +192,13 @@
 		const cta = container.querySelector('.js-alloy-calculator-cta');
 
 		if (results) {
+			results.classList.remove('alloy-calculator-results-hidden');
 			results.classList.remove('aur:hidden');
 			results.classList.add('aur:grid');
 		}
 
 		if (cta) {
+			cta.classList.remove('alloy-calculator-results-hidden');
 			cta.classList.remove('aur:hidden');
 		}
 	}
@@ -206,11 +208,13 @@
 		const cta = container.querySelector('.js-alloy-calculator-cta');
 
 		if (results) {
+			results.classList.add('alloy-calculator-results-hidden');
 			results.classList.add('aur:hidden');
 			results.classList.remove('aur:grid');
 		}
 
 		if (cta) {
+			cta.classList.add('alloy-calculator-results-hidden');
 			cta.classList.add('aur:hidden');
 		}
 	}
