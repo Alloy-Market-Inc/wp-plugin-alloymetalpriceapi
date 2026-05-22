@@ -302,7 +302,7 @@ Calculator UI includes:
   - Average Pawn Shop Offer
   - Alloy's Estimated Offer
 - Results stay hidden until Calculate Value is clicked
-- After results are shown, values recalculate as fields change
+- Changing fields does not calculate or submit until Calculate Value is clicked again
 
 Metal behavior:
 

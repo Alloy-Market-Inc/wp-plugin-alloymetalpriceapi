@@ -215,7 +215,7 @@ Best for:
 Behavior note:
 
 - Results stay hidden until Calculate Value is clicked
-- After results are shown, values recalculate as fields change
+- Changing fields does not calculate or submit until Calculate Value is clicked again
 
 ## `[metal_calculator_layout]`
 

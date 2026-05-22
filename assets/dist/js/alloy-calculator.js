@@ -115,7 +115,6 @@
 
 		const pricePerGram = parseFloat(priceData.pricePerGram);
 		const displayPrice = container.querySelector('.js-alloy-calculator-display-price');
-		const weightInput = container.querySelector('.js-alloy-calculator-weight');
 
 		container.dataset.basePrice = String(pricePerGram);
 
@@ -124,10 +123,6 @@
 		}
 
 		updateLayoutPriceDisplays(container, pricePerGram);
-
-		if (weightInput && parseFloat(weightInput.value || '0') > 0) {
-			calculate(container);
-		}
 	}
 
 	function hydrateCalculatorPrice(container) {
@@ -463,12 +458,6 @@
 		if (form) {
 			event.preventDefault();
 
-			const container = form.closest('.js-alloy-calculator');
-
-			if (container) {
-				calculate(container, true);
-			}
-
 			return;
 		}
 
@@ -549,22 +538,6 @@
 		}
 	});
 
-	document.addEventListener('change', function (event) {
-		const field = event.target.closest(
-			'.js-alloy-calculator-purity, .js-alloy-calculator-weight-unit, .js-alloy-calculator-stone',
-		);
-
-		if (!field) {
-			return;
-		}
-
-		const container = field.closest('.js-alloy-calculator');
-
-		if (container) {
-			calculate(container, false);
-		}
-	});
-
 	document.addEventListener('input', function (event) {
 		const conversionField = event.target.closest(
 			'.js-conversion-hard-cost, .js-conversion-profit-margin',
@@ -590,18 +563,6 @@
 			}
 
 			return;
-		}
-
-		const field = event.target.closest('.js-alloy-calculator-weight, .js-alloy-calculator-purity');
-
-		if (!field) {
-			return;
-		}
-
-		const container = field.closest('.js-alloy-calculator');
-
-		if (container) {
-			calculate(container, false);
 		}
 	});
 
