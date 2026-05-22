@@ -68,7 +68,6 @@ class Alloy_Metal_Price_API_Calculator_Renderer {
 			<section
 				id="<?php echo esc_attr($instance_id); ?>"
 				class="<?php echo esc_attr($section_class); ?>"
-				style="display:none"
 				data-alloy-calculator-pending="true"
 				data-base-price="<?php echo esc_attr((string) $base_price); ?>"
 				data-metal="<?php echo esc_attr($metal); ?>"
@@ -252,7 +251,7 @@ class Alloy_Metal_Price_API_Calculator_Renderer {
 
 		$styles_rendered = true;
 
-		return '<style>.alloy-calculator-submit{min-height:49px;border-color:#727a82!important;background:#727a82!important;color:#fff!important;border-radius:4px!important;font-weight:700!important}.alloy-calculator-submit:hover{border-color:#616870!important;background:#616870!important;color:#fff!important}.alloy-calculator-result-card{border-radius:6px!important;padding:14px 10px!important;font-family:var(--aur-font-sans,"Lexend Deca",Arial,sans-serif}.alloy-calculator-result-card h3{font-size:18px!important;line-height:1.35!important;font-weight:700!important;color:#1f2937!important}.alloy-calculator-result-value{display:inline;font:inherit;color:inherit}.alloy-calculator-result-card--market{border-color:#c7ccd2!important;background:#eef0f3!important}.alloy-calculator-result-card--pawn{border-color:#e0c5c7!important;background:#efd4d6!important}.alloy-calculator-result-card--alloy{border-color:#bdd7c2!important;background:#d8ead9!important}.alloy-calculator-kit-button{min-height:62px;align-items:center;border-color:#df8158!important;background:#df8158!important;color:#fff!important;border-radius:7px!important;font-weight:700!important}.alloy-calculator-kit-button:hover{border-color:#d4744b!important;background:#d4744b!important;color:#fff!important}</style>';
+		return '<style>@keyframes alloyCalculatorSkeletonExit{to{height:0;margin:0;padding:0;opacity:0;overflow:hidden;visibility:hidden}}.alloy-calculator-skeleton{animation:alloyCalculatorSkeletonExit .01s linear .6s forwards}.alloy-calculator-submit{min-height:49px;border-color:#727a82!important;background:#727a82!important;color:#fff!important;border-radius:4px!important;font-weight:700!important}.alloy-calculator-submit:hover{border-color:#616870!important;background:#616870!important;color:#fff!important}.alloy-calculator-result-card{border-radius:6px!important;padding:14px 10px!important;font-family:var(--aur-font-sans,"Lexend Deca",Arial,sans-serif}.alloy-calculator-result-card h3{font-size:18px!important;line-height:1.35!important;font-weight:700!important;color:#1f2937!important}.alloy-calculator-result-value{display:inline;font:inherit;color:inherit}.alloy-calculator-result-card--market{border-color:#c7ccd2!important;background:#eef0f3!important}.alloy-calculator-result-card--pawn{border-color:#e0c5c7!important;background:#efd4d6!important}.alloy-calculator-result-card--alloy{border-color:#bdd7c2!important;background:#d8ead9!important}.alloy-calculator-kit-button{min-height:62px;align-items:center;border-color:#df8158!important;background:#df8158!important;color:#fff!important;border-radius:7px!important;font-weight:700!important}.alloy-calculator-kit-button:hover{border-color:#d4744b!important;background:#d4744b!important;color:#fff!important}</style>';
 	}
 
 	/**
@@ -268,7 +267,7 @@ class Alloy_Metal_Price_API_Calculator_Renderer {
 
 		ob_start();
 ?>
-		<div id="<?php echo esc_attr($skeleton_id); ?>" aria-hidden="true" style="box-sizing:border-box;width:100%;max-width:520px;margin:0 auto;padding:20px;border-radius:24px;background:#fff;box-shadow:0 8px 24px rgba(0,0,0,.06);font-family:'Lexend Deca',Arial,sans-serif;color:#1f2937;">
+		<div id="<?php echo esc_attr($skeleton_id); ?>" class="alloy-calculator-skeleton" aria-hidden="true" style="box-sizing:border-box;width:100%;max-width:520px;margin:0 auto;padding:20px;border-radius:24px;background:#fff;box-shadow:0 8px 24px rgba(0,0,0,.06);font-family:'Lexend Deca',Arial,sans-serif;color:#1f2937;">
 			<div style="height:28px;width:70%;max-width:320px;margin:0 auto 20px;border-radius:8px;background:#e8edf1;color:transparent;overflow:hidden;"><?php echo esc_html($title); ?></div>
 			<div style="display:grid;gap:16px;">
 				<div style="display:grid;gap:8px;">
