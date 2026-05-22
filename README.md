@@ -100,6 +100,19 @@ Full build shortcut:
 npm run build
 ```
 
+## WP Engine Deploy
+
+This plugin has a plugin-only WP Engine deploy flow using SSH Gateway and `rsync`, documented in:
+
+- [`WPE-DEPLOY.md`](/Users/jamescook/REPOS/LOCAL-SITES/alloy-marcom/app/public/wp-content/plugins/AlloyMetalPriceAPI/WPE-DEPLOY.md)
+
+Use the deploy script:
+
+```bash
+./scripts/deploy-wpe-plugin.sh --dry-run
+./scripts/deploy-wpe-plugin.sh
+```
+
 Source CSS lives in:
 
 - [`assets/src/css/plugin.css`](/Users/jamescook/REPOS/LOCAL-SITES/alloy-marcom/app/public/wp-content/plugins/AlloyMetalPriceAPI/assets/src/css/plugin.css)

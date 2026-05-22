@@ -1,0 +1,11 @@
+.git/
+.gitignore
+node_modules/
+assets/src/
+package.json
+package-lock.json
+postcss.config.js
+scripts/
+README.md
+SHORTCODES.md
+WPE-DEPLOY.md
