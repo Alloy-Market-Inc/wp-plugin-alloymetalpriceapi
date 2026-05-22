@@ -1,4 +1,6 @@
 (function () {
+	const metalPriceRequests = {};
+
 	function toCurrency(value) {
 		const amount = Number.isFinite(value) ? value : 0;
 
@@ -34,6 +36,106 @@
 		const amount = Number.isFinite(value) ? value : 0;
 
 		return (Math.round(amount * 100) / 100).toFixed(2);
+	}
+
+	function fetchCalculatorPrice(metal) {
+		const normalizedMetal = metal || 'gold';
+
+		if (!window.alloyMetalPriceApi || !window.alloyMetalPriceApi.ajaxUrl) {
+			return Promise.resolve(null);
+		}
+
+		if (metalPriceRequests[normalizedMetal]) {
+			return metalPriceRequests[normalizedMetal];
+		}
+
+		const body = new URLSearchParams({
+			action: 'alloy_metal_price_api_refresh_calculator_price',
+			nonce: window.alloyMetalPriceApi.refreshNonce || '',
+			metal: normalizedMetal,
+		});
+
+		metalPriceRequests[normalizedMetal] = fetch(window.alloyMetalPriceApi.ajaxUrl, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+			},
+			body: body.toString(),
+		})
+			.then(function (response) {
+				return response.json();
+			})
+			.then(function (payload) {
+				if (!payload || !payload.success || !payload.data) {
+					return null;
+				}
+
+				return payload.data;
+			})
+			.catch(function () {
+				return null;
+			});
+
+		return metalPriceRequests[normalizedMetal];
+	}
+
+	function updateLayoutPriceDisplays(container, pricePerGram) {
+		const layout = container.closest('.alloy-calculator-layout-shell');
+
+		if (!layout) {
+			return;
+		}
+
+		layout.querySelectorAll('.js-alloy-metal-price-per-gram').forEach(function (field) {
+			const multiplier = parseFloat(field.dataset.purityMultiplier || '1');
+			const safeMultiplier = Number.isFinite(multiplier) ? multiplier : 1;
+
+			field.textContent = toCurrency(pricePerGram * safeMultiplier);
+		});
+
+		layout.querySelectorAll('.js-alloy-metal-price-per-ounce').forEach(function (field) {
+			const multiplier = parseFloat(field.dataset.purityMultiplier || '1');
+			const safeMultiplier = Number.isFinite(multiplier) ? multiplier : 1;
+
+			field.textContent = toCurrency(pricePerGram * safeMultiplier * 31.1035);
+		});
+
+		layout.querySelectorAll('.js-alloy-metal-price-per-kilo').forEach(function (field) {
+			const multiplier = parseFloat(field.dataset.purityMultiplier || '1');
+			const safeMultiplier = Number.isFinite(multiplier) ? multiplier : 1;
+
+			field.textContent = toCurrency(pricePerGram * safeMultiplier * 1000);
+		});
+	}
+
+	function updateCalculatorPrice(container, priceData) {
+		if (!priceData || !Number.isFinite(parseFloat(priceData.pricePerGram))) {
+			return;
+		}
+
+		const pricePerGram = parseFloat(priceData.pricePerGram);
+		const displayPrice = container.querySelector('.js-alloy-calculator-display-price');
+		const weightInput = container.querySelector('.js-alloy-calculator-weight');
+
+		container.dataset.basePrice = String(pricePerGram);
+
+		if (displayPrice) {
+			displayPrice.textContent = formatNumber(pricePerGram);
+		}
+
+		updateLayoutPriceDisplays(container, pricePerGram);
+
+		if (weightInput && parseFloat(weightInput.value || '0') > 0) {
+			calculate(container);
+		}
+	}
+
+	function hydrateCalculatorPrice(container) {
+		const metal = container.dataset.metal || 'gold';
+
+		fetchCalculatorPrice(metal).then(function (priceData) {
+			updateCalculatorPrice(container, priceData);
+		});
 	}
 
 	function getStoneDeduction(weightInGrams, stoneMaterial) {
@@ -294,6 +396,7 @@
 		}
 
 		closeTooltip(container);
+		hydrateCalculatorPrice(container);
 	}
 
 	function initializeConversionCalculator(container) {

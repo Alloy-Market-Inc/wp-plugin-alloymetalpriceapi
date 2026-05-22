@@ -18,6 +18,13 @@ class Alloy_Metal_Price_API_Client {
 	const BASE_URL = 'https://aurify.app/api/v1';
 
 	/**
+	 * Cached spot price lifetime in seconds.
+	 *
+	 * @var int
+	 */
+	const PRICE_CACHE_TTL = 60;
+
+	/**
 	 * Logger instance.
 	 *
 	 * @var Alloy_Metal_Price_API_Logger
@@ -78,6 +85,51 @@ class Alloy_Metal_Price_API_Client {
 			);
 		}
 
-		return (float) $body;
+		$price = (float) $body;
+
+		set_transient($this->get_price_cache_key($metal_type), $price, self::PRICE_CACHE_TTL);
+		update_option($this->get_last_price_option_key($metal_type), $price, false);
+
+		return $price;
+	}
+
+	/**
+	 * Get the last cached metal price without making a remote request.
+	 *
+	 * @param string $metal_type Metal type expected by the Aurify API.
+	 * @return float|null
+	 */
+	public function get_cached_metal_price($metal_type) {
+		$cached_price = get_transient($this->get_price_cache_key($metal_type));
+
+		if (false === $cached_price || ! is_numeric($cached_price)) {
+			$cached_price = get_option($this->get_last_price_option_key($metal_type), null);
+		}
+
+		if (null === $cached_price || false === $cached_price || ! is_numeric($cached_price)) {
+			return null;
+		}
+
+		return (float) $cached_price;
+	}
+
+	/**
+	 * Build the transient key for a metal price.
+	 *
+	 * @param string $metal_type Metal type expected by the Aurify API.
+	 * @return string
+	 */
+	protected function get_price_cache_key($metal_type) {
+		return 'alloy_metal_price_api_price_' . sanitize_key($metal_type);
+	}
+
+	/**
+	 * Build the option key for the last known metal price.
+	 *
+	 * @param string $metal_type Metal type expected by the Aurify API.
+	 * @return string
+	 */
+	protected function get_last_price_option_key($metal_type) {
+		return 'alloy_metal_price_api_last_price_' . sanitize_key($metal_type);
 	}
 }

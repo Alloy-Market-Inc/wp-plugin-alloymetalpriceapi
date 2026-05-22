@@ -107,11 +107,8 @@ class Alloy_Metal_Price_API_Metal_Calculator_Layout_Shortcode {
 		$purity_value        = $this->parse_purity_value($atts['purity'], $metal);
 		$right_variant       = $this->normalize_right_variant($atts['right']);
 		$classring           = $this->normalize_boolean_attribute($atts['classring']);
-		$spot_price_per_gram = $this->api_client->get_metal_price($metal);
-
-		if (is_wp_error($spot_price_per_gram)) {
-			$spot_price_per_gram = 0;
-		}
+		$spot_price_per_gram = $this->api_client->get_cached_metal_price($metal);
+		$spot_price_per_gram = null === $spot_price_per_gram ? 0 : $spot_price_per_gram;
 
 		$layout_id        = wp_unique_id('alloy-calculator-layout-');
 		$layout_skeleton = $layout_id . '-skeleton';
@@ -137,6 +134,7 @@ class Alloy_Metal_Price_API_Metal_Calculator_Layout_Shortcode {
 			<div
 				id="<?php echo esc_attr($layout_id); ?>"
 				class="alloy-calculator-layout-content aur:flex aur:w-full aur:justify-center aur:font-sans"
+				data-metal="<?php echo esc_attr($metal); ?>"
 				data-alloy-layout-pending="true">
 			<div class="alloy-calculator-layout-grid aur:flex aur:w-full aur:max-w-7xl aur:flex-col aur:gap-15 aur:md:grid aur:md:grid-cols-2 aur:md:items-start">
 				<div class="alloy-calculator-layout-main aur:w-full aur:md:max-w-150">
@@ -434,15 +432,15 @@ class Alloy_Metal_Price_API_Metal_Calculator_Layout_Shortcode {
 			<div class="aur:space-y-3">
 				<div class="aur:flex aur:items-center aur:justify-between aur:rounded-2xl aur:bg-slate-50 aur:px-4 aur:py-3 aur:text-lg aur:font-bold aur:text-slate-800">
 					<span class="aur:font-normal aur:text-slate-500"><?php esc_html_e('Per Gram:', 'alloy-metal-price-api'); ?></span>
-					<span class="aur:text-slate-800"><?php echo esc_html($this->format_currency($spot_price_per_gram)); ?></span>
+					<span class="js-alloy-metal-price-per-gram aur:text-slate-800"><?php echo esc_html($this->format_currency($spot_price_per_gram)); ?></span>
 				</div>
 				<div class="aur:flex aur:items-center aur:justify-between aur:rounded-2xl aur:bg-slate-50 aur:px-4 aur:py-3 aur:text-lg aur:font-bold aur:text-slate-800">
 					<span class="aur:font-normal aur:text-slate-500"><?php esc_html_e('Per Ounce:', 'alloy-metal-price-api'); ?></span>
-					<span class="aur:text-slate-800"><?php echo esc_html($this->format_currency($price_per_ounce)); ?></span>
+					<span class="js-alloy-metal-price-per-ounce aur:text-slate-800"><?php echo esc_html($this->format_currency($price_per_ounce)); ?></span>
 				</div>
 				<div class="aur:flex aur:items-center aur:justify-between aur:rounded-2xl aur:bg-slate-50 aur:px-4 aur:py-3 aur:text-lg aur:font-bold aur:text-slate-800">
 					<span class="aur:font-normal aur:text-slate-500"><?php esc_html_e('Per Kilo:', 'alloy-metal-price-api'); ?></span>
-					<span class="aur:text-slate-800"><?php echo esc_html($this->format_currency($price_per_kilo)); ?></span>
+					<span class="js-alloy-metal-price-per-kilo aur:text-slate-800"><?php echo esc_html($this->format_currency($price_per_kilo)); ?></span>
 				</div>
 			</div>
 
@@ -593,15 +591,15 @@ class Alloy_Metal_Price_API_Metal_Calculator_Layout_Shortcode {
 			<div class="aur:space-y-3">
 				<div class="aur:flex aur:items-center aur:justify-between aur:rounded-2xl aur:bg-slate-50 aur:px-4 aur:py-3 aur:text-lg aur:font-bold aur:text-slate-800">
 					<span class="aur:font-normal aur:text-slate-500"><?php esc_html_e('Per Gram:', 'alloy-metal-price-api'); ?></span>
-					<span class="aur:text-slate-800"><?php echo esc_html($this->format_currency($price_per_gram)); ?></span>
+					<span class="js-alloy-metal-price-per-gram aur:text-slate-800" data-purity-multiplier="<?php echo esc_attr((string) $purity_multiplier); ?>"><?php echo esc_html($this->format_currency($price_per_gram)); ?></span>
 				</div>
 				<div class="aur:flex aur:items-center aur:justify-between aur:rounded-2xl aur:bg-slate-50 aur:px-4 aur:py-3 aur:text-lg aur:font-bold aur:text-slate-800">
 					<span class="aur:font-normal aur:text-slate-500"><?php esc_html_e('Per Ounce:', 'alloy-metal-price-api'); ?></span>
-					<span class="aur:text-slate-800"><?php echo esc_html($this->format_currency($price_per_ounce)); ?></span>
+					<span class="js-alloy-metal-price-per-ounce aur:text-slate-800" data-purity-multiplier="<?php echo esc_attr((string) $purity_multiplier); ?>"><?php echo esc_html($this->format_currency($price_per_ounce)); ?></span>
 				</div>
 				<div class="aur:flex aur:items-center aur:justify-between aur:rounded-2xl aur:bg-slate-50 aur:px-4 aur:py-3 aur:text-lg aur:font-bold aur:text-slate-800">
 					<span class="aur:font-normal aur:text-slate-500"><?php esc_html_e('Per Kilo:', 'alloy-metal-price-api'); ?></span>
-					<span class="aur:text-slate-800"><?php echo esc_html($this->format_currency($price_per_kilo)); ?></span>
+					<span class="js-alloy-metal-price-per-kilo aur:text-slate-800" data-purity-multiplier="<?php echo esc_attr((string) $purity_multiplier); ?>"><?php echo esc_html($this->format_currency($price_per_kilo)); ?></span>
 				</div>
 			</div>
 
