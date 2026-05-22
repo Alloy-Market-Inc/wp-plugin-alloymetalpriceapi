@@ -113,6 +113,9 @@ class Alloy_Metal_Price_API_Metal_Calculator_Layout_Shortcode {
 			$spot_price_per_gram = 0;
 		}
 
+		$layout_id        = wp_unique_id('alloy-calculator-layout-');
+		$layout_skeleton = $layout_id . '-skeleton';
+
 		$calculator_markup = $this->calculator_renderer->render(
 			array(
 				'title'               => $title,
@@ -129,15 +132,19 @@ class Alloy_Metal_Price_API_Metal_Calculator_Layout_Shortcode {
 
 		ob_start();
 ?>
-		<?php echo $this->render_layout_skeleton($title, $classring); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
-		<div class="aur:flex aur:w-full aur:justify-center aur:font-sans">
-			<div class="aur:flex aur:w-full aur:max-w-7xl aur:flex-col aur:gap-15 aur:md:grid aur:md:grid-cols-2 aur:md:items-start">
-				<div class="aur:w-full aur:md:max-w-150">
+		<div class="alloy-calculator-layout-shell">
+			<?php echo $this->render_layout_skeleton($layout_skeleton, $title, $classring); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+			<div
+				id="<?php echo esc_attr($layout_id); ?>"
+				class="alloy-calculator-layout-content aur:flex aur:w-full aur:justify-center aur:font-sans"
+				data-alloy-layout-pending="true">
+			<div class="alloy-calculator-layout-grid aur:flex aur:w-full aur:max-w-7xl aur:flex-col aur:gap-15 aur:md:grid aur:md:grid-cols-2 aur:md:items-start">
+				<div class="alloy-calculator-layout-main aur:w-full aur:md:max-w-150">
 					<?php echo $calculator_markup; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped 
 					?>
 				</div>
 
-				<div class="aur:w-full aur:md:max-w-95 aur:space-y-5 aur:justify-self-end">
+				<div class="alloy-calculator-layout-side aur:w-full aur:md:max-w-95 aur:space-y-5 aur:justify-self-end">
 					<?php
 					if ('gold' === $metal && '14k' === $right_variant) {
 						echo $this->render_14k_right_column($spot_price_per_gram); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
@@ -147,6 +154,8 @@ class Alloy_Metal_Price_API_Metal_Calculator_Layout_Shortcode {
 					?>
 				</div>
 			</div>
+			</div>
+			<?php echo $this->render_layout_reveal_script($layout_id, $layout_skeleton); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 		</div>
 	<?php
 
@@ -156,11 +165,12 @@ class Alloy_Metal_Price_API_Metal_Calculator_Layout_Shortcode {
 	/**
 	 * Render a two-column first-paint skeleton for the full calculator layout shortcode.
 	 *
-	 * @param string $title Calculator title.
-	 * @param bool   $classring Whether the class ring selector will render.
+	 * @param string $skeleton_id Skeleton element ID.
+	 * @param string $title       Calculator title.
+	 * @param bool   $classring   Whether the class ring selector will render.
 	 * @return string
 	 */
-	protected function render_layout_skeleton($title, $classring) {
+	protected function render_layout_skeleton($skeleton_id, $title, $classring) {
 		$rows = $classring ? 4 : 3;
 
 		ob_start();
@@ -168,25 +178,112 @@ class Alloy_Metal_Price_API_Metal_Calculator_Layout_Shortcode {
 		<style>
 			@keyframes alloyCalculatorLayoutSkeletonExit {
 				to {
-					height: 0;
-					margin: 0;
-					padding: 0;
 					opacity: 0;
-					overflow: hidden;
 					visibility: hidden;
 				}
 			}
+			@keyframes alloyCalculatorLayoutPendingFallback {
+				to {
+					visibility: visible;
+				}
+			}
+			.alloy-calculator-layout-shell {
+				position: relative;
+				width: 100%;
+			}
 			.alloy-calculator-layout-skeleton {
-				animation: alloyCalculatorLayoutSkeletonExit .01s linear .6s forwards;
+				position: absolute;
+				top: 0;
+				right: 0;
+				left: 0;
+				z-index: 2;
+				pointer-events: none;
+				animation: alloyCalculatorLayoutSkeletonExit .01s linear 3s forwards;
+			}
+			.alloy-calculator-layout-content[data-alloy-layout-pending="true"] {
+				visibility: hidden;
+				animation: alloyCalculatorLayoutPendingFallback .01s linear 3s forwards;
+			}
+			.alloy-calculator-layout-content[data-alloy-layout-pending="true"] {
+				display: flex;
+				width: 100%;
+				justify-content: center;
+				font-family: "Lexend Deca", Arial, sans-serif;
+			}
+			.alloy-calculator-layout-content[data-alloy-layout-pending="true"] .alloy-calculator-layout-grid {
+				display: grid;
+				width: 100%;
+				max-width: 1280px;
+				gap: 60px;
+			}
+			.alloy-calculator-layout-content[data-alloy-layout-pending="true"] .alloy-calculator-layout-main {
+				width: 100%;
+				max-width: 600px;
+			}
+			.alloy-calculator-layout-content[data-alloy-layout-pending="true"] .js-alloy-calculator {
+				box-sizing: border-box;
+				width: 100%;
+				border-radius: 24px;
+				background: #fff;
+				padding: 32px;
+				font-family: "Lexend Deca", Arial, sans-serif;
+				box-shadow: 0 4px 10px rgba(0,0,0,.1);
+			}
+			.alloy-calculator-layout-content[data-alloy-layout-pending="true"] .js-alloy-calculator form {
+				display: grid;
+				gap: 16px;
+			}
+			.alloy-calculator-layout-content[data-alloy-layout-pending="true"] .js-alloy-calculator label {
+				display: block;
+				margin: 0 0 8px;
+				font-size: 14px;
+				font-weight: 500;
+				color: #334155;
+			}
+			.alloy-calculator-layout-content[data-alloy-layout-pending="true"] .js-alloy-calculator select,
+			.alloy-calculator-layout-content[data-alloy-layout-pending="true"] .js-alloy-calculator input {
+				box-sizing: border-box;
+				width: 100%;
+				min-height: 48px;
+				border: 1px solid #cbd5e1;
+				border-radius: 6px;
+				background: #fff;
+				padding: 12px 16px;
+				font-size: 16px;
+				color: #0f172a;
+			}
+			.alloy-calculator-layout-content[data-alloy-layout-pending="true"] .alloy-calculator-layout-side {
+				display: grid;
+				gap: 20px;
+				width: 100%;
+			}
+			.alloy-calculator-layout-content[data-alloy-layout-pending="true"] .alloy-calculator-layout-side > div {
+				box-sizing: border-box;
+				width: 100%;
+				border-radius: 16px;
+				background: #fff;
+				padding: 20px;
+				box-shadow: 0 4px 10px rgba(0,0,0,.1);
+			}
+			.alloy-calculator-layout-content[data-alloy-layout-pending="true"] .alloy-calculator-layout-side h3 {
+				margin: 0 0 16px;
+				font-size: 24px;
+				line-height: 1.25;
+				text-align: center;
 			}
 			@media (min-width: 768px) {
+				.alloy-calculator-layout-content[data-alloy-layout-pending="true"] .alloy-calculator-layout-grid,
 				.alloy-calculator-layout-skeleton__grid {
-					grid-template-columns: minmax(0, 1.55fr) minmax(280px, .95fr);
+					grid-template-columns: repeat(2, minmax(0, 1fr));
+				}
+				.alloy-calculator-layout-content[data-alloy-layout-pending="true"] .alloy-calculator-layout-side {
+					max-width: 380px;
+					justify-self: end;
 				}
 			}
 		</style>
-		<div class="alloy-calculator-layout-skeleton" aria-hidden="true" style="box-sizing:border-box;width:100%;max-width:1280px;margin:0 auto 24px;font-family:'Lexend Deca',Arial,sans-serif;">
-			<div class="alloy-calculator-layout-skeleton__grid" style="display:grid;gap:32px;width:100%;">
+		<div id="<?php echo esc_attr($skeleton_id); ?>" class="alloy-calculator-layout-skeleton" aria-hidden="true" style="box-sizing:border-box;width:100%;max-width:1280px;margin:0 auto;font-family:'Lexend Deca',Arial,sans-serif;">
+			<div class="alloy-calculator-layout-skeleton__grid" style="display:grid;gap:60px;width:100%;">
 				<div style="box-sizing:border-box;width:100%;padding:32px;border-radius:24px;background:#fff;box-shadow:0 4px 10px rgba(0,0,0,.1);">
 					<div style="height:32px;width:68%;max-width:380px;margin:20px auto 40px;border-radius:8px;background:#e8edf1;color:transparent;overflow:hidden;"><?php echo esc_html($title); ?></div>
 					<div style="display:grid;gap:24px;">
@@ -222,6 +319,24 @@ class Alloy_Metal_Price_API_Metal_Calculator_Layout_Shortcode {
 	<?php
 
 		return trim((string) ob_get_clean());
+	}
+
+	/**
+	 * Render a reveal script for the layout-level skeleton.
+	 *
+	 * @param string $layout_id Layout content element ID.
+	 * @param string $skeleton_id Skeleton element ID.
+	 * @return string
+	 */
+	protected function render_layout_reveal_script($layout_id, $skeleton_id) {
+		$layout_id_json   = wp_json_encode($layout_id);
+		$skeleton_id_json = wp_json_encode($skeleton_id);
+
+		return sprintf(
+			'<script>(function(){var layout=document.getElementById(%1$s);var skeleton=document.getElementById(%2$s);if(!layout){return;}var revealed=false;var started=Date.now();function reveal(){if(revealed){return;}revealed=true;layout.removeAttribute("data-alloy-layout-pending");layout.style.visibility="";if(skeleton){skeleton.hidden=true;skeleton.style.display="none";}}function pluginStylesheet(){var links=document.querySelectorAll("link[rel~=\"stylesheet\"]");for(var i=0;i<links.length;i++){var link=links[i];if(link.id==="alloy-metal-price-api-frontend-css"||(link.href&&link.href.indexOf("/assets/dist/css/plugin.css")!==-1)){return link;}}return null;}function ready(link){return !!(link&&link.sheet);}function wait(){var link=pluginStylesheet();if(ready(link)){reveal();return;}if(link){link.addEventListener("load",reveal,{once:true});link.addEventListener("error",reveal,{once:true});}if(Date.now()-started>=3000){reveal();return;}window.setTimeout(wait,50);}wait();})();</script>',
+			$layout_id_json,
+			$skeleton_id_json
+		);
 	}
 
 	/**
