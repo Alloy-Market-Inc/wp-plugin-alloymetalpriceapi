@@ -89,20 +89,23 @@ class Alloy_Metal_Price_API_Metal_Spot_Ticker_Shortcode {
 		);
 
 		$this->assets->enqueue_frontend_assets();
+		$this->assets->enqueue_frontend_scripts();
 
 		$metal               = $this->normalize_metal($atts['metal']);
 		$purity_karat        = $this->parse_purity_karat($atts['purity']);
 		$purity_multiplier   = $purity_karat / 24;
 		$metal_label         = self::METAL_LABELS[$metal];
 		$pill_text           = $this->build_pill_text($atts['pill_text'], $metal_label, $purity_karat);
-		$spot_price_per_gram = $this->api_client->get_metal_price($metal);
+		$spot_price_per_gram = $this->api_client->get_cached_metal_price($metal);
 
-		if (is_wp_error($spot_price_per_gram)) {
+		if (null === $spot_price_per_gram) {
 			return $this->render_card(
 				$pill_text,
 				__('Unavailable', 'alloy-metal-price-api'),
 				__('Unavailable', 'alloy-metal-price-api'),
-				__('Updating…', 'alloy-metal-price-api')
+				__('Updating…', 'alloy-metal-price-api'),
+				$metal,
+				$purity_multiplier
 			);
 		}
 
@@ -110,11 +113,13 @@ class Alloy_Metal_Price_API_Metal_Spot_Ticker_Shortcode {
 		$spot_price_per_ounce = $spot_price_per_gram * self::TROY_OUNCE_IN_GRAMS;
 
 		return $this->render_card(
-			$pill_text,
-			$this->format_currency($spot_price_per_ounce),
-			$this->format_currency($spot_price_per_gram),
-			$this->get_updated_label()
-		);
+				$pill_text,
+				$this->format_currency($spot_price_per_ounce),
+				$this->format_currency($spot_price_per_gram),
+				$this->get_updated_label(),
+				$metal,
+				$purity_multiplier
+			);
 	}
 
 	/**
@@ -126,18 +131,18 @@ class Alloy_Metal_Price_API_Metal_Spot_Ticker_Shortcode {
 	 * @param string $updated_label Updated label text.
 	 * @return string
 	 */
-	protected function render_card($pill_text, $price_ounce, $price_gram, $updated_label) {
+	protected function render_card($pill_text, $price_ounce, $price_gram, $updated_label, $metal = 'gold', $purity_multiplier = 1) {
 		ob_start();
-?>
+	?>
 		<div class="aur:flex aur:w-full aur:justify-center aur:font-sans">
 			<div class="aur:w-full aur:rounded-xl aur:border aur:border-slate-900 aur:bg-white aur:p-6 aur:shadow-[0_4px_20px_rgba(0,0,0,0.08)] aur:flex aur:flex-row aur:items-center aur:justify-between aur:gap-4">
 				<div class="aur:inline-flex aur:rounded-lg aur:bg-primary aur:px-4 aur:py-2 aur:text-sm aur:font-semibold aur:text-white aur:uppercase">
 					<?php echo esc_html($pill_text); ?>
 				</div>
-				<div class="aur:flex aur:flex-col aur:gap-3 aur:text-xl aur:text-slate-900 aur:sm:flex-row aur:sm:items-center aur:sm:justify-center aur:sm:gap-8">
-					<span><?php esc_html_e('USD/oz:', 'alloy-metal-price-api'); ?> <strong><?php echo esc_html($price_ounce); ?></strong></span>
-					<span><?php esc_html_e('USD/g:', 'alloy-metal-price-api'); ?> <strong><?php echo esc_html($price_gram); ?></strong></span>
-				</div>
+					<div class="aur:flex aur:flex-col aur:gap-3 aur:text-xl aur:text-slate-900 aur:sm:flex-row aur:sm:items-center aur:sm:justify-center aur:sm:gap-8">
+						<span><?php esc_html_e('USD/oz:', 'alloy-metal-price-api'); ?> <strong><span class="js-alloy-live-price" data-metal="<?php echo esc_attr($metal); ?>" data-price-factor="<?php echo esc_attr((string) ($purity_multiplier * self::TROY_OUNCE_IN_GRAMS)); ?>"><?php echo esc_html($price_ounce); ?></span></strong></span>
+						<span><?php esc_html_e('USD/g:', 'alloy-metal-price-api'); ?> <strong><span class="js-alloy-live-price" data-metal="<?php echo esc_attr($metal); ?>" data-price-factor="<?php echo esc_attr((string) $purity_multiplier); ?>"><?php echo esc_html($price_gram); ?></span></strong></span>
+					</div>
 				<div class="aur:flex aur:items-center aur:justify-center aur:gap-2 aur:text-sm aur:text-slate-500">
 					<span class="aur:inline-block aur:h-2 aur:w-2 aur:rounded-full aur:bg-secondary" aria-hidden="true"></span>
 					<span><?php echo esc_html($updated_label); ?></span>
@@ -146,7 +151,13 @@ class Alloy_Metal_Price_API_Metal_Spot_Ticker_Shortcode {
 		</div>
 <?php
 
-		return trim((string) ob_get_clean());
+		$content = trim((string) ob_get_clean());
+
+		return Alloy_Metal_Price_API_Shortcode_Shell::render(
+			$content,
+			Alloy_Metal_Price_API_Shortcode_Shell::card_skeleton(1),
+			self::TAG
+		);
 	}
 
 	/**

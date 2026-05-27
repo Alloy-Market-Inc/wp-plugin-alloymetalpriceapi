@@ -84,9 +84,9 @@ class Alloy_Metal_Price_API_Metal_Price_Calc_Shortcode {
 		$weight       = $this->parse_weight($atts['weight']);
 		$weight_unit  = $this->normalize_weight_unit($atts['weight_unit']);
 		$output       = $this->normalize_output($atts['output']);
-		$spot_price   = $this->api_client->get_metal_price($metal);
+		$spot_price   = $this->api_client->get_cached_metal_price($metal);
 
-		if (is_wp_error($spot_price)) {
+		if (null === $spot_price) {
 			return '<span>' . esc_html__('Unavailable', 'alloy-metal-price-api') . '</span>';
 		}
 

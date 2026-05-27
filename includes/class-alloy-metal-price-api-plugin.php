@@ -12,6 +12,7 @@ if (! defined('ABSPATH')) {
 require_once ALLOY_METAL_PRICE_API_PLUGIN_DIR . 'includes/class-alloy-metal-price-api-logger.php';
 require_once ALLOY_METAL_PRICE_API_PLUGIN_DIR . 'includes/class-alloy-metal-price-api-client.php';
 require_once ALLOY_METAL_PRICE_API_PLUGIN_DIR . 'includes/class-alloy-metal-price-api-assets.php';
+require_once ALLOY_METAL_PRICE_API_PLUGIN_DIR . 'includes/shortcodes/class-alloy-metal-price-api-shortcode-shell.php';
 require_once ALLOY_METAL_PRICE_API_PLUGIN_DIR . 'includes/shortcodes/class-alloy-metal-price-api-calculator-renderer.php';
 require_once ALLOY_METAL_PRICE_API_PLUGIN_DIR . 'includes/shortcodes/class-alloy-metal-price-api-metal-price-shortcode.php';
 require_once ALLOY_METAL_PRICE_API_PLUGIN_DIR . 'includes/shortcodes/class-alloy-metal-price-api-metal-price-table-shortcode.php';

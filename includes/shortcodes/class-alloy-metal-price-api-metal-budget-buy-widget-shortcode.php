@@ -93,9 +93,9 @@ class Alloy_Metal_Price_API_Metal_Budget_Buy_Widget_Shortcode {
 				strtolower($metal_label)
 			);
 
-		$spot_price_per_gram = $this->api_client->get_metal_price($metal);
+		$spot_price_per_gram = $this->api_client->get_cached_metal_price($metal);
 
-		if (is_wp_error($spot_price_per_gram)) {
+		if (null === $spot_price_per_gram) {
 			$spot_price_per_gram = 0;
 		}
 
@@ -106,7 +106,8 @@ class Alloy_Metal_Price_API_Metal_Budget_Buy_Widget_Shortcode {
 		?>
 		<div class="aur:flex aur:w-full aur:justify-center aur:font-sans">
 			<div
-				class="js-metal-budget-buy-widget aur:w-full aur:max-w-160 aur:rounded-2xl aur:border aur:border-slate-300 aur:bg-white aur:p-6 aur:shadow-[0_4px_10px_rgba(0,0,0,0.08)]"
+				class="js-metal-budget-buy-widget js-alloy-live-spot-ounce aur:w-full aur:max-w-160 aur:rounded-2xl aur:border aur:border-slate-300 aur:bg-white aur:p-6 aur:shadow-[0_4px_10px_rgba(0,0,0,0.08)]"
+				data-metal="<?php echo esc_attr($metal); ?>"
 				data-budget="<?php echo esc_attr(number_format((float) $budget, 2, '.', '')); ?>"
 				data-spot-ounce="<?php echo esc_attr(number_format($spot_price_per_ounce, 2, '.', '')); ?>">
 				<h3 class="aur:mb-3 aur:mt-0 aur:text-2xl! aur:font-semibold aur:text-slate-900!">
@@ -124,7 +125,7 @@ class Alloy_Metal_Price_API_Metal_Budget_Buy_Widget_Shortcode {
 					);
 					?>
 					<strong class="aur:whitespace-nowrap aur:font-semibold aur:text-slate-900">
-						<?php echo esc_html($this->format_currency($spot_price_per_ounce)); ?>
+						<span class="js-alloy-live-price" data-metal="<?php echo esc_attr($metal); ?>" data-price-factor="<?php echo esc_attr((string) self::TROY_OUNCE_IN_GRAMS); ?>"><?php echo esc_html($this->format_currency($spot_price_per_ounce)); ?></span>
 					</strong>
 				</p>
 
@@ -156,7 +157,13 @@ class Alloy_Metal_Price_API_Metal_Budget_Buy_Widget_Shortcode {
 		</div>
 		<?php
 
-		return trim((string) ob_get_clean());
+		$content = trim((string) ob_get_clean());
+
+		return Alloy_Metal_Price_API_Shortcode_Shell::render(
+			$content,
+			Alloy_Metal_Price_API_Shortcode_Shell::card_skeleton(3),
+			self::TAG
+		);
 	}
 
 	/**

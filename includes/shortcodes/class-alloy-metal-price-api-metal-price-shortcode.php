@@ -98,23 +98,25 @@ class Alloy_Metal_Price_API_Metal_Price_Shortcode {
 			$unit = 'gram';
 		}
 
-		$price = $this->api_client->get_metal_price($this->symbol_map[$symbol]);
-
-		if (is_wp_error($price)) {
-			return '';
-		}
-
 		$this->assets->enqueue_frontend_assets();
+		$this->assets->enqueue_frontend_scripts();
 
-		$formatted_price = (string) round($this->convert_price_unit($price, $unit), 2);
+		$metal           = $this->symbol_map[$symbol];
+		$price           = $this->api_client->get_cached_metal_price($metal);
+		$price_factor    = $this->get_price_factor($unit);
+		$formatted_price = null === $price ? '' : (string) round((float) $price * $price_factor, 2);
 		$symbol_slug     = strtolower($symbol);
 
 		ob_start();
 		?>
 		<span
-			class="aur:text-base aur:font-sans"
+			class="js-alloy-live-price aur:text-base aur:font-sans"
+			data-metal="<?php echo esc_attr($metal); ?>"
 			data-metal-symbol="<?php echo esc_attr($symbol_slug); ?>"
 			data-metal-unit="<?php echo esc_attr($unit); ?>"
+			data-price-factor="<?php echo esc_attr((string) $price_factor); ?>"
+			data-price-format="number"
+			data-decimals="2"
 		>
 			<?php echo esc_html($formatted_price); ?>
 		</span>
@@ -131,14 +133,24 @@ class Alloy_Metal_Price_API_Metal_Price_Shortcode {
 	 * @return float
 	 */
 	protected function convert_price_unit($price, $unit) {
+		return $price * $this->get_price_factor($unit);
+	}
+
+	/**
+	 * Get the multiplier for converting a gram price into a display unit.
+	 *
+	 * @param string $unit Requested unit.
+	 * @return float
+	 */
+	protected function get_price_factor($unit) {
 		switch ($unit) {
 			case 'kilogram':
-				return $price * 1000;
+				return 1000;
 			case 'ounce':
-				return $price * 31.1035;
+				return 31.1035;
 			case 'gram':
 			default:
-				return $price;
+				return 1;
 		}
 	}
 }

@@ -37,9 +37,17 @@ class Alloy_Metal_Price_API_Assets {
 	 * @var array<int, string>
 	 */
 	const SCRIPT_SHORTCODES = array(
+		'metalpriceapi',
+		'metal_price_table',
 		'metal_calculator',
 		'metal_calculator_layout',
 		'conversion_rate_calculator',
+		'metal_price_compare',
+		'metal_payout_comparison',
+		'metal_spot_ticker',
+		'metal_goldbar_live_melt_table',
+		'metal_fractional_goldbar_module',
+		'metal_standard_goldbar_module',
 		'metal_offer_card',
 		'metal_budget_buy_widget',
 	);

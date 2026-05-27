@@ -44,6 +44,7 @@ If you only need the short version:
 - Add shortcode settings inside the brackets like `purity="14K"`
 - Use straight quotes like `"` in shortcode attributes
 - If you leave attributes out, the shortcode uses its default settings
+- Styled shortcodes reserve their first-paint layout before the plugin stylesheet finishes loading, then hydrate fresh live prices after the page loads.
 
 ## `[metalpriceapi]`
 

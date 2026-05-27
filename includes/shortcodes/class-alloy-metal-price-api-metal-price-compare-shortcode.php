@@ -89,6 +89,7 @@ class Alloy_Metal_Price_API_Metal_Price_Compare_Shortcode {
 		);
 
 		$this->assets->enqueue_frontend_assets();
+		$this->assets->enqueue_frontend_scripts();
 
 		$metal_a       = $this->normalize_metal($atts['metal_a']);
 		$metal_b       = $this->normalize_metal($atts['metal_b']);
@@ -108,46 +109,50 @@ class Alloy_Metal_Price_API_Metal_Price_Compare_Shortcode {
 		$price_a = $this->get_price_per_troy_ounce($metal_a);
 		$price_b = $this->get_price_per_troy_ounce($metal_b);
 
-		return $this->render_card(
-			$title,
-			$metal_a_label,
-			$price_a,
-			$metal_b_label,
-			$price_b,
-			(is_wp_error($price_a) || is_wp_error($price_b)) ? __('Feed error', 'alloy-metal-price-api') : $this->get_updated_label()
-		);
+			return $this->render_card(
+				$title,
+				$metal_a,
+				$metal_a_label,
+				$price_a,
+				$metal_b,
+				$metal_b_label,
+				$price_b,
+				(null === $price_a || null === $price_b) ? __('Updating…', 'alloy-metal-price-api') : $this->get_updated_label()
+			);
 	}
 
 	/**
 	 * Render the comparison card.
 	 *
-	 * @param string         $title Title text.
-	 * @param string         $metal_a_label First metal label.
-	 * @param float|\WP_Error $price_a First metal price per troy ounce.
-	 * @param string         $metal_b_label Second metal label.
-	 * @param float|\WP_Error $price_b Second metal price per troy ounce.
-	 * @param string         $updated_label Updated label text.
+	 * @param string     $title Title text.
+	 * @param string     $metal_a First metal key.
+	 * @param string     $metal_a_label First metal label.
+	 * @param float|null $price_a First metal price per troy ounce.
+	 * @param string     $metal_b Second metal key.
+	 * @param string     $metal_b_label Second metal label.
+	 * @param float|null $price_b Second metal price per troy ounce.
+	 * @param string     $updated_label Updated label text.
 	 * @return string
 	 */
-	protected function render_card($title, $metal_a_label, $price_a, $metal_b_label, $price_b, $updated_label) {
+	protected function render_card($title, $metal_a, $metal_a_label, $price_a, $metal_b, $metal_b_label, $price_b, $updated_label) {
 		ob_start();
-?>
+	?>
 		<div class="aur:flex aur:w-full aur:justify-center aur:font-sans">
 			<div class="aur:w-full aur:rounded-2xl aur:max-w-180 aur:mx-auto aur:border aur:border-slate-900 aur:bg-white aur:p-6 aur:shadow-[0_4px_16px_rgba(0,0,0,0.06)]">
 				<div class="aur:mb-5 aur:text-center aur:text-xl! aur:font-semibold aur:text-primary!">
 					<?php echo esc_html($title); ?>
 				</div>
 
-				<div class="aur:space-y-3">
-					<div class="aur:flex aur:items-center aur:justify-between aur:rounded-xl aur:bg-slate-50 aur:px-4 aur:py-3">
-						<span class="aur:text-base aur:font-medium aur:text-slate-900"><?php echo esc_html($metal_a_label); ?></span>
-						<span class="aur:text-xl aur:font-semibold aur:text-primary"><?php echo esc_html($this->format_price($price_a)); ?></span>
-					</div>
+					<div class="aur:space-y-3">
+						<div class="aur:flex aur:items-center aur:justify-between aur:rounded-xl aur:bg-slate-50 aur:px-4 aur:py-3">
+							<span class="aur:text-base aur:font-medium aur:text-slate-900"><?php echo esc_html($metal_a_label); ?></span>
+							<span class="aur:text-xl aur:font-semibold aur:text-primary"><span class="js-alloy-live-price" data-metal="<?php echo esc_attr($metal_a); ?>" data-price-factor="<?php echo esc_attr((string) self::TROY_OUNCE_IN_GRAMS); ?>"><?php echo esc_html($this->format_price($price_a)); ?></span></span>
+						</div>
 
-					<div class="aur:flex aur:items-center aur:justify-between aur:rounded-xl aur:bg-slate-50 aur:px-4 aur:py-3">
-						<span class="aur:text-base aur:font-medium aur:text-slate-900"><?php echo esc_html($metal_b_label); ?></span>
-						<span class="aur:text-xl aur:font-semibold aur:text-primary"><?php echo esc_html($this->format_price($price_b)); ?></span>
-					</div>
+						<div class="aur:flex aur:items-center aur:justify-between aur:rounded-xl aur:bg-slate-50 aur:px-4 aur:py-3">
+							<span class="aur:text-base aur:font-medium aur:text-slate-900"><?php echo esc_html($metal_b_label); ?></span>
+							<span class="aur:text-xl aur:font-semibold aur:text-primary"><span class="js-alloy-live-price" data-metal="<?php echo esc_attr($metal_b); ?>" data-price-factor="<?php echo esc_attr((string) self::TROY_OUNCE_IN_GRAMS); ?>"><?php echo esc_html($this->format_price($price_b)); ?></span></span>
+						</div>
 				</div>
 
 				<div class="aur:mt-5 aur:flex aur:items-center aur:justify-center aur:gap-2 aur:text-sm aur:text-slate-500">
@@ -158,20 +163,26 @@ class Alloy_Metal_Price_API_Metal_Price_Compare_Shortcode {
 		</div>
 <?php
 
-		return trim((string) ob_get_clean());
+		$content = trim((string) ob_get_clean());
+
+		return Alloy_Metal_Price_API_Shortcode_Shell::render(
+			$content,
+			Alloy_Metal_Price_API_Shortcode_Shell::card_skeleton(2),
+			self::TAG
+		);
 	}
 
 	/**
 	 * Get the current metal price per troy ounce.
 	 *
 	 * @param string $metal Normalized metal key.
-	 * @return float|\WP_Error
+	 * @return float|null
 	 */
 	protected function get_price_per_troy_ounce($metal) {
-		$price_per_gram = $this->api_client->get_metal_price($metal);
+		$price_per_gram = $this->api_client->get_cached_metal_price($metal);
 
-		if (is_wp_error($price_per_gram)) {
-			return $price_per_gram;
+		if (null === $price_per_gram) {
+			return null;
 		}
 
 		return (float) $price_per_gram * self::TROY_OUNCE_IN_GRAMS;
@@ -180,11 +191,11 @@ class Alloy_Metal_Price_API_Metal_Price_Compare_Shortcode {
 	/**
 	 * Format a live price value.
 	 *
-	 * @param float|\WP_Error $price Monetary value.
+	 * @param float|null $price Monetary value.
 	 * @return string
 	 */
 	protected function format_price($price) {
-		if (is_wp_error($price)) {
+		if (null === $price) {
 			return '$—';
 		}
 

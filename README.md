@@ -46,6 +46,8 @@ The plugin currently fetches prices from:
 
 The plugin registers its stylesheet and script on `wp_enqueue_scripts` and conditionally enqueues them only on singular content that contains supported shortcodes.
 
+Styled shortcodes render with small inline first-paint placeholders so their dimensions are reserved while `plugin.css` loads. Live-price shortcodes use the last cached price for server-rendered markup and hydrate fresh prices asynchronously after the page is interactive, which avoids blocking the initial layout on the Aurify API.
+
 Shortcodes that enqueue CSS:
 
 - `metalpriceapi`

@@ -38,6 +38,15 @@
 		return (Math.round(amount * 100) / 100).toFixed(2);
 	}
 
+	function formatPlainNumber(value, decimals) {
+		const amount = Number.isFinite(value) ? value : 0;
+		const precision = Number.isFinite(decimals) ? decimals : 2;
+
+		return (Math.round(amount * Math.pow(10, precision)) / Math.pow(10, precision)).toFixed(
+			precision,
+		);
+	}
+
 	function fetchCalculatorPrice(metal) {
 		const normalizedMetal = metal || 'gold';
 
@@ -123,6 +132,54 @@
 		}
 
 		updateLayoutPriceDisplays(container, pricePerGram);
+	}
+
+	function updateLivePriceElements(root, priceData) {
+		if (!priceData || !Number.isFinite(parseFloat(priceData.pricePerGram))) {
+			return;
+		}
+
+		const pricePerGram = parseFloat(priceData.pricePerGram);
+		const metal = priceData.metal || 'gold';
+		const scope = root || document;
+
+		scope
+			.querySelectorAll('.js-alloy-live-price[data-metal="' + metal + '"]')
+			.forEach(function (field) {
+				const factor = parseFloat(field.dataset.priceFactor || '1');
+				const safeFactor = Number.isFinite(factor) ? factor : 1;
+				const decimals = parseInt(field.dataset.decimals || '2', 10);
+				const format = field.dataset.priceFormat || 'currency';
+				const value = pricePerGram * safeFactor;
+
+				field.textContent =
+					format === 'number' ? formatPlainNumber(value, decimals) : toCurrency(value);
+			});
+
+		scope
+			.querySelectorAll('.js-alloy-live-spot-ounce[data-metal="' + metal + '"]')
+			.forEach(function (container) {
+				container.dataset.spotOunce = formatPlainNumber(pricePerGram * 31.1035, 2);
+				calculateBudgetBuyWidget(container);
+			});
+	}
+
+	function hydrateLivePrices() {
+		const metals = {};
+
+		document.querySelectorAll('.js-alloy-live-price[data-metal]').forEach(function (field) {
+			metals[field.dataset.metal || 'gold'] = true;
+		});
+
+		document.querySelectorAll('.js-alloy-live-spot-ounce[data-metal]').forEach(function (field) {
+			metals[field.dataset.metal || 'gold'] = true;
+		});
+
+		Object.keys(metals).forEach(function (metal) {
+			fetchCalculatorPrice(metal).then(function (priceData) {
+				updateLivePriceElements(document, priceData);
+			});
+		});
 	}
 
 	function hydrateCalculatorPrice(container) {
@@ -436,9 +493,13 @@
 				refreshOfferCard(card);
 			});
 		}
+
+		refreshOfferCard(card);
 	}
 
 	function initializeAlloyMetalPriceApi() {
+		hydrateLivePrices();
+
 		document.querySelectorAll('.js-alloy-calculator').forEach(function (container) {
 			initialize(container);
 		});
