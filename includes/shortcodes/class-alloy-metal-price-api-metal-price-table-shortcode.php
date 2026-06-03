@@ -311,7 +311,8 @@ class Alloy_Metal_Price_API_14K_Gold_Price_Table_Shortcode {
 		return Alloy_Metal_Price_API_Shortcode_Shell::render(
 			$content,
 			Alloy_Metal_Price_API_Shortcode_Shell::table_skeleton(count($rows)),
-			self::TAG
+			self::TAG,
+			'metal_price_table'
 		);
 	}
 

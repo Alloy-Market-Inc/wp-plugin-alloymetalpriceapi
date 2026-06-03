@@ -45,6 +45,7 @@ If you only need the short version:
 - Use straight quotes like `"` in shortcode attributes
 - If you leave attributes out, the shortcode uses its default settings
 - Styled shortcodes reserve their first-paint layout before the plugin stylesheet finishes loading, then hydrate fresh live prices after the page loads.
+- Do not add page-content wrappers like `alloy-shortcode-cls-reserve` around styled shortcodes. The plugin owns those reserves for calculators, tables, offer cards, spot tickers, and the conversion calculator.
 
 ## `[metalpriceapi]`
 

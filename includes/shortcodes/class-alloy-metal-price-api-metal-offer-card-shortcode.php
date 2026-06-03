@@ -149,7 +149,8 @@ class Alloy_Metal_Price_API_Metal_Offer_Card_Shortcode {
 		return Alloy_Metal_Price_API_Shortcode_Shell::render(
 			$content,
 			Alloy_Metal_Price_API_Shortcode_Shell::card_skeleton(2),
-			self::TAG
+			self::TAG,
+			'metal_offer_card'
 		);
 	}
 

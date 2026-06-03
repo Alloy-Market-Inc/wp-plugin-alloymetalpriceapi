@@ -151,7 +151,8 @@ class Alloy_Metal_Price_API_Conversion_Rate_Calculator_Shortcode {
 		return Alloy_Metal_Price_API_Shortcode_Shell::render(
 			$content,
 			Alloy_Metal_Price_API_Shortcode_Shell::card_skeleton(4),
-			self::TAG
+			self::TAG,
+			'conversion_rate_calculator'
 		);
 	}
 

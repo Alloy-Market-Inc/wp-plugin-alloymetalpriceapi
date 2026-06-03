@@ -127,9 +127,14 @@ class Alloy_Metal_Price_API_Metal_Calculator_Layout_Shortcode {
 			)
 		);
 
+		$shell_class = 'alloy-calculator-layout-shell alloy-calculator-layout-shell--reserve';
+		if ($classring) {
+			$shell_class .= ' alloy-calculator-layout-shell--classring';
+		}
+
 		ob_start();
 ?>
-		<div class="alloy-calculator-layout-shell">
+		<div class="<?php echo esc_attr($shell_class); ?>">
 			<?php echo $this->render_layout_skeleton($layout_skeleton, $title, $classring); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 			<div
 				id="<?php echo esc_attr($layout_id); ?>"
@@ -186,8 +191,15 @@ class Alloy_Metal_Price_API_Metal_Calculator_Layout_Shortcode {
 				}
 			}
 			.alloy-calculator-layout-shell {
+				box-sizing: border-box;
 				position: relative;
 				width: 100%;
+			}
+			.alloy-calculator-layout-shell--reserve {
+				min-height: 1291px;
+			}
+			.alloy-calculator-layout-shell--classring {
+				min-height: 1405px;
 			}
 			.alloy-calculator-layout-skeleton {
 				position: absolute;
@@ -227,9 +239,35 @@ class Alloy_Metal_Price_API_Metal_Calculator_Layout_Shortcode {
 				font-family: "Lexend Deca", Arial, sans-serif;
 				box-shadow: 0 4px 10px rgba(0,0,0,.1);
 			}
-			.alloy-calculator-layout-content[data-alloy-layout-pending="true"] .js-alloy-calculator form {
+			.alloy-calculator-layout-content[data-alloy-layout-pending="true"] .js-alloy-calculator h2 {
+				margin: 0 0 12px;
+				font-size: 24px;
+				line-height: 32px;
+				font-weight: 600;
+				text-align: center;
+				color: #000;
+			}
+			.alloy-calculator-layout-content[data-alloy-layout-pending="true"] .js-alloy-calculator form,
+			.alloy-calculator-layout-content[data-alloy-layout-pending="true"] .js-alloy-calculator .aur\:grid {
 				display: grid;
+			}
+			.alloy-calculator-layout-content[data-alloy-layout-pending="true"] .js-alloy-calculator form {
 				gap: 16px;
+			}
+			.alloy-calculator-layout-content[data-alloy-layout-pending="true"] .js-alloy-calculator .aur\:gap-6 {
+				gap: 24px;
+			}
+			.alloy-calculator-layout-content[data-alloy-layout-pending="true"] .js-alloy-calculator .aur\:relative {
+				position: relative;
+			}
+			.alloy-calculator-layout-content[data-alloy-layout-pending="true"] .js-alloy-calculator .aur\:mb-1 {
+				margin-bottom: 4px;
+			}
+			.alloy-calculator-layout-content[data-alloy-layout-pending="true"] .js-alloy-calculator .aur\:text-2xl {
+				font-size: 24px;
+				line-height: 32px;
+				font-weight: 600;
+				color: #1b98b9;
 			}
 			.alloy-calculator-layout-content[data-alloy-layout-pending="true"] .js-alloy-calculator label {
 				display: block;
@@ -250,6 +288,24 @@ class Alloy_Metal_Price_API_Metal_Calculator_Layout_Shortcode {
 				font-size: 16px;
 				color: #0f172a;
 			}
+			.alloy-calculator-layout-content[data-alloy-layout-pending="true"] .js-alloy-calculator-tooltip {
+				display: none;
+			}
+			.alloy-calculator-layout-content[data-alloy-layout-pending="true"] .js-alloy-calculator-tooltip-button {
+				display: inline-flex;
+				width: 20px;
+				height: 20px;
+				align-items: center;
+				justify-content: center;
+				border: 0;
+				border-radius: 9999px;
+				background: #1b98b9;
+				padding: 0;
+				color: #fff;
+				font-size: 11px;
+				line-height: 1;
+				font-weight: 700;
+			}
 			.alloy-calculator-layout-content[data-alloy-layout-pending="true"] .alloy-calculator-layout-side {
 				display: grid;
 				gap: 20px;
@@ -269,12 +325,69 @@ class Alloy_Metal_Price_API_Metal_Calculator_Layout_Shortcode {
 				line-height: 1.25;
 				text-align: center;
 			}
+			.alloy-calculator-layout-content[data-alloy-layout-pending="true"] .alloy-calculator-layout-side .aur\:space-y-3 > :not(:last-child) {
+				margin-bottom: 12px;
+			}
+			.alloy-calculator-layout-content[data-alloy-layout-pending="true"] .alloy-calculator-layout-side .aur\:space-y-1 > :not(:last-child) {
+				margin-bottom: 4px;
+			}
+			.alloy-calculator-layout-content[data-alloy-layout-pending="true"] .alloy-calculator-layout-side .aur\:flex {
+				display: flex;
+			}
+			.alloy-calculator-layout-content[data-alloy-layout-pending="true"] .alloy-calculator-layout-side .aur\:items-center {
+				align-items: center;
+			}
+			.alloy-calculator-layout-content[data-alloy-layout-pending="true"] .alloy-calculator-layout-side .aur\:justify-between {
+				justify-content: space-between;
+			}
+			.alloy-calculator-layout-content[data-alloy-layout-pending="true"] .alloy-calculator-layout-side .aur\:rounded-2xl {
+				border-radius: 16px;
+			}
+			.alloy-calculator-layout-content[data-alloy-layout-pending="true"] .alloy-calculator-layout-side .aur\:bg-slate-50 {
+				background: #f8fafc;
+			}
+			.alloy-calculator-layout-content[data-alloy-layout-pending="true"] .alloy-calculator-layout-side .aur\:px-4 {
+				padding-right: 16px;
+				padding-left: 16px;
+			}
+			.alloy-calculator-layout-content[data-alloy-layout-pending="true"] .alloy-calculator-layout-side .aur\:py-3 {
+				padding-top: 12px;
+				padding-bottom: 12px;
+			}
+			.alloy-calculator-layout-content[data-alloy-layout-pending="true"] .alloy-calculator-layout-side .aur\:py-4 {
+				padding-top: 16px;
+				padding-bottom: 16px;
+			}
+			.alloy-calculator-layout-content[data-alloy-layout-pending="true"] .alloy-calculator-layout-side .aur\:text-lg {
+				font-size: 18px;
+				line-height: 28px;
+			}
+			.alloy-calculator-layout-content[data-alloy-layout-pending="true"] .alloy-calculator-layout-side .aur\:text-sm {
+				font-size: 14px;
+				line-height: 20px;
+			}
+			.alloy-calculator-layout-content[data-alloy-layout-pending="true"] .alloy-calculator-layout-side .aur\:font-bold {
+				font-weight: 700;
+			}
+			.alloy-calculator-layout-content[data-alloy-layout-pending="true"] .alloy-calculator-layout-side .aur\:font-normal {
+				font-weight: 400;
+			}
+			.alloy-calculator-layout-content[data-alloy-layout-pending="true"] .alloy-calculator-layout-side ul {
+				margin-bottom: 0;
+				list-style-type: disc;
+				padding-left: 20px;
+			}
 			@media (min-width: 768px) {
+				.alloy-calculator-layout-shell--reserve,
+				.alloy-calculator-layout-shell--classring {
+					min-height: 760px;
+				}
 				.alloy-calculator-layout-content[data-alloy-layout-pending="true"] .alloy-calculator-layout-grid,
 				.alloy-calculator-layout-skeleton__grid {
 					grid-template-columns: repeat(2, minmax(0, 1fr));
 				}
-				.alloy-calculator-layout-content[data-alloy-layout-pending="true"] .alloy-calculator-layout-side {
+				.alloy-calculator-layout-content[data-alloy-layout-pending="true"] .alloy-calculator-layout-side,
+				.alloy-calculator-layout-skeleton__side {
 					max-width: 380px;
 					justify-self: end;
 				}
@@ -298,7 +411,7 @@ class Alloy_Metal_Price_API_Metal_Calculator_Layout_Shortcode {
 						<div style="height:50px;border-radius:6px;background:#737a82;"></div>
 					</div>
 				</div>
-				<div style="display:grid;gap:20px;width:100%;">
+				<div class="alloy-calculator-layout-skeleton__side" style="display:grid;gap:20px;width:100%;">
 					<div style="box-sizing:border-box;width:100%;padding:20px;border-radius:16px;background:#fff;box-shadow:0 4px 10px rgba(0,0,0,.1);">
 						<div style="height:30px;width:70%;margin:0 auto 18px;border-radius:8px;background:#e8edf1;"></div>
 						<div style="display:grid;gap:12px;">
@@ -331,7 +444,7 @@ class Alloy_Metal_Price_API_Metal_Calculator_Layout_Shortcode {
 		$skeleton_id_json = wp_json_encode($skeleton_id);
 
 		return sprintf(
-			'<script>(function(){var layout=document.getElementById(%1$s);var skeleton=document.getElementById(%2$s);if(!layout){return;}var revealed=false;var started=Date.now();function reveal(){if(revealed){return;}revealed=true;layout.removeAttribute("data-alloy-layout-pending");layout.style.visibility="";if(skeleton){skeleton.hidden=true;skeleton.style.display="none";}}function pluginStylesheet(){var links=document.querySelectorAll("link[rel~=\"stylesheet\"]");for(var i=0;i<links.length;i++){var link=links[i];if(link.id==="alloy-metal-price-api-frontend-css"||(link.href&&link.href.indexOf("/assets/dist/css/plugin.css")!==-1)){return link;}}return null;}function ready(link){return !!(link&&link.sheet);}function wait(){var link=pluginStylesheet();if(ready(link)){reveal();return;}if(link){link.addEventListener("load",reveal,{once:true});link.addEventListener("error",reveal,{once:true});}if(Date.now()-started>=3000){reveal();return;}window.setTimeout(wait,50);}wait();})();</script>',
+			'<script>(function(){var layout=document.getElementById(%1$s);var skeleton=document.getElementById(%2$s);if(!layout){return;}var revealed=false;var started=Date.now();function reveal(){if(revealed){return;}revealed=true;layout.removeAttribute("data-alloy-layout-pending");layout.style.visibility="";if(skeleton){skeleton.hidden=true;skeleton.style.display="none";}}function pluginStylesheet(){var links=document.querySelectorAll("link[rel~=\"stylesheet\"]");for(var i=0;i<links.length;i++){var link=links[i];var href=link.href||"";if(link.id==="alloy-metal-price-api-frontend-css"||href.indexOf("/assets/dist/css/plugin.css")!==-1||href.indexOf("AlloyMetalPriceAPI")!==-1||href.indexOf("alloy-metal-price-api")!==-1){return link;}}return null;}function ready(link){return !!(link&&link.sheet);}function wait(){var link=pluginStylesheet();if(ready(link)){reveal();return;}if(link){link.addEventListener("load",reveal,{once:true});link.addEventListener("error",reveal,{once:true});}if(Date.now()-started>=3000){reveal();return;}window.setTimeout(wait,50);}window.addEventListener("NitroStylesLoaded",reveal,{once:true});document.addEventListener("NitroStylesLoaded",reveal,{once:true});wait();})();</script>',
 			$layout_id_json,
 			$skeleton_id_json
 		);

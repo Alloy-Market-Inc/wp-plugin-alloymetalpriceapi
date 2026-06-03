@@ -134,6 +134,17 @@
 		updateLayoutPriceDisplays(container, pricePerGram);
 	}
 
+	function stabilizeLivePriceField(field) {
+		if (!field) {
+			return;
+		}
+
+		field.style.fontVariantNumeric = 'tabular-nums';
+		field.style.minWidth = field.closest('td') ? '8ch' : field.style.minWidth || '7ch';
+		field.style.display = 'inline-block';
+		field.dataset.alloyLivePriceStable = 'true';
+	}
+
 	function updateLivePriceElements(root, priceData) {
 		if (!priceData || !Number.isFinite(parseFloat(priceData.pricePerGram))) {
 			return;
@@ -146,6 +157,8 @@
 		scope
 			.querySelectorAll('.js-alloy-live-price[data-metal="' + metal + '"]')
 			.forEach(function (field) {
+				stabilizeLivePriceField(field);
+
 				const factor = parseFloat(field.dataset.priceFactor || '1');
 				const safeFactor = Number.isFinite(factor) ? factor : 1;
 				const decimals = parseInt(field.dataset.decimals || '2', 10);
@@ -168,6 +181,7 @@
 		const metals = {};
 
 		document.querySelectorAll('.js-alloy-live-price[data-metal]').forEach(function (field) {
+			stabilizeLivePriceField(field);
 			metals[field.dataset.metal || 'gold'] = true;
 		});
 
