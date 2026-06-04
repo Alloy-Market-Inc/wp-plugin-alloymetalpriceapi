@@ -85,11 +85,7 @@ class Alloy_Metal_Price_API_Alloy_Calculator_Shortcode {
 		$metal               = $this->normalize_metal($atts['metal']);
 		$purity_value        = $this->parse_purity_value($atts['purity'], $metal);
 		$classring           = $this->normalize_boolean_attribute($atts['classring']);
-		$spot_price_per_gram = $this->api_client->get_metal_price($metal);
-
-		if (is_wp_error($spot_price_per_gram)) {
-			$spot_price_per_gram = 0;
-		}
+		$spot_price_per_gram = $this->api_client->get_cached_metal_price($metal);
 
 		return $this->calculator_renderer->render(
 			array(
@@ -97,7 +93,7 @@ class Alloy_Metal_Price_API_Alloy_Calculator_Shortcode {
 				'metal'               => $metal,
 				'purity_value'        => $purity_value,
 				'classring'           => $classring,
-				'base_price_per_gram' => $spot_price_per_gram,
+				'base_price_per_gram' => null === $spot_price_per_gram ? 0 : $spot_price_per_gram,
 				'wrapper_class'       => 'aur:flex aur:w-full aur:justify-center aur:font-sans',
 			)
 		);

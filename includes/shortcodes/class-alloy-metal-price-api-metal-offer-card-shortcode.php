@@ -75,7 +75,7 @@ class Alloy_Metal_Price_API_Metal_Offer_Card_Shortcode {
 
 		$title        = sanitize_text_field((string) $atts['title']);
 		$purity_karat = $this->parse_purity_karat($atts['purity']);
-		$pricing      = $this->get_offer_card_pricing($purity_karat);
+		$pricing      = $this->get_offer_card_pricing($purity_karat, true);
 		$purity_label = $this->format_purity_label($purity_karat);
 		$instance_id  = wp_unique_id('metal-offer-card-');
 
@@ -115,7 +115,7 @@ class Alloy_Metal_Price_API_Metal_Offer_Card_Shortcode {
 						</div>
 
 						<div class="aur:min-w-65 aur:flex-1 aur:rounded-2xl aur:border-2 aur:border-primary aur:p-4 aur:text-center">
-							<div class="aur:text-xl aur:font-semibold aur:text-primary"><?php esc_html_e('Alloy’s Estimated Offer', 'alloy-metal-price-api'); ?></div>
+							<div class="aur:text-xl aur:font-semibold aur:text-primary"><?php esc_html_e('Alloy\'s Estimated Offer', 'alloy-metal-price-api'); ?></div>
 							<div class="js-metal-offer-card-alloy aur:text-[22px] aur:text-primary"><?php echo esc_html($pricing['alloy']); ?></div>
 						</div>
 					</div>
@@ -144,7 +144,14 @@ class Alloy_Metal_Price_API_Metal_Offer_Card_Shortcode {
 		</div>
 <?php
 
-		return trim((string) ob_get_clean());
+		$content = trim((string) ob_get_clean());
+
+		return Alloy_Metal_Price_API_Shortcode_Shell::render(
+			$content,
+			Alloy_Metal_Price_API_Shortcode_Shell::card_skeleton(2),
+			self::TAG,
+			'metal_offer_card'
+		);
 	}
 
 	/**
@@ -157,19 +164,20 @@ class Alloy_Metal_Price_API_Metal_Offer_Card_Shortcode {
 
 		$purity_karat = $this->parse_purity_karat(isset($_POST['purity']) ? wp_unslash($_POST['purity']) : '24K');
 
-		wp_send_json_success($this->get_offer_card_pricing($purity_karat));
+		wp_send_json_success($this->get_offer_card_pricing($purity_karat, false));
 	}
 
 	/**
 	 * Build offer card pricing strings for a purity.
 	 *
-	 * @param int $purity_karat Purity karat value.
+	 * @param int  $purity_karat Purity karat value.
+	 * @param bool $cached_only Whether to avoid a remote request.
 	 * @return array<string, string>
 	 */
-	protected function get_offer_card_pricing($purity_karat) {
-		$spot_price_per_gram = $this->api_client->get_metal_price('gold');
+	protected function get_offer_card_pricing($purity_karat, $cached_only = false) {
+		$spot_price_per_gram = $cached_only ? $this->api_client->get_cached_metal_price('gold') : $this->api_client->get_metal_price('gold');
 
-		if (is_wp_error($spot_price_per_gram)) {
+		if (is_wp_error($spot_price_per_gram) || null === $spot_price_per_gram) {
 			return array(
 				'spot'  => __('Unavailable', 'alloy-metal-price-api'),
 				'pawn'  => __('Unavailable', 'alloy-metal-price-api'),

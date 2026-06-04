@@ -83,12 +83,13 @@ class Alloy_Metal_Price_API_Metal_Payout_Comparison_Shortcode {
 		);
 
 		$this->assets->enqueue_frontend_assets();
+		$this->assets->enqueue_frontend_scripts();
 
 		$title               = sanitize_text_field((string) $atts['title']);
 		$link_url            = esc_url((string) $atts['link_url']);
-		$spot_price_per_gram = $this->api_client->get_metal_price('gold');
+		$spot_price_per_gram = $this->api_client->get_cached_metal_price('gold');
 
-		if (is_wp_error($spot_price_per_gram)) {
+		if (null === $spot_price_per_gram) {
 			return $this->render_unavailable_state($title, $link_url);
 		}
 
@@ -100,10 +101,13 @@ class Alloy_Metal_Price_API_Metal_Payout_Comparison_Shortcode {
 			$alloy_offer = $spot_price * $this->get_alloy_offer_rate($karat);
 
 			$rows[] = array(
-				'karat' => absint($karat) . 'K',
-				'spot'  => $this->format_currency($spot_price),
-				'pawn'  => $this->format_currency($pawn_offer),
-				'alloy' => $this->format_currency($alloy_offer),
+				'karat'        => absint($karat) . 'K',
+				'spot'         => $this->format_currency($spot_price),
+				'pawn'         => $this->format_currency($pawn_offer),
+				'alloy'        => $this->format_currency($alloy_offer),
+				'spot_factor'  => $karat / 24,
+				'pawn_factor'  => ($karat / 24) * 0.4,
+				'alloy_factor' => ($karat / 24) * $this->get_alloy_offer_rate($karat),
 			);
 		}
 
@@ -199,9 +203,9 @@ class Alloy_Metal_Price_API_Metal_Payout_Comparison_Shortcode {
 							<?php foreach ($rows as $index => $row) : ?>
 								<tr class="<?php echo esc_attr(0 === $index % 2 ? 'aur:bg-white' : 'aur:bg-table-row-alt'); ?> aur:group">
 									<td class="aur:px-2 aur:py-2 aur:group-hover:bg-secondary! aur:group-hover:text-white!"><?php echo esc_html($row['karat']); ?></td>
-									<td class="aur:px-2 aur:py-2 aur:group-hover:bg-secondary! aur:group-hover:text-white!"><?php echo esc_html($row['spot']); ?></td>
-									<td class="aur:px-2 aur:py-2 aur:group-hover:bg-secondary! aur:group-hover:text-white!"><?php echo esc_html($row['pawn']); ?></td>
-									<td class="aur:px-2 aur:py-2 aur:font-medium aur:text-primary  aur:group-hover:bg-primary! aur:group-hover:text-white!"><?php echo esc_html($row['alloy']); ?></td>
+										<td class="aur:px-2 aur:py-2 aur:group-hover:bg-secondary! aur:group-hover:text-white!"><?php echo $this->render_live_price_cell($row, 'spot'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></td>
+										<td class="aur:px-2 aur:py-2 aur:group-hover:bg-secondary! aur:group-hover:text-white!"><?php echo $this->render_live_price_cell($row, 'pawn'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></td>
+										<td class="aur:px-2 aur:py-2 aur:font-medium aur:text-primary  aur:group-hover:bg-primary! aur:group-hover:text-white!"><?php echo $this->render_live_price_cell($row, 'alloy'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></td>
 								</tr>
 							<?php endforeach; ?>
 						</tbody>
@@ -211,17 +215,44 @@ class Alloy_Metal_Price_API_Metal_Payout_Comparison_Shortcode {
 						<?php echo esc_html($footnote); ?>
 					</div>
 
-					<div id="currentGoldPrice" class="aur:hidden">
-						<span class="aur:text-base aur:font-sans" data-metal-symbol="xau" data-metal-unit="ounce">
-							<?php echo esc_html($hidden_gold_price); ?>
-						</span>
-					</div>
+						<div id="currentGoldPrice" class="aur:hidden">
+							<span class="aur:text-base aur:font-sans" data-metal-symbol="xau" data-metal-unit="ounce">
+								<span class="js-alloy-live-price" data-metal="gold" data-price-factor="<?php echo esc_attr((string) self::TROY_OUNCE_IN_GRAMS); ?>" data-price-format="number" data-decimals="2"><?php echo esc_html($hidden_gold_price); ?></span>
+							</span>
+						</div>
 				</div>
 			</a>
 		</div>
 <?php
 
-		return trim((string) ob_get_clean());
+		$content = trim((string) ob_get_clean());
+
+		return Alloy_Metal_Price_API_Shortcode_Shell::render(
+			$content,
+			Alloy_Metal_Price_API_Shortcode_Shell::table_skeleton(count($rows)),
+			self::TAG
+		);
+	}
+
+	/**
+	 * Render a table value with an optional live-price hydration hook.
+	 *
+	 * @param array<string, string|float> $row Row data.
+	 * @param string                      $key Value key.
+	 * @return string
+	 */
+	protected function render_live_price_cell($row, $key) {
+		$factor_key = $key . '_factor';
+
+		if (! isset($row[$factor_key])) {
+			return esc_html($row[$key]);
+		}
+
+		return sprintf(
+			'<span class="js-alloy-live-price" data-metal="gold" data-price-factor="%1$s">%2$s</span>',
+			esc_attr((string) $row[$factor_key]),
+			esc_html($row[$key])
+		);
 	}
 
 	/**

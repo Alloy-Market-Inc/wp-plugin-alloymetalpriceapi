@@ -44,6 +44,8 @@ If you only need the short version:
 - Add shortcode settings inside the brackets like `purity="14K"`
 - Use straight quotes like `"` in shortcode attributes
 - If you leave attributes out, the shortcode uses its default settings
+- Styled shortcodes reserve their first-paint layout before the plugin stylesheet finishes loading, then hydrate fresh live prices after the page loads.
+- Do not add page-content wrappers like `alloy-shortcode-cls-reserve` around styled shortcodes. The plugin owns those reserves for calculators, tables, offer cards, spot tickers, and the conversion calculator.
 
 ## `[metalpriceapi]`
 
@@ -204,13 +206,18 @@ Purity note:
 Class-ring note:
 
 - When `classring="true"`, the calculator adds a stone-material select
-- Any stone option other than `No stone` deducts `10%` of total weight, with a minimum of `0.5 g` and a maximum of `3 g`
+- Any stone option other than `No stone` deducts `20%` of total weight, with a minimum of `0.5 g` and a maximum of `3 g`
 - The calculator then uses the remaining metal-only weight for the value calculation
 
 Best for:
 
 - Simple calculator sections
 - Landing pages where the calculator should be the main focus
+
+Behavior note:
+
+- Results stay hidden until Calculate Value is clicked
+- Changing fields does not calculate or submit until Calculate Value is clicked again
 
 ## `[metal_calculator_layout]`
 
@@ -268,6 +275,7 @@ Purity note:
 Notes:
 
 - Gold keeps the standard gold content boxes
+- Calculator results stay hidden until Calculate Value is clicked
 - `right="14K"` is for gold only
 - Platinum uses a platinum fineness box in the bottom-right area
 - Silver and Palladium currently use a placeholder bottom-right box until their custom content is added

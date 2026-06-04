@@ -46,6 +46,8 @@ The plugin currently fetches prices from:
 
 The plugin registers its stylesheet and script on `wp_enqueue_scripts` and conditionally enqueues them only on singular content that contains supported shortcodes.
 
+Styled shortcodes render with small inline first-paint placeholders so their dimensions are reserved while `plugin.css` loads. Live-price shortcodes use the last cached price for server-rendered markup and hydrate fresh prices asynchronously after the page is interactive, which avoids blocking the initial layout on the Aurify API.
+
 Shortcodes that enqueue CSS:
 
 - `metalpriceapi`
@@ -100,14 +102,27 @@ Full build shortcut:
 npm run build
 ```
 
+## WP Engine Deploy
+
+This plugin has a plugin-only WP Engine deploy flow using SSH Gateway and `rsync`, documented in:
+
+- [`WPE-DEPLOY.md`](/Users/jamescook/REPOS/ALLOY/alloy-marcom/wp-content/plugins/AlloyMetalPriceAPI/WPE-DEPLOY.md)
+
+Use the deploy script:
+
+```bash
+./scripts/deploy-wpe-plugin.sh --dry-run
+./scripts/deploy-wpe-plugin.sh
+```
+
 Source CSS lives in:
 
-- [`assets/src/css/plugin.css`](/Users/jamescook/REPOS/LOCAL-SITES/alloy-marcom/app/public/wp-content/plugins/AlloyMetalPriceAPI/assets/src/css/plugin.css)
+- [`assets/src/css/plugin.css`](/Users/jamescook/REPOS/ALLOY/alloy-marcom/wp-content/plugins/AlloyMetalPriceAPI/assets/src/css/plugin.css)
 
 Built assets live in:
 
-- [`assets/dist/css/plugin.css`](/Users/jamescook/REPOS/LOCAL-SITES/alloy-marcom/app/public/wp-content/plugins/AlloyMetalPriceAPI/assets/dist/css/plugin.css)
-- [`assets/dist/js/alloy-calculator.js`](/Users/jamescook/REPOS/LOCAL-SITES/alloy-marcom/app/public/wp-content/plugins/AlloyMetalPriceAPI/assets/dist/js/alloy-calculator.js)
+- [`assets/dist/css/plugin.css`](/Users/jamescook/REPOS/ALLOY/alloy-marcom/wp-content/plugins/AlloyMetalPriceAPI/assets/dist/css/plugin.css)
+- [`assets/dist/js/alloy-calculator.js`](/Users/jamescook/REPOS/ALLOY/alloy-marcom/wp-content/plugins/AlloyMetalPriceAPI/assets/dist/js/alloy-calculator.js)
 
 ## Shortcode Reference
 
@@ -288,7 +303,8 @@ Calculator UI includes:
   - Current Market Value
   - Average Pawn Shop Offer
   - Alloy's Estimated Offer
-- Live recalculation as fields change
+- Results stay hidden until Calculate Value is clicked
+- Changing fields does not calculate or submit until Calculate Value is clicked again
 
 Metal behavior:
 
@@ -304,7 +320,7 @@ Offer logic:
   - `0.85` for `22K` and `24K`
   - `0.7` for all other karats
 - When `classring="true"` and any stone option other than `No stone (metal-only)` is selected:
-  - deduct `10%` of total weight
+  - deduct `20%` of total weight
   - with a minimum deduction of `0.5 g`
   - and a maximum deduction of `3 g`
   - then calculate all values from the remaining metal-only grams
@@ -326,7 +342,7 @@ API failure behavior:
 
 - If the live gold price request fails, the calculator still renders
 - Base price becomes `0`
-- Calculated values start from zero until refreshed page content gets valid data
+- Calculated values remain hidden until Calculate Value is clicked and start from zero until refreshed page content gets valid data
 
 Implementation note:
 
@@ -1026,31 +1042,31 @@ The plugin makes live API requests on page render or refresh. Different shortcod
 
 Plugin bootstrap:
 
-- [`alloy-metal-price-api.php`](/Users/jamescook/REPOS/LOCAL-SITES/alloy-marcom/app/public/wp-content/plugins/AlloyMetalPriceAPI/alloy-metal-price-api.php)
+- [`alloy-metal-price-api.php`](/Users/jamescook/REPOS/ALLOY/alloy-marcom/wp-content/plugins/AlloyMetalPriceAPI/alloy-metal-price-api.php)
 
 Core services:
 
-- [`includes/class-alloy-metal-price-api-plugin.php`](/Users/jamescook/REPOS/LOCAL-SITES/alloy-marcom/app/public/wp-content/plugins/AlloyMetalPriceAPI/includes/class-alloy-metal-price-api-plugin.php)
-- [`includes/class-alloy-metal-price-api-assets.php`](/Users/jamescook/REPOS/LOCAL-SITES/alloy-marcom/app/public/wp-content/plugins/AlloyMetalPriceAPI/includes/class-alloy-metal-price-api-assets.php)
-- [`includes/class-alloy-metal-price-api-client.php`](/Users/jamescook/REPOS/LOCAL-SITES/alloy-marcom/app/public/wp-content/plugins/AlloyMetalPriceAPI/includes/class-alloy-metal-price-api-client.php)
-- [`includes/class-alloy-metal-price-api-logger.php`](/Users/jamescook/REPOS/LOCAL-SITES/alloy-marcom/app/public/wp-content/plugins/AlloyMetalPriceAPI/includes/class-alloy-metal-price-api-logger.php)
+- [`includes/class-alloy-metal-price-api-plugin.php`](/Users/jamescook/REPOS/ALLOY/alloy-marcom/wp-content/plugins/AlloyMetalPriceAPI/includes/class-alloy-metal-price-api-plugin.php)
+- [`includes/class-alloy-metal-price-api-assets.php`](/Users/jamescook/REPOS/ALLOY/alloy-marcom/wp-content/plugins/AlloyMetalPriceAPI/includes/class-alloy-metal-price-api-assets.php)
+- [`includes/class-alloy-metal-price-api-client.php`](/Users/jamescook/REPOS/ALLOY/alloy-marcom/wp-content/plugins/AlloyMetalPriceAPI/includes/class-alloy-metal-price-api-client.php)
+- [`includes/class-alloy-metal-price-api-logger.php`](/Users/jamescook/REPOS/ALLOY/alloy-marcom/wp-content/plugins/AlloyMetalPriceAPI/includes/class-alloy-metal-price-api-logger.php)
 
 Shortcodes:
 
-- [`includes/shortcodes/class-alloy-metal-price-api-metal-price-shortcode.php`](/Users/jamescook/REPOS/LOCAL-SITES/alloy-marcom/app/public/wp-content/plugins/AlloyMetalPriceAPI/includes/shortcodes/class-alloy-metal-price-api-metal-price-shortcode.php)
-- [`includes/shortcodes/class-alloy-metal-price-api-metal-price-table-shortcode.php`](/Users/jamescook/REPOS/LOCAL-SITES/alloy-marcom/app/public/wp-content/plugins/AlloyMetalPriceAPI/includes/shortcodes/class-alloy-metal-price-api-metal-price-table-shortcode.php)
-- [`includes/shortcodes/class-alloy-metal-price-api-calculator-renderer.php`](/Users/jamescook/REPOS/LOCAL-SITES/alloy-marcom/app/public/wp-content/plugins/AlloyMetalPriceAPI/includes/shortcodes/class-alloy-metal-price-api-calculator-renderer.php)
-- [`includes/shortcodes/class-alloy-metal-price-api-metal-calculator-shortcode.php`](/Users/jamescook/REPOS/LOCAL-SITES/alloy-marcom/app/public/wp-content/plugins/AlloyMetalPriceAPI/includes/shortcodes/class-alloy-metal-price-api-metal-calculator-shortcode.php)
-- [`includes/shortcodes/class-alloy-metal-price-api-metal-calculator-layout-shortcode.php`](/Users/jamescook/REPOS/LOCAL-SITES/alloy-marcom/app/public/wp-content/plugins/AlloyMetalPriceAPI/includes/shortcodes/class-alloy-metal-price-api-metal-calculator-layout-shortcode.php)
-- [`includes/shortcodes/class-alloy-metal-price-api-metal-offer-card-shortcode.php`](/Users/jamescook/REPOS/LOCAL-SITES/alloy-marcom/app/public/wp-content/plugins/AlloyMetalPriceAPI/includes/shortcodes/class-alloy-metal-price-api-metal-offer-card-shortcode.php)
-- [`includes/shortcodes/class-alloy-metal-price-api-metal-price-compare-shortcode.php`](/Users/jamescook/REPOS/LOCAL-SITES/alloy-marcom/app/public/wp-content/plugins/AlloyMetalPriceAPI/includes/shortcodes/class-alloy-metal-price-api-metal-price-compare-shortcode.php)
-- [`includes/shortcodes/class-alloy-metal-price-api-metal-payout-comparison-shortcode.php`](/Users/jamescook/REPOS/LOCAL-SITES/alloy-marcom/app/public/wp-content/plugins/AlloyMetalPriceAPI/includes/shortcodes/class-alloy-metal-price-api-metal-payout-comparison-shortcode.php)
-- [`includes/shortcodes/class-alloy-metal-price-api-metal-spot-ticker-shortcode.php`](/Users/jamescook/REPOS/LOCAL-SITES/alloy-marcom/app/public/wp-content/plugins/AlloyMetalPriceAPI/includes/shortcodes/class-alloy-metal-price-api-metal-spot-ticker-shortcode.php)
-- [`includes/shortcodes/class-alloy-metal-price-api-metal-goldbar-live-melt-table-shortcode.php`](/Users/jamescook/REPOS/LOCAL-SITES/alloy-marcom/app/public/wp-content/plugins/AlloyMetalPriceAPI/includes/shortcodes/class-alloy-metal-price-api-metal-goldbar-live-melt-table-shortcode.php)
-- [`includes/shortcodes/class-alloy-metal-price-api-metal-fractional-goldbar-module-shortcode.php`](/Users/jamescook/REPOS/LOCAL-SITES/alloy-marcom/app/public/wp-content/plugins/AlloyMetalPriceAPI/includes/shortcodes/class-alloy-metal-price-api-metal-fractional-goldbar-module-shortcode.php)
-- [`includes/shortcodes/class-alloy-metal-price-api-metal-standard-goldbar-module-shortcode.php`](/Users/jamescook/REPOS/LOCAL-SITES/alloy-marcom/app/public/wp-content/plugins/AlloyMetalPriceAPI/includes/shortcodes/class-alloy-metal-price-api-metal-standard-goldbar-module-shortcode.php)
-- [`includes/shortcodes/class-alloy-metal-price-api-conversion-rate-calculator-shortcode.php`](/Users/jamescook/REPOS/LOCAL-SITES/alloy-marcom/app/public/wp-content/plugins/AlloyMetalPriceAPI/includes/shortcodes/class-alloy-metal-price-api-conversion-rate-calculator-shortcode.php)
-- [`includes/shortcodes/class-alloy-metal-price-api-metal-price-calc-shortcode.php`](/Users/jamescook/REPOS/LOCAL-SITES/alloy-marcom/app/public/wp-content/plugins/AlloyMetalPriceAPI/includes/shortcodes/class-alloy-metal-price-api-metal-price-calc-shortcode.php)
+- [`includes/shortcodes/class-alloy-metal-price-api-metal-price-shortcode.php`](/Users/jamescook/REPOS/ALLOY/alloy-marcom/wp-content/plugins/AlloyMetalPriceAPI/includes/shortcodes/class-alloy-metal-price-api-metal-price-shortcode.php)
+- [`includes/shortcodes/class-alloy-metal-price-api-metal-price-table-shortcode.php`](/Users/jamescook/REPOS/ALLOY/alloy-marcom/wp-content/plugins/AlloyMetalPriceAPI/includes/shortcodes/class-alloy-metal-price-api-metal-price-table-shortcode.php)
+- [`includes/shortcodes/class-alloy-metal-price-api-calculator-renderer.php`](/Users/jamescook/REPOS/ALLOY/alloy-marcom/wp-content/plugins/AlloyMetalPriceAPI/includes/shortcodes/class-alloy-metal-price-api-calculator-renderer.php)
+- [`includes/shortcodes/class-alloy-metal-price-api-metal-calculator-shortcode.php`](/Users/jamescook/REPOS/ALLOY/alloy-marcom/wp-content/plugins/AlloyMetalPriceAPI/includes/shortcodes/class-alloy-metal-price-api-metal-calculator-shortcode.php)
+- [`includes/shortcodes/class-alloy-metal-price-api-metal-calculator-layout-shortcode.php`](/Users/jamescook/REPOS/ALLOY/alloy-marcom/wp-content/plugins/AlloyMetalPriceAPI/includes/shortcodes/class-alloy-metal-price-api-metal-calculator-layout-shortcode.php)
+- [`includes/shortcodes/class-alloy-metal-price-api-metal-offer-card-shortcode.php`](/Users/jamescook/REPOS/ALLOY/alloy-marcom/wp-content/plugins/AlloyMetalPriceAPI/includes/shortcodes/class-alloy-metal-price-api-metal-offer-card-shortcode.php)
+- [`includes/shortcodes/class-alloy-metal-price-api-metal-price-compare-shortcode.php`](/Users/jamescook/REPOS/ALLOY/alloy-marcom/wp-content/plugins/AlloyMetalPriceAPI/includes/shortcodes/class-alloy-metal-price-api-metal-price-compare-shortcode.php)
+- [`includes/shortcodes/class-alloy-metal-price-api-metal-payout-comparison-shortcode.php`](/Users/jamescook/REPOS/ALLOY/alloy-marcom/wp-content/plugins/AlloyMetalPriceAPI/includes/shortcodes/class-alloy-metal-price-api-metal-payout-comparison-shortcode.php)
+- [`includes/shortcodes/class-alloy-metal-price-api-metal-spot-ticker-shortcode.php`](/Users/jamescook/REPOS/ALLOY/alloy-marcom/wp-content/plugins/AlloyMetalPriceAPI/includes/shortcodes/class-alloy-metal-price-api-metal-spot-ticker-shortcode.php)
+- [`includes/shortcodes/class-alloy-metal-price-api-metal-goldbar-live-melt-table-shortcode.php`](/Users/jamescook/REPOS/ALLOY/alloy-marcom/wp-content/plugins/AlloyMetalPriceAPI/includes/shortcodes/class-alloy-metal-price-api-metal-goldbar-live-melt-table-shortcode.php)
+- [`includes/shortcodes/class-alloy-metal-price-api-metal-fractional-goldbar-module-shortcode.php`](/Users/jamescook/REPOS/ALLOY/alloy-marcom/wp-content/plugins/AlloyMetalPriceAPI/includes/shortcodes/class-alloy-metal-price-api-metal-fractional-goldbar-module-shortcode.php)
+- [`includes/shortcodes/class-alloy-metal-price-api-metal-standard-goldbar-module-shortcode.php`](/Users/jamescook/REPOS/ALLOY/alloy-marcom/wp-content/plugins/AlloyMetalPriceAPI/includes/shortcodes/class-alloy-metal-price-api-metal-standard-goldbar-module-shortcode.php)
+- [`includes/shortcodes/class-alloy-metal-price-api-conversion-rate-calculator-shortcode.php`](/Users/jamescook/REPOS/ALLOY/alloy-marcom/wp-content/plugins/AlloyMetalPriceAPI/includes/shortcodes/class-alloy-metal-price-api-conversion-rate-calculator-shortcode.php)
+- [`includes/shortcodes/class-alloy-metal-price-api-metal-price-calc-shortcode.php`](/Users/jamescook/REPOS/ALLOY/alloy-marcom/wp-content/plugins/AlloyMetalPriceAPI/includes/shortcodes/class-alloy-metal-price-api-metal-price-calc-shortcode.php)
 
 ## Quick Copy/Paste Examples
 

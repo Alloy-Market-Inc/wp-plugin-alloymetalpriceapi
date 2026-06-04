@@ -100,6 +100,7 @@ class Alloy_Metal_Price_API_14K_Gold_Price_Table_Shortcode {
 		);
 
 		$this->assets->enqueue_frontend_assets();
+		$this->assets->enqueue_frontend_scripts();
 
 		$metal               = $this->normalize_metal($atts['metal']);
 		$metal_label         = self::METAL_LABELS[$metal];
@@ -115,9 +116,9 @@ class Alloy_Metal_Price_API_14K_Gold_Price_Table_Shortcode {
 		$purity_multiplier   = 'gold' === $metal ? ((int) $purity_value / 24) : (float) $purity_value;
 		$data_variant        = $this->normalize_data_variant($atts['data']);
 		$show_live_box       = $this->parse_boolean_att($atts['show_live_box']);
-		$spot_price_per_gram = $this->api_client->get_metal_price($metal);
+		$spot_price_per_gram = $this->api_client->get_cached_metal_price($metal);
 
-		if (is_wp_error($spot_price_per_gram)) {
+		if (null === $spot_price_per_gram) {
 			return $this->render_unavailable_table($title, $metal_label, $purity_label, $show_live_box, $data_variant, $default_title);
 		}
 
@@ -153,9 +154,11 @@ class Alloy_Metal_Price_API_14K_Gold_Price_Table_Shortcode {
 							? $this->build_compound_label($purity_label, $metal_label)
 							: $this->build_compound_label('gold' === $metal ? '24K' : __('Spot', 'alloy-metal-price-api'), $metal_label)
 					)
-				),
-				'price'       => $this->format_currency('default' === $data_variant ? $price_per_gram : $spot_price_per_gram),
-				'subtext'     => $has_manual_purity ? sprintf(
+					),
+					'price'        => $this->format_currency('default' === $data_variant ? $price_per_gram : $spot_price_per_gram),
+					'price_factor' => 'default' === $data_variant ? $purity_multiplier : 1,
+					'metal'        => $metal,
+					'subtext'      => $has_manual_purity ? sprintf(
 					/* translators: 1: metal label like Gold or Platinum, 2: current spot price per gram. */
 					__('Based on %1$s spot price: %2$s/g', 'alloy-metal-price-api'),
 					$metal_label,
@@ -220,17 +223,26 @@ class Alloy_Metal_Price_API_14K_Gold_Price_Table_Shortcode {
 	 */
 	protected function render_table($title, $rows, $footer_left, $footer_right, $live_box = null) {
 		ob_start();
-?>
+	?>
 		<div class="aur:flex aur:w-full aur:justify-center aur:font-sans">
-			<div class="aur:flex aur:w-full aur:flex-col aur:items-center aur:gap-8 aur:lg:flex-row aur:lg:items-stretch aur:lg:justify-center">
-				<?php if (is_array($live_box)) : ?>
-					<aside class="aur:flex aur:w-full aur:flex-col aur:items-center aur:justify-center aur:gap-5 aur:rounded-2xl aur:border aur:border-slate-900 aur:bg-white aur:p-5 aur:text-center aur:shadow-[0_4px_16px_rgba(0,0,0,0.06)] aur:lg:max-w-80">
-						<div class="aur:inline-flex aur:rounded-lg aur:bg-primary aur:px-4 aur:py-2 aur:text-xs aur:font-semibold aur:tracking-wide aur:text-white">
-							<?php echo esc_html($live_box['pill']); ?>
-						</div>
-						<div class="aur:text-5xl aur:font-semibold <?php echo esc_attr($live_box['price_class']); ?>">
-							<?php echo esc_html($live_box['price']); ?>
-						</div>
+				<div class="aur:flex aur:w-full aur:flex-col aur:items-center aur:gap-8 aur:lg:flex-row aur:lg:items-stretch aur:lg:justify-center">
+					<?php if (is_array($live_box)) : ?>
+						<aside class="aur:flex aur:w-full aur:flex-col aur:items-center aur:justify-center aur:gap-5 aur:rounded-2xl aur:border aur:border-slate-900 aur:bg-white aur:p-5 aur:text-center aur:shadow-[0_4px_16px_rgba(0,0,0,0.06)] aur:lg:max-w-80">
+							<div class="aur:inline-flex aur:rounded-lg aur:bg-primary aur:px-4 aur:py-2 aur:text-xs aur:font-semibold aur:tracking-wide aur:text-white">
+								<?php echo esc_html($live_box['pill']); ?>
+							</div>
+							<div class="aur:text-5xl aur:font-semibold <?php echo esc_attr($live_box['price_class']); ?>">
+								<?php if (isset($live_box['metal'], $live_box['price_factor'])) : ?>
+									<span
+										class="js-alloy-live-price"
+										data-metal="<?php echo esc_attr($live_box['metal']); ?>"
+										data-price-factor="<?php echo esc_attr((string) $live_box['price_factor']); ?>">
+										<?php echo esc_html($live_box['price']); ?>
+									</span>
+								<?php else : ?>
+									<?php echo esc_html($live_box['price']); ?>
+								<?php endif; ?>
+							</div>
 						<?php if ('' !== trim((string) $live_box['subtext'])) : ?>
 							<div class="aur:text-sm aur:text-slate-600">
 								<?php echo esc_html($live_box['subtext']); ?>
@@ -260,15 +272,24 @@ class Alloy_Metal_Price_API_14K_Gold_Price_Table_Shortcode {
 								if (0 === $index % 2) {
 									$row_classes .= ' aur:bg-table-row-alt';
 								}
-								?>
-								<tr class="<?php echo esc_attr($row_classes); ?>">
-									<td class="aur:px-4 aur:py-3 aur:text-base aur:font-normal aur:text-slate-900">
-										<?php echo esc_html($row['label']); ?>
-									</td>
-									<td class="aur:px-4 aur:py-3 aur:text-right aur:text-base aur:font-semibold aur:text-primary">
-										<?php echo esc_html($row['value']); ?>
-									</td>
-								</tr>
+									?>
+									<tr class="<?php echo esc_attr($row_classes); ?>">
+										<td class="aur:px-4 aur:py-3 aur:text-base aur:font-normal aur:text-slate-900">
+											<?php echo esc_html($row['label']); ?>
+										</td>
+										<td class="aur:px-4 aur:py-3 aur:text-right aur:text-base aur:font-semibold aur:text-primary">
+											<?php if (isset($row['metal'], $row['value_factor'])) : ?>
+												<span
+													class="js-alloy-live-price"
+													data-metal="<?php echo esc_attr($row['metal']); ?>"
+													data-price-factor="<?php echo esc_attr((string) $row['value_factor']); ?>">
+													<?php echo esc_html($row['value']); ?>
+												</span>
+											<?php else : ?>
+												<?php echo esc_html($row['value']); ?>
+											<?php endif; ?>
+										</td>
+									</tr>
 							<?php endforeach; ?>
 						</tbody>
 					</table>
@@ -285,7 +306,14 @@ class Alloy_Metal_Price_API_14K_Gold_Price_Table_Shortcode {
 		</div>
 <?php
 
-		return trim((string) ob_get_clean());
+		$content = trim((string) ob_get_clean());
+
+		return Alloy_Metal_Price_API_Shortcode_Shell::render(
+			$content,
+			Alloy_Metal_Price_API_Shortcode_Shell::table_skeleton(count($rows)),
+			self::TAG,
+			'metal_price_table'
+		);
 	}
 
 	/**
@@ -410,46 +438,56 @@ class Alloy_Metal_Price_API_14K_Gold_Price_Table_Shortcode {
 					$metal_label
 				) : $title,
 				'rows'        => array(
-					array(
-						'label' => sprintf(
-							/* translators: %s: metal label like Gold or Silver. */
-							__('1 oz %s Bar', 'alloy-metal-price-api'),
-							$metal_label
+						array(
+							'label' => sprintf(
+								/* translators: %s: metal label like Gold or Silver. */
+								__('1 oz %s Bar', 'alloy-metal-price-api'),
+								$metal_label
+							),
+							'value'        => $this->format_currency($spot_price_per_gram * self::TROY_OUNCE_IN_GRAMS),
+							'metal'        => $metal,
+							'value_factor' => self::TROY_OUNCE_IN_GRAMS,
 						),
-						'value' => $this->format_currency($spot_price_per_gram * self::TROY_OUNCE_IN_GRAMS),
-					),
-					array(
-						'label' => sprintf(
-							/* translators: %s: metal label like Gold or Silver. */
-							__('5 oz %s Bar', 'alloy-metal-price-api'),
-							$metal_label
+						array(
+							'label' => sprintf(
+								/* translators: %s: metal label like Gold or Silver. */
+								__('5 oz %s Bar', 'alloy-metal-price-api'),
+								$metal_label
+							),
+							'value'        => $this->format_currency($spot_price_per_gram * self::TROY_OUNCE_IN_GRAMS * 5),
+							'metal'        => $metal,
+							'value_factor' => self::TROY_OUNCE_IN_GRAMS * 5,
 						),
-						'value' => $this->format_currency($spot_price_per_gram * self::TROY_OUNCE_IN_GRAMS * 5),
-					),
-					array(
-						'label' => sprintf(
-							/* translators: %s: metal label like Gold or Silver. */
-							__('10 oz %s Bar', 'alloy-metal-price-api'),
-							$metal_label
+						array(
+							'label' => sprintf(
+								/* translators: %s: metal label like Gold or Silver. */
+								__('10 oz %s Bar', 'alloy-metal-price-api'),
+								$metal_label
+							),
+							'value'        => $this->format_currency($spot_price_per_gram * self::TROY_OUNCE_IN_GRAMS * 10),
+							'metal'        => $metal,
+							'value_factor' => self::TROY_OUNCE_IN_GRAMS * 10,
 						),
-						'value' => $this->format_currency($spot_price_per_gram * self::TROY_OUNCE_IN_GRAMS * 10),
-					),
-					array(
-						'label' => sprintf(
-							/* translators: %s: metal label like Gold or Silver. */
-							__('100 g %s Bar', 'alloy-metal-price-api'),
-							$metal_label
+						array(
+							'label' => sprintf(
+								/* translators: %s: metal label like Gold or Silver. */
+								__('100 g %s Bar', 'alloy-metal-price-api'),
+								$metal_label
+							),
+							'value'        => $this->format_currency($spot_price_per_gram * 100),
+							'metal'        => $metal,
+							'value_factor' => 100,
 						),
-						'value' => $this->format_currency($spot_price_per_gram * 100),
-					),
-					array(
-						'label' => sprintf(
-							/* translators: %s: metal label like Gold or Silver. */
-							__('1 kg %s Bar', 'alloy-metal-price-api'),
-							$metal_label
+						array(
+							'label' => sprintf(
+								/* translators: %s: metal label like Gold or Silver. */
+								__('1 kg %s Bar', 'alloy-metal-price-api'),
+								$metal_label
+							),
+							'value'        => $this->format_currency($spot_price_per_gram * 1000),
+							'metal'        => $metal,
+							'value_factor' => 1000,
 						),
-						'value' => $this->format_currency($spot_price_per_gram * 1000),
-					),
 				),
 				'footer_left' => sprintf(
 					/* translators: 1: metal label like Gold or Silver, 2: current spot price per gram. */
@@ -464,20 +502,24 @@ class Alloy_Metal_Price_API_14K_Gold_Price_Table_Shortcode {
 			'title'       => $title,
 			'rows'        => array(
 				array(
-					'label' => sprintf(
-						/* translators: %s: purity label like 14K. */
-						__('%s Price Per Gram', 'alloy-metal-price-api'),
-						$this->build_compound_label($purity_label, $metal_label)
+						'label' => sprintf(
+							/* translators: %s: purity label like 14K. */
+							__('%s Price Per Gram', 'alloy-metal-price-api'),
+							$this->build_compound_label($purity_label, $metal_label)
+						),
+						'value'        => $this->format_currency($price_per_gram),
+						'metal'        => $metal,
+						'value_factor' => $purity_multiplier,
 					),
-					'value' => $this->format_currency($price_per_gram),
-				),
 				array(
 					'label' => sprintf(
 						/* translators: %s: purity label like 14K. */
 						__('%s Price Per Ounce', 'alloy-metal-price-api'),
 						$this->build_compound_label($purity_label, $metal_label)
 					),
-					'value' => $this->format_currency($price_per_ounce),
+					'value'        => $this->format_currency($price_per_ounce),
+					'metal'        => $metal,
+					'value_factor' => $purity_multiplier * self::OUNCE_IN_GRAMS,
 				),
 				array(
 					'label' => sprintf(
@@ -485,7 +527,9 @@ class Alloy_Metal_Price_API_14K_Gold_Price_Table_Shortcode {
 						__('%s Price Per Troy Ounce', 'alloy-metal-price-api'),
 						$this->build_compound_label($purity_label, $metal_label)
 					),
-					'value' => $this->format_currency($price_per_troy_ounce),
+					'value'        => $this->format_currency($price_per_troy_ounce),
+					'metal'        => $metal,
+					'value_factor' => $purity_multiplier * self::TROY_OUNCE_IN_GRAMS,
 				),
 				array(
 					'label' => sprintf(
@@ -493,7 +537,9 @@ class Alloy_Metal_Price_API_14K_Gold_Price_Table_Shortcode {
 						__('%s Price Per Kilo', 'alloy-metal-price-api'),
 						$this->build_compound_label($purity_label, $metal_label)
 					),
-					'value' => $this->format_currency($price_per_kilo),
+					'value'        => $this->format_currency($price_per_kilo),
+					'metal'        => $metal,
+					'value_factor' => $purity_multiplier * 1000,
 				),
 			),
 			'footer_left' => sprintf(
