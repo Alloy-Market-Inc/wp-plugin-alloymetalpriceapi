@@ -37,9 +37,9 @@ The deploy script defaults to that environment, but you can override it.
 ## Files In This Flow
 
 - deploy script:
-  [`scripts/deploy-wpe-plugin.sh`](/Users/jamescook/REPOS/LOCAL-SITES/alloy-marcom/app/public/wp-content/plugins/AlloyMetalPriceAPI/scripts/deploy-wpe-plugin.sh)
+  [`scripts/deploy-wpe-plugin.sh`](/Users/jamescook/REPOS/ALLOY/alloy-marcom/wp-content/plugins/AlloyMetalPriceAPI/scripts/deploy-wpe-plugin.sh)
 - rsync ignore file:
-  [`/.wpe-deploy-ignore`](/Users/jamescook/REPOS/LOCAL-SITES/alloy-marcom/app/public/wp-content/plugins/AlloyMetalPriceAPI/.wpe-deploy-ignore)
+  [`/.wpe-deploy-ignore`](/Users/jamescook/REPOS/ALLOY/alloy-marcom/wp-content/plugins/AlloyMetalPriceAPI/.wpe-deploy-ignore)
 
 ## What Gets Deployed
 
@@ -128,7 +128,7 @@ These can be overridden with environment variables if WP Engine naming differs.
 - Do not use WP Engine GitPush directly from this repository unless the repository layout changes to match the full site root.
 - Prefer the plugin-only `rsync` flow in this file.
 - Run a dry run before the first deploy to any new environment.
-- Keep [`README.md`](/Users/jamescook/REPOS/LOCAL-SITES/alloy-marcom/app/public/wp-content/plugins/AlloyMetalPriceAPI/README.md) and [`SHORTCODES.md`](/Users/jamescook/REPOS/LOCAL-SITES/alloy-marcom/app/public/wp-content/plugins/AlloyMetalPriceAPI/SHORTCODES.md) updated when shortcode behavior changes.
+- Keep [`README.md`](/Users/jamescook/REPOS/ALLOY/alloy-marcom/wp-content/plugins/AlloyMetalPriceAPI/README.md) and [`SHORTCODES.md`](/Users/jamescook/REPOS/ALLOY/alloy-marcom/wp-content/plugins/AlloyMetalPriceAPI/SHORTCODES.md) updated when shortcode behavior changes.
 - If SSH access fails, confirm:
   - the SSH key is present locally
   - the key is authorized in WP Engine
