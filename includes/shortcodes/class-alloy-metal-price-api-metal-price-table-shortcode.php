@@ -137,7 +137,8 @@ class Alloy_Metal_Price_API_14K_Gold_Price_Table_Shortcode {
 			$price_per_ounce,
 			$price_per_troy_ounce,
 			$price_per_kilo,
-			$spot_price_per_gram
+			$spot_price_per_gram,
+			$purity_multiplier
 		);
 
 		return $this->render_table(
@@ -427,9 +428,10 @@ class Alloy_Metal_Price_API_14K_Gold_Price_Table_Shortcode {
 	 * @param float  $price_per_troy_ounce Purity-adjusted price per troy ounce.
 	 * @param float  $price_per_kilo Purity-adjusted price per kilo.
 	 * @param float  $spot_price_per_gram Current 24K spot price per gram.
+	 * @param float  $purity_multiplier Purity multiplier used for client-side live-price hydration.
 	 * @return array<string, mixed>
 	 */
-	protected function build_table_config($title, $default_title, $metal, $metal_label, $data_variant, $purity_label, $price_per_gram, $price_per_ounce, $price_per_troy_ounce, $price_per_kilo, $spot_price_per_gram) {
+	protected function build_table_config($title, $default_title, $metal, $metal_label, $data_variant, $purity_label, $price_per_gram, $price_per_ounce, $price_per_troy_ounce, $price_per_kilo, $spot_price_per_gram, $purity_multiplier) {
 		if ('gold_bars' === $data_variant) {
 			return array(
 				'title'       => $default_title === $title ? sprintf(
