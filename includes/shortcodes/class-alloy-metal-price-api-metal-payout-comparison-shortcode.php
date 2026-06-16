@@ -176,40 +176,48 @@ class Alloy_Metal_Price_API_Metal_Payout_Comparison_Shortcode {
 			</a> -->
 
 			<a href="<?php echo esc_url($link_url); ?>" class="aur:relative aur:z-10 aur:block aur:no-underline! aur:text-inherit!">
-				<div class="aur:w-full aur:rounded-3xl aur:bg-white aur:px-7 aur:pb-6 aur:pt-6 aur:shadow-[0_4px_20px_rgba(0,0,0,0.08)]">
+				<div class="aur:w-full aur:rounded-3xl aur:bg-white aur:px-4 aur:pb-6 aur:pt-6 aur:shadow-[0_4px_20px_rgba(0,0,0,0.08)] aur:sm:px-6">
 					<h2 class="aur:mb-5 aur:text-center aur:text-2xl! aur:font-semibold aur:text-slate-900!">
 						<?php echo esc_html($title); ?>
 					</h2>
 
-					<table aria-label="<?php esc_attr_e('Pawn shop and Alloy gold payout comparison by karat', 'alloy-metal-price-api'); ?>" class="aur:w-full aur:border-collapse aur:text-center aur:text-base aur:text-slate-900">
-						<thead class="aur:bg-slate-100">
-							<tr>
-								<th class="aur:px-2 aur:py-2 aur:text-sm aur:leading-tight aur:font-semibold"><?php esc_html_e('Karat', 'alloy-metal-price-api'); ?></th>
-								<th class="aur:px-2 aur:py-2 aur:text-sm aur:leading-tight aur:font-semibold">
-									<?php esc_html_e('Spot Price', 'alloy-metal-price-api'); ?><br>
-									<?php esc_html_e('(per gram)', 'alloy-metal-price-api'); ?>
-								</th>
-								<th class="aur:px-2 aur:py-2 aur:text-sm aur:leading-tight aur:font-semibold">
-									<?php esc_html_e('Pawn Shop', 'alloy-metal-price-api'); ?><br>
-									<?php esc_html_e('Offer', 'alloy-metal-price-api'); ?>
-								</th>
-								<th class="aur:px-2 aur:py-2 aur:text-sm aur:leading-tight aur:font-semibold">
-									<?php esc_html_e('Alloy Estimated', 'alloy-metal-price-api'); ?><br>
-									<?php esc_html_e('Offer', 'alloy-metal-price-api'); ?>
-								</th>
-							</tr>
-						</thead>
-						<tbody>
-							<?php foreach ($rows as $index => $row) : ?>
-								<tr class="<?php echo esc_attr(0 === $index % 2 ? 'aur:bg-white' : 'aur:bg-table-row-alt'); ?> aur:group">
-									<td class="aur:px-2 aur:py-2 aur:group-hover:bg-secondary! aur:group-hover:text-white!"><?php echo esc_html($row['karat']); ?></td>
+					<div class="aur:w-full aur:overflow-x-auto">
+						<table aria-label="<?php esc_attr_e('Pawn shop and Alloy gold payout comparison by karat', 'alloy-metal-price-api'); ?>" class="aur:w-full aur:border-collapse aur:text-center aur:text-base aur:text-slate-900" style="min-width:560px;table-layout:fixed;">
+							<colgroup>
+								<col style="width:18%;">
+								<col style="width:27%;">
+								<col style="width:23%;">
+								<col style="width:32%;">
+							</colgroup>
+							<thead class="aur:bg-slate-100">
+								<tr>
+									<th class="aur:px-2 aur:py-2 aur:text-sm aur:leading-tight aur:font-semibold"><?php esc_html_e('Karat', 'alloy-metal-price-api'); ?></th>
+									<th class="aur:px-2 aur:py-2 aur:text-sm aur:leading-tight aur:font-semibold">
+										<?php esc_html_e('Spot Price', 'alloy-metal-price-api'); ?><br>
+										<?php esc_html_e('(per gram)', 'alloy-metal-price-api'); ?>
+									</th>
+									<th class="aur:px-2 aur:py-2 aur:text-sm aur:leading-tight aur:font-semibold">
+										<?php esc_html_e('Pawn Shop', 'alloy-metal-price-api'); ?><br>
+										<?php esc_html_e('Offer', 'alloy-metal-price-api'); ?>
+									</th>
+									<th class="aur:px-2 aur:py-2 aur:text-sm aur:leading-tight aur:font-semibold">
+										<?php esc_html_e('Alloy Estimated', 'alloy-metal-price-api'); ?><br>
+										<?php esc_html_e('Offer', 'alloy-metal-price-api'); ?>
+									</th>
+								</tr>
+							</thead>
+							<tbody>
+								<?php foreach ($rows as $index => $row) : ?>
+									<tr class="<?php echo esc_attr(0 === $index % 2 ? 'aur:bg-white' : 'aur:bg-table-row-alt'); ?> aur:group">
+										<td class="aur:px-2 aur:py-2 aur:group-hover:bg-secondary! aur:group-hover:text-white!"><?php echo esc_html($row['karat']); ?></td>
 										<td class="aur:px-2 aur:py-2 aur:group-hover:bg-secondary! aur:group-hover:text-white!"><?php echo $this->render_live_price_cell($row, 'spot'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></td>
 										<td class="aur:px-2 aur:py-2 aur:group-hover:bg-secondary! aur:group-hover:text-white!"><?php echo $this->render_live_price_cell($row, 'pawn'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></td>
 										<td class="aur:px-2 aur:py-2 aur:font-medium aur:text-primary  aur:group-hover:bg-primary! aur:group-hover:text-white!"><?php echo $this->render_live_price_cell($row, 'alloy'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></td>
-								</tr>
-							<?php endforeach; ?>
-						</tbody>
-					</table>
+									</tr>
+								<?php endforeach; ?>
+							</tbody>
+						</table>
+					</div>
 
 					<div class="aur:mt-3 aur:text-center aur:text-xs aur:leading-tight aur:text-slate-600">
 						<?php echo esc_html($footnote); ?>
