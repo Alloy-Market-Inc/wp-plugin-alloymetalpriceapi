@@ -204,8 +204,12 @@ class Alloy_Metal_Price_API_Metal_Offer_Card_Shortcode {
 	 * @return float
 	 */
 	protected function get_alloy_offer_rate($purity_karat) {
-		if (22 === (int) $purity_karat || 24 === (int) $purity_karat) {
+		if (24 === (int) $purity_karat) {
 			return 0.85;
+		}
+
+		if (22 === (int) $purity_karat) {
+			return 0.8;
 		}
 
 		return 0.7;

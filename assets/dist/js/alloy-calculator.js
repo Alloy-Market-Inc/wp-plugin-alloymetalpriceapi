@@ -25,8 +25,12 @@
 	}
 
 	function getAlloyOfferRate(karat) {
-		if (karat === 22 || karat === 24) {
+		if (karat === 24) {
 			return 0.85;
+		}
+
+		if (karat === 22) {
+			return 0.8;
 		}
 
 		return 0.7;

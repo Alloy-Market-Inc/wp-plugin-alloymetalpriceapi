@@ -317,7 +317,8 @@ Offer logic:
 - Market value = `spot price per gram × purity factor × weight in grams`
 - Pawn shop offer = `market value × 0.4`
 - Alloy estimate:
-  - `0.85` for `22K` and `24K`
+  - `0.85` for `24K`
+  - `0.8` for `22K`
   - `0.7` for all other karats
 - When `classring="true"` and any stone option other than `No stone (metal-only)` is selected:
   - deduct `20%` of total weight
@@ -473,7 +474,8 @@ Offer logic:
 - Spot = `24K spot × purity factor`
 - Pawn = `spot × 0.4`
 - Alloy =
-  - `spot × 0.85` for `22K` and `24K`
+  - `spot × 0.85` for `24K`
+  - `spot × 0.8` for `22K`
   - `spot × 0.7` for all other karats
 
 Examples:
@@ -582,7 +584,8 @@ Offer logic:
 - Spot = `24K spot × purity factor`
 - Pawn = `spot × 0.4`
 - Alloy =
-  - `spot × 0.85` for `22K` and `24K`
+  - `spot × 0.85` for `24K`
+  - `spot × 0.8` for `22K`
   - `spot × 0.7` for all other karats
 
 Examples:

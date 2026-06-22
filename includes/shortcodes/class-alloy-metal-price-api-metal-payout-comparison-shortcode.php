@@ -270,8 +270,12 @@ class Alloy_Metal_Price_API_Metal_Payout_Comparison_Shortcode {
 	 * @return float
 	 */
 	protected function get_alloy_offer_rate($karat) {
-		if (22 === (int) $karat || 24 === (int) $karat) {
+		if (24 === (int) $karat) {
 			return 0.85;
+		}
+
+		if (22 === (int) $karat) {
+			return 0.8;
 		}
 
 		return 0.7;

@@ -253,8 +253,12 @@ class Alloy_Metal_Price_API_Metal_Price_Calc_Shortcode {
 	 * @return float
 	 */
 	protected function get_alloy_offer_rate($metal, $purity_value) {
-		if ('gold' === $metal && (22 === (int) $purity_value || 24 === (int) $purity_value)) {
+		if ('gold' === $metal && 24 === (int) $purity_value) {
 			return 0.85;
+		}
+
+		if ('gold' === $metal && 22 === (int) $purity_value) {
+			return 0.8;
 		}
 
 		return 0.7;
