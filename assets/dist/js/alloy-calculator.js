@@ -24,18 +24,6 @@
 		}
 	}
 
-	function getAlloyOfferRate(karat) {
-		if (karat === 24) {
-			return 0.85;
-		}
-
-		if (karat === 22) {
-			return 0.8;
-		}
-
-		return 0.7;
-	}
-
 	function formatNumber(value) {
 		const amount = Number.isFinite(value) ? value : 0;
 
@@ -51,15 +39,16 @@
 		);
 	}
 
-	function fetchCalculatorPrice(metal) {
+	function fetchCalculatorPrice(metal, includePayoutTable) {
 		const normalizedMetal = metal || 'gold';
+		const requestKey = normalizedMetal + ':' + (includePayoutTable ? 'payout' : 'price');
 
 		if (!window.alloyMetalPriceApi || !window.alloyMetalPriceApi.ajaxUrl) {
 			return Promise.resolve(null);
 		}
 
-		if (metalPriceRequests[normalizedMetal]) {
-			return metalPriceRequests[normalizedMetal];
+		if (metalPriceRequests[requestKey]) {
+			return metalPriceRequests[requestKey];
 		}
 
 		const body = new URLSearchParams({
@@ -68,7 +57,11 @@
 			metal: normalizedMetal,
 		});
 
-		metalPriceRequests[normalizedMetal] = fetch(window.alloyMetalPriceApi.ajaxUrl, {
+		if (includePayoutTable) {
+			body.set('includePayoutTable', '1');
+		}
+
+		metalPriceRequests[requestKey] = fetch(window.alloyMetalPriceApi.ajaxUrl, {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
@@ -89,7 +82,7 @@
 				return null;
 			});
 
-		return metalPriceRequests[normalizedMetal];
+		return metalPriceRequests[requestKey];
 	}
 
 	function updateLayoutPriceDisplays(container, pricePerGram) {
@@ -136,6 +129,12 @@
 		}
 
 		updateLayoutPriceDisplays(container, pricePerGram);
+	}
+
+	function updateCalculatorPayoutRows(container, priceData) {
+		const payoutRows = priceData && Array.isArray(priceData.payoutRows) ? priceData.payoutRows : [];
+
+		container.dataset.payoutRows = JSON.stringify(payoutRows);
 	}
 
 	function stabilizeLivePriceField(field) {
@@ -194,7 +193,7 @@
 		});
 
 		Object.keys(metals).forEach(function (metal) {
-			fetchCalculatorPrice(metal).then(function (priceData) {
+			fetchCalculatorPrice(metal, false).then(function (priceData) {
 				updateLivePriceElements(document, priceData);
 			});
 		});
@@ -203,8 +202,9 @@
 	function hydrateCalculatorPrice(container) {
 		const metal = container.dataset.metal || 'gold';
 
-		fetchCalculatorPrice(metal).then(function (priceData) {
+		fetchCalculatorPrice(metal, true).then(function (priceData) {
 			updateCalculatorPrice(container, priceData);
+			updateCalculatorPayoutRows(container, priceData);
 		});
 	}
 
@@ -260,6 +260,61 @@
 		}
 
 		closeTooltip(container);
+	}
+
+	function normalizeGrade(value) {
+		const grade = String(value || '')
+			.trim()
+			.toUpperCase()
+			.replace(/\s+/g, '');
+
+		if (/^\d+$/.test(grade)) {
+			return grade + 'K';
+		}
+
+		return grade;
+	}
+
+	function getPayoutRows(container) {
+		try {
+			const rows = JSON.parse(container.dataset.payoutRows || '[]');
+
+			return Array.isArray(rows) ? rows : [];
+		} catch (error) {
+			return [];
+		}
+	}
+
+	function findPayoutRate(container, metal, purityRaw, purity) {
+		const rows = getPayoutRows(container);
+
+		if (!rows.length) {
+			return null;
+		}
+
+		if (metal === 'gold') {
+			const targetGrade = normalizeGrade(Number.isFinite(purityRaw) ? purityRaw : 24);
+			const gradeMatch = rows.find(function (row) {
+				return normalizeGrade(row.grade) === targetGrade;
+			});
+
+			if (gradeMatch && Number.isFinite(parseFloat(gradeMatch.externalSpotPercent))) {
+				return parseFloat(gradeMatch.externalSpotPercent);
+			}
+		}
+
+		const tolerance = metal === 'gold' ? 0.0001 : 0.0006;
+		const purityMatch = rows.find(function (row) {
+			const rowPurity = parseFloat(row.purityPercent);
+
+			return Number.isFinite(rowPurity) && Math.abs(rowPurity - purity) <= tolerance;
+		});
+
+		if (!purityMatch || !Number.isFinite(parseFloat(purityMatch.externalSpotPercent))) {
+			return null;
+		}
+
+		return parseFloat(purityMatch.externalSpotPercent);
 	}
 
 	function revealCalculatorResults(container) {
@@ -326,8 +381,9 @@
 		const totalValue = pricePerGram * purity * weightInGrams;
 		const currentMarketValue = totalValue;
 		const averagePawnShopOffer = totalValue * 0.4;
+		const alloyOfferRate = findPayoutRate(container, metal, purityRaw, purity);
 		const alloyEstimatedOffer =
-			totalValue * (metal === 'gold' ? getAlloyOfferRate(purityRaw) : 0.7);
+			null === alloyOfferRate ? null : totalValue * alloyOfferRate;
 
 		if (marketValue) {
 			marketValue.textContent = toCurrency(currentMarketValue);
@@ -338,7 +394,8 @@
 		}
 
 		if (alloyValue) {
-			alloyValue.textContent = toCurrency(alloyEstimatedOffer);
+			alloyValue.textContent =
+				null === alloyEstimatedOffer ? 'Unavailable' : toCurrency(alloyEstimatedOffer);
 		}
 
 		if (metaValue) {

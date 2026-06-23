@@ -159,12 +159,25 @@ class Alloy_Metal_Price_API_Plugin {
 			);
 		}
 
+		$include_payout_table = isset($_POST['includePayoutTable'])
+			&& wp_validate_boolean(wp_unslash($_POST['includePayoutTable']));
+		$payout_table         = array();
+
+		if ($include_payout_table && in_array($metal, array('gold', 'silver', 'platinum'), true)) {
+			$payout_table_response = $this->api_client->get_payout_table($metal);
+
+			if (! is_wp_error($payout_table_response)) {
+				$payout_table = $payout_table_response;
+			}
+		}
+
 		wp_send_json_success(
 			array(
 				'metal'         => $metal,
 				'pricePerGram'  => (float) $price_per_gram,
 				'pricePerOunce' => (float) $price_per_gram * 31.1035,
 				'pricePerKilo'  => (float) $price_per_gram * 1000,
+				'payoutRows'    => $payout_table,
 			)
 		);
 	}

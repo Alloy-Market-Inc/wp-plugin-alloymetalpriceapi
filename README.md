@@ -316,10 +316,8 @@ Offer logic:
 
 - Market value = `spot price per gram × purity factor × weight in grams`
 - Pawn shop offer = `market value × 0.4`
-- Alloy estimate:
-  - `0.85` for `24K`
-  - `0.8` for `22K`
-  - `0.7` for all other karats
+- For gold, silver, and platinum, Alloy estimate = `market value × externalSpotPercent` from Aurify's payout table endpoint
+- If no payout table row is available for the selected purity, Alloy estimate shows `Unavailable`
 - When `classring="true"` and any stone option other than `No stone (metal-only)` is selected:
   - deduct `20%` of total weight
   - with a minimum deduction of `0.5 g`
@@ -344,6 +342,8 @@ API failure behavior:
 - If the live gold price request fails, the calculator still renders
 - Base price becomes `0`
 - Calculated values remain hidden until Calculate Value is clicked and start from zero until refreshed page content gets valid data
+- If the payout table request fails, the calculator uses the last cached payout table only
+- If no cached payout table is available, market and pawn values still calculate and Alloy's Estimated Offer shows `Unavailable`
 
 Implementation note:
 

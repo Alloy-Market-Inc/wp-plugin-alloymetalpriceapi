@@ -218,6 +218,8 @@ Behavior note:
 
 - Results stay hidden until Calculate Value is clicked
 - Changing fields does not calculate or submit until Calculate Value is clicked again
+- For gold, silver, and platinum, Alloy's Estimated Offer uses Aurify's payout table `externalSpotPercent`
+- If no payout table row is available for the selected purity, Alloy's Estimated Offer shows `Unavailable`
 
 ## `[metal_calculator_layout]`
 
@@ -276,6 +278,8 @@ Notes:
 
 - Gold keeps the standard gold content boxes
 - Calculator results stay hidden until Calculate Value is clicked
+- For gold, silver, and platinum, Alloy's Estimated Offer uses Aurify's payout table `externalSpotPercent`
+- If no payout table row is available for the selected purity, Alloy's Estimated Offer shows `Unavailable`
 - `right="14K"` is for gold only
 - Platinum uses a platinum fineness box in the bottom-right area
 - Silver and Palladium currently use a placeholder bottom-right box until their custom content is added
