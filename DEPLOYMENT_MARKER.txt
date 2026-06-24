@@ -1,0 +1,3 @@
+deployment_marker=2026-06-24-gold-calculator-reserve-560
+target=thealloymarket.com page_id=20170
+change=page-scoped standalone gold calculator reserve height set to 560px
