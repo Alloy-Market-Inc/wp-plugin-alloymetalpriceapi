@@ -1,0 +1,35 @@
+name: Dispatch MARCOM Release
+
+on:
+  push:
+    branches: [production]
+
+permissions:
+  contents: read
+
+jobs:
+  dispatch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - name: Require a merged production PR
+        env:
+          GH_TOKEN: ${{ secrets.MARCOM_RELEASE_TOKEN }}
+        run: |
+          merged=$(gh api "repos/$GITHUB_REPOSITORY/commits/$GITHUB_SHA/pulls" \
+            --jq '[.[] | select(.merged_at != null and .base.ref == "production")] | length')
+          test "$merged" -gt 0
+      - name: Dispatch exact plugin release
+        env:
+          GH_TOKEN: ${{ secrets.MARCOM_RELEASE_TOKEN }}
+        run: |
+          version=$(sed -nE 's/^[[:space:]]*\*[[:space:]]*Version:[[:space:]]*([^[:space:]]+).*/\1/p' alloy-metal-price-api.php | head -1)
+          test -n "$version"
+          jq -n \
+            --arg component plugin \
+            --arg repository "$GITHUB_REPOSITORY" \
+            --arg sha "$GITHUB_SHA" \
+            --arg version "$version" \
+            '{event_type:"marcom-component-release",client_payload:{component:$component,repository:$repository,sha:$sha,version:$version}}' \
+            | gh api --method POST repos/Alloy-Market-Inc/wp-site-alloy-marcom/dispatches --input -
+
