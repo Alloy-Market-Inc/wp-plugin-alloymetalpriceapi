@@ -15,4 +15,4 @@ To retry a failed dispatch after fixing its external blocker:
 ./scripts/deploy-wpe-plugin.sh --redispatch
 ```
 
-The command only accepts the clean current `origin/production` SHA and requires an associated merged production PR. It does not upload files.
+The command only accepts the clean current `origin/release` SHA and requires an associated merged release-branch PR. It does not upload files.

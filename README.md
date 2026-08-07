@@ -108,7 +108,7 @@ Production releases are built and promoted by the private Alloy MARCOM operation
 
 - [`WPE-DEPLOY.md`](/Users/jamescook/REPOS/ALLOY/alloy-marcom/wp-content/plugins/AlloyMetalPriceAPI/WPE-DEPLOY.md)
 
-The local script can redispatch an already-merged production SHA; it cannot upload files directly.
+The local script can redispatch an already-merged Git `release` SHA; it cannot upload files directly. The Git `integration` branch is non-deployable, and production refers only to the WP Engine environment.
 
 Source CSS lives in:
 
