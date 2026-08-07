@@ -2,22 +2,28 @@ name: Dispatch MARCOM Release
 
 on:
   push:
-    branches: [production]
+    branches: [release]
+    paths-ignore:
+      - ".github/**"
+      - "README.md"
+      - "WPE-DEPLOY.md"
+      - "scripts/deploy-wpe-plugin.sh"
 
 permissions:
   contents: read
+  pull-requests: read
 
 jobs:
   dispatch:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
-      - name: Require a merged production PR
+      - name: Require a merged release PR
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           merged=$(gh api "repos/$GITHUB_REPOSITORY/commits/$GITHUB_SHA/pulls" \
-            --jq '[.[] | select(.merged_at != null and .base.ref == "production")] | length')
+            --jq '[.[] | select(.merged_at != null and .base.ref == "release")] | length')
           test "$merged" -gt 0
       - name: Dispatch exact plugin release
         env:
