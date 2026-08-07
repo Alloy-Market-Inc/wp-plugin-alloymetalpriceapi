@@ -1,13 +1,9 @@
-name: Dispatch MARCOM Release
+name: Weekly MARCOM Release Dispatch
 
 on:
-  push:
-    branches: [release]
-    paths-ignore:
-      - ".github/**"
-      - "README.md"
-      - "WPE-DEPLOY.md"
-      - "scripts/deploy-wpe-plugin.sh"
+  schedule:
+    - cron: "0 13,14 * * 3"
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -17,15 +13,47 @@ jobs:
   dispatch:
     runs-on: ubuntu-latest
     steps:
+      - name: Wednesday 8 AM Central guard
+        id: guard
+        run: |
+          if [[ "${{ github.event_name }}" != schedule || "$(TZ=America/Chicago date +%u-%H)" == 3-08 ]]; then
+            echo "run=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "run=false" >> "$GITHUB_OUTPUT"
+          fi
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        if: steps.guard.outputs.run == 'true'
+        with:
+          fetch-depth: 0
       - name: Require a merged release PR
+        if: steps.guard.outputs.run == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           merged=$(gh api "repos/$GITHUB_REPOSITORY/commits/$GITHUB_SHA/pulls" \
             --jq '[.[] | select(.merged_at != null and .base.ref == "release")] | length')
           test "$merged" -gt 0
+      - name: Compare with production-verified plugin
+        if: steps.guard.outputs.run == 'true'
+        id: state
+        env:
+          GH_TOKEN: ${{ secrets.MARCOM_RELEASE_TOKEN }}
+        run: |
+          deployed=$(gh api "repos/Alloy-Market-Inc/wp-site-alloy-marcom/contents/release/current.json?ref=release" \
+            --jq .content | base64 --decode | jq -r '.components.plugin.sha')
+          git cat-file -e "$deployed^{commit}"
+          if git diff --quiet "$deployed" "$GITHUB_SHA" -- . \
+            ':(exclude).github/**' \
+            ':(exclude)README.md' \
+            ':(exclude)WPE-DEPLOY.md' \
+            ':(exclude)scripts/deploy-wpe-plugin.sh'; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "No deployable plugin files changed since $deployed." >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
       - name: Dispatch exact plugin release
+        if: steps.guard.outputs.run == 'true' && steps.state.outputs.changed == 'true'
         env:
           GH_TOKEN: ${{ secrets.MARCOM_RELEASE_TOKEN }}
         run: |
