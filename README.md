@@ -120,17 +120,29 @@ The resulting ignored `build/AlloyMetalPriceAPI.zip` contains only the plugin
 PHP and compiled runtime assets. Development sources, Node dependencies,
 tests, workflows, and package manifests are excluded.
 
-## Release transition
+## Private updates and releases
 
-This repository owns the plugin source and build assets. Its retired MARCOM
-dispatch workflow and redispatch script have been removed. Merging a pull
-request into the Git `release` branch does not currently publish or deploy the
-plugin.
+The plugin uses Plugin Update Checker 5.7 and the Alloy private update service.
+WordPress configuration must provide `ALLOY_UPDATE_SERVICE_URL` and
+`ALLOY_UPDATE_SERVICE_READ_TOKEN`; the plugin contains neither value. If either
+is absent or invalid, update checks fail closed without affecting plugin
+runtime behavior. The bearer credential is attached only to this component's
+authenticated update-service routes.
 
-The replacement tag-publishing and private WordPress update process is not
-active yet. Direct deployment to WP Engine remains prohibited until that
-replacement process or an explicitly approved hotfix procedure is available.
-The Git `integration` branch remains non-deployable.
+Normal release flow:
+
+1. Merge the approved version and compiled assets into `release`.
+2. Confirm the plugin header and `package.json` contain the same semantic
+   version.
+3. Create and push the matching `vX.Y.Z` tag on that `release` commit.
+4. GitHub Actions rebuilds, validates, packages, and publishes the immutable
+   ZIP to the Alloy update service.
+
+The tag workflow rejects non-`release` commits, mismatched versions, missing
+assets, malformed packages, and missing credentials. Merging alone does not
+publish or deploy. Publishing creates an update offer; WordPress installation
+is handled separately by Smart Plugin Manager or the approved hotfix command.
+The `integration` branch remains non-deployable.
 
 Source CSS lives in:
 

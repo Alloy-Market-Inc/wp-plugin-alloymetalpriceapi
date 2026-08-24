@@ -19,3 +19,4 @@ find . -name '*.php' -not -path './node_modules/*' -print0 \
   | xargs -0 -n1 php -l
 node --check assets/dist/js/alloy-calculator.js
 php scripts/validate-payout-table-normalizer.php
+php scripts/validate-updater.php

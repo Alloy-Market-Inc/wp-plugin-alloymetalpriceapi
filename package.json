@@ -8,11 +8,22 @@
 		"watch:css": "tailwindcss -i ./assets/src/css/plugin.css -o ./assets/dist/css/plugin.css --watch",
 		"build": "npm run build:css",
 		"validate": "bash scripts/validate.sh",
-		"package": "bash scripts/build-package.sh"
+		"validate:release": "node scripts/validate-release-contract.mjs",
+		"package": "bash scripts/build-package.sh",
+		"publish-release": "node scripts/publish-release.mjs"
+	},
+	"alloyRelease": {
+		"componentSlug": "alloy-metal-price-api",
+		"expectedDirectory": "AlloyMetalPriceAPI",
+		"headerFile": "alloy-metal-price-api.php",
+		"minimumWordPressVersion": "6.5",
+		"testedWordPressVersion": "7.0",
+		"minimumPhpVersion": "8.1"
 	},
 	"devDependencies": {
 		"@tailwindcss/cli": "^4.1.4",
 		"@tailwindcss/postcss": "^4.1.4",
+		"@vercel/blob": "2.3.0",
 		"postcss": "^8.5.3",
 		"tailwindcss": "^4.1.4"
 	}

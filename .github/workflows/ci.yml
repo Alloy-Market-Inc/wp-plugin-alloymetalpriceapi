@@ -17,5 +17,10 @@ jobs:
         with:
           php-version: "8.2"
           coverage: none
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: "24"
+          cache: npm
       - run: npm ci
+      - run: npm run validate:release
       - run: npm run package
