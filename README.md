@@ -102,13 +102,17 @@ Full build shortcut:
 npm run build
 ```
 
-## Release
+## Release transition
 
-WP Engine production releases are built and promoted by the private Alloy MARCOM operations repository during the Wednesday 8:00 AM Central component window. A merged Git `release` SHA becomes eligible for that window and does not deploy immediately. The Git `integration` branch is non-deployable, and production refers only to the WP Engine environment:
+This repository owns the plugin source and build assets. Its retired MARCOM
+dispatch workflow and redispatch script have been removed. Merging a pull
+request into the Git `release` branch does not currently publish or deploy the
+plugin.
 
-- [`WPE-DEPLOY.md`](/Users/jamescook/REPOS/ALLOY/alloy-marcom/wp-content/plugins/AlloyMetalPriceAPI/WPE-DEPLOY.md)
-
-The local script is an emergency redispatch path and cannot upload files directly.
+The replacement tag-publishing and private WordPress update process is not
+active yet. Direct deployment to WP Engine remains prohibited until that
+replacement process or an explicitly approved hotfix procedure is available.
+The Git `integration` branch remains non-deployable.
 
 Source CSS lives in:
 
