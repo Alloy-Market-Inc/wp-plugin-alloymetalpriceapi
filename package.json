@@ -6,7 +6,9 @@
 	"scripts": {
 		"build:css": "tailwindcss -i ./assets/src/css/plugin.css -o ./assets/dist/css/plugin.css --minify",
 		"watch:css": "tailwindcss -i ./assets/src/css/plugin.css -o ./assets/dist/css/plugin.css --watch",
-		"build": "npm run build:css"
+		"build": "npm run build:css",
+		"validate": "bash scripts/validate.sh",
+		"package": "bash scripts/build-package.sh"
 	},
 	"devDependencies": {
 		"@tailwindcss/cli": "^4.1.4",

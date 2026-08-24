@@ -81,7 +81,7 @@ This plugin uses Tailwind CSS v4 for frontend styles.
 Install dependencies:
 
 ```bash
-npm install
+npm ci
 ```
 
 Build CSS once:
@@ -101,6 +101,24 @@ Full build shortcut:
 ```bash
 npm run build
 ```
+
+The editable files under `assets/src/` and the compiled files under
+`assets/dist/` are both tracked. Validate that the committed runtime assets
+exactly match their sources with:
+
+```bash
+npm run validate
+```
+
+Create the WordPress-ready package with:
+
+```bash
+npm run package
+```
+
+The resulting ignored `build/AlloyMetalPriceAPI.zip` contains only the plugin
+PHP and compiled runtime assets. Development sources, Node dependencies,
+tests, workflows, and package manifests are excluded.
 
 ## Release transition
 

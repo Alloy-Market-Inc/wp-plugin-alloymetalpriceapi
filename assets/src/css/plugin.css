@@ -1,0 +1,57 @@
+@import 'tailwindcss' prefix(aur);
+
+@theme {
+    --color-primary: #1b98b9;
+    --color-secondary: #f17f51;
+    --color-accent: #254d60;
+    --color-table-row-alt: #f9f9f9;
+    --font-sans: 'Lexend Deca', sans-serif;
+}
+
+@source "../../../alloy-metal-price-api.php";
+@source "../../../includes";
+
+@layer components {
+    .alloy-shortcode-shell .js-alloy-live-price,
+    .alloy-calculator-layout-shell .js-alloy-live-price,
+    .alloy-calculator-layout-shell .js-alloy-metal-price-per-gram,
+    .alloy-calculator-layout-shell .js-alloy-metal-price-per-ounce,
+    .alloy-calculator-layout-shell .js-alloy-metal-price-per-kilo {
+        text-align: right;
+        font-variant-numeric: tabular-nums;
+        min-width: 7ch;
+        display: inline-block;
+    }
+
+    .alloy-shortcode-shell td .js-alloy-live-price {
+        min-width: 8ch;
+    }
+
+    .alloy-shortcode-shell td:has(.js-alloy-live-price) {
+        font-variant-numeric: tabular-nums;
+        width: 10ch;
+        min-width: 10ch;
+    }
+
+    @media (max-width: 767px) {
+        .alloy-shortcode-shell--reserve-metal-price-table {
+            min-height: 454px;
+        }
+    }
+
+    .alloy-shortcode-shell .aur\:text-5xl .js-alloy-live-price {
+        text-align: center;
+        min-width: 7.5ch;
+    }
+
+    .alloy-shortcode-shell .aur\:text-sm,
+    .alloy-calculator-layout-shell .aur\:text-sm,
+    .alloy-shortcode-shell--reserve-metal-spot-ticker .alloy-shortcode-content,
+    .alloy-shortcode-shell--reserve-metal-price-table .alloy-shortcode-content {
+        font-variant-numeric: tabular-nums;
+    }
+
+    .alloy-shortcode-shell .aur\:flex .js-alloy-live-price {
+        white-space: nowrap;
+    }
+}
