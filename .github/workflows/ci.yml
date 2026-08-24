@@ -18,4 +18,5 @@ jobs:
           php-version: "8.2"
           coverage: none
       - run: npm ci
+      - run: npm run validate:release
       - run: npm run package

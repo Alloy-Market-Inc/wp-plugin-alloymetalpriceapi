@@ -19,7 +19,9 @@ bash scripts/validate.sh
 mkdir -p "$PACKAGE_DIR/assets"
 cp alloy-metal-price-api.php "$PACKAGE_DIR/"
 cp -R includes "$PACKAGE_DIR/"
+cp -R plugin-update-checker "$PACKAGE_DIR/"
 cp -R assets/dist "$PACKAGE_DIR/assets/"
+rm -f "$PACKAGE_DIR/plugin-update-checker/composer.json"
 
 mkdir -p "$BUILD_DIR"
 rm -f "$ZIP_PATH"
@@ -33,6 +35,7 @@ ZIP_ENTRIES="$(unzip -Z1 "$ZIP_PATH")"
 grep -qx "$PACKAGE_SLUG/alloy-metal-price-api.php" <<<"$ZIP_ENTRIES"
 grep -qx "$PACKAGE_SLUG/assets/dist/css/plugin.css" <<<"$ZIP_ENTRIES"
 grep -qx "$PACKAGE_SLUG/assets/dist/js/alloy-calculator.js" <<<"$ZIP_ENTRIES"
+grep -qx "$PACKAGE_SLUG/plugin-update-checker/load-v5p7.php" <<<"$ZIP_ENTRIES"
 
 if grep -Eq '(^|/)(assets/src|node_modules|tests|\.github|package(-lock)?\.json)(/|$)' <<<"$ZIP_ENTRIES"; then
   echo "Package contains development-only files." >&2
