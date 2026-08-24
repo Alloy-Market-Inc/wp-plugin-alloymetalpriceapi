@@ -21,7 +21,7 @@ const match = header.match(/^\s*\*?\s*Version:\s*(.+)$/mi);
 if (!match || match[1].trim() !== packageJson.version) fail('Component header and package.json versions must match.');
 
 const tag = process.env.GITHUB_REF_NAME;
-if (tag) {
+if (process.env.GITHUB_REF_TYPE === 'tag') {
   if (tag !== `v${packageJson.version}`) fail(`Tag ${tag} does not match version ${packageJson.version}.`);
   const sha = process.env.GITHUB_SHA || 'HEAD';
   try {
