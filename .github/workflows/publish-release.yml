@@ -7,6 +7,7 @@ on:
 
 permissions:
   contents: read
+  issues: write
 
 concurrency:
   group: publish-${{ github.ref }}
@@ -14,6 +15,8 @@ concurrency:
 
 jobs:
   publish:
+    outputs:
+      version: ${{ steps.contract.outputs.version }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
@@ -40,4 +43,29 @@ jobs:
         env:
           UPDATE_SERVICE_URL: ${{ vars.UPDATE_SERVICE_URL }}
           UPDATE_SERVICE_PUBLISHER_TOKEN: ${{ secrets.UPDATE_SERVICE_PUBLISHER_TOKEN }}
-          UPDATE_SERVICE_READ_TOKEN: ${{ secrets.UPDATE_SERVICE_READ_TOKEN_PRODUCTION }}
+          UPDATE_SERVICE_READ_TOKEN: ${{ secrets.UPDATE_SERVICE_READ_TOKEN_STAGING }}
+
+  staging-qa:
+    needs: publish
+    uses: Alloy-Market-Inc/wp-site-alloy-marcom/.github/workflows/custom-component-qa.yml@release
+    with:
+      component_type: plugin
+      component_slug: alloy-metal-price-api
+      version: ${{ needs.publish.outputs.version }}
+      automatic_qa: true
+    secrets:
+      MARCOM_QA_REPOSITORY_TOKEN: ${{ secrets.MARCOM_QA_REPOSITORY_TOKEN }}
+      UPDATE_SERVICE_READ_TOKEN_STAGING: ${{ secrets.UPDATE_SERVICE_READ_TOKEN_STAGING }}
+      UPDATE_SERVICE_PROMOTION_TOKEN: ${{ secrets.UPDATE_SERVICE_PROMOTION_TOKEN }}
+      WPE_API_USER_ID: ${{ secrets.WPE_API_USER_ID }}
+      WPE_API_PASSWORD: ${{ secrets.WPE_API_PASSWORD }}
+      WPE_SSH_PRIVATE_KEY: ${{ secrets.WPE_SSH_PRIVATE_KEY }}
+      WPE_STAGING_HTTP_USER: ${{ secrets.WPE_STAGING_HTTP_USER }}
+      WPE_STAGING_HTTP_PASSWORD: ${{ secrets.WPE_STAGING_HTTP_PASSWORD }}
+      WPE_STAGING_SYNTHETIC_FORM_JSON: ${{ secrets.WPE_STAGING_SYNTHETIC_FORM_JSON }}
+      ALLOY_QA_AURIFY_VERIFY_URL: ${{ secrets.ALLOY_QA_AURIFY_VERIFY_URL }}
+      ALLOY_QA_AURIFY_VERIFY_TOKEN: ${{ secrets.ALLOY_QA_AURIFY_VERIFY_TOKEN }}
+      ALLOY_QA_SMTP_HOST: ${{ secrets.ALLOY_QA_SMTP_HOST }}
+      ALLOY_QA_SMTP_USERNAME: ${{ secrets.ALLOY_QA_SMTP_USERNAME }}
+      ALLOY_QA_SMTP_PASSWORD: ${{ secrets.ALLOY_QA_SMTP_PASSWORD }}
+      ALLOY_QA_SMTP_FROM: ${{ secrets.ALLOY_QA_SMTP_FROM }}

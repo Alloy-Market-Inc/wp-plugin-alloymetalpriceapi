@@ -136,12 +136,16 @@ Normal release flow:
    version.
 3. Create and push the matching `vX.Y.Z` tag on that `release` commit.
 4. GitHub Actions rebuilds, validates, packages, and publishes the immutable
-   ZIP to the Alloy update service.
+   ZIP as the staging candidate.
+5. MARCOM automation installs the candidate on staging, runs the plugin's
+   critical acceptance contract, and promotes only the accepted checksum.
 
 The tag workflow rejects non-`release` commits, mismatched versions, missing
 assets, malformed packages, and missing credentials. Merging alone does not
-publish or deploy. Publishing creates an update offer; WordPress installation
-is handled separately by Smart Plugin Manager or the approved hotfix command.
+publish or deploy. Production cannot read an unpromoted candidate; after
+acceptance, installation is handled by Smart Plugin Manager or the approved
+hotfix command. GitHub retains the QA result and redacted evidence, and failures
+leave production unchanged.
 The `integration` branch remains non-deployable.
 
 Source CSS lives in:
