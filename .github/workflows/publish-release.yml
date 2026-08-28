@@ -7,7 +7,6 @@ on:
 
 permissions:
   contents: read
-  issues: write
 
 concurrency:
   group: publish-${{ github.ref }}
@@ -15,55 +14,11 @@ concurrency:
 
 jobs:
   publish:
-    outputs:
-      version: ${{ steps.contract.outputs.version }}
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
-        with:
-          fetch-depth: 0
-      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
-        with:
-          node-version: "24"
-          cache: npm
-      - uses: shivammathur/setup-php@bf6b4fbd49ca58e4608c9c89fba0b8d90bd2a39f
-        with:
-          php-version: "8.2"
-          coverage: none
-      - id: contract
-        run: npm run validate:release
-      - run: npm ci
-      - run: npm run package
-      - name: Publish immutable package
-        run: >-
-          npm run publish-release --
-          "${{ steps.contract.outputs.version }}"
-          "build/AlloyMetalPriceAPI.zip"
-          "${{ github.server_url }}/${{ github.repository }}/releases/tag/${{ github.ref_name }}"
-        env:
-          UPDATE_SERVICE_URL: ${{ vars.UPDATE_SERVICE_URL }}
-          UPDATE_SERVICE_PUBLISHER_TOKEN: ${{ secrets.UPDATE_SERVICE_PUBLISHER_TOKEN }}
-          UPDATE_SERVICE_READ_TOKEN: ${{ secrets.UPDATE_SERVICE_READ_TOKEN_STAGING }}
-
-  qa-and-deploy:
-    needs: publish
-    uses: Alloy-Market-Inc/wp-site-alloy-marcom/.github/workflows/custom-component-qa.yml@release
+    uses: Alloy-Market-Inc/wp-site-alloy-marcom/.github/workflows/component-publish.yml@release
     with:
-      component_type: plugin
-      component_slug: alloy-metal-price-api
-      version: ${{ needs.publish.outputs.version }}
-      automatic_qa: true
+      manifest_path: alloy-component.json
+      release_ref: ${{ github.ref }}
+      recovery_tag: ""
     secrets:
-      MARCOM_QA_REPOSITORY_SSH_KEY: ${{ secrets.MARCOM_QA_REPOSITORY_SSH_KEY }}
+      UPDATE_SERVICE_PUBLISHER_TOKEN: ${{ secrets.UPDATE_SERVICE_PUBLISHER_TOKEN }}
       UPDATE_SERVICE_READ_TOKEN_STAGING: ${{ secrets.UPDATE_SERVICE_READ_TOKEN_STAGING }}
-      UPDATE_SERVICE_READ_TOKEN_PRODUCTION: ${{ secrets.UPDATE_SERVICE_READ_TOKEN_PRODUCTION }}
-      UPDATE_SERVICE_PROMOTION_TOKEN: ${{ secrets.UPDATE_SERVICE_PROMOTION_TOKEN }}
-      WPE_API_USER_ID: ${{ secrets.WPE_API_USER_ID }}
-      WPE_API_PASSWORD: ${{ secrets.WPE_API_PASSWORD }}
-      WPE_SSH_PRIVATE_KEY: ${{ secrets.WPE_SSH_PRIVATE_KEY }}
-      WPE_STAGING_HTTP_USER: ${{ secrets.WPE_STAGING_HTTP_USER }}
-      WPE_STAGING_HTTP_PASSWORD: ${{ secrets.WPE_STAGING_HTTP_PASSWORD }}
-      ALLOY_QA_SMTP_HOST: ${{ secrets.ALLOY_QA_SMTP_HOST }}
-      ALLOY_QA_SMTP_USERNAME: ${{ secrets.ALLOY_QA_SMTP_USERNAME }}
-      ALLOY_QA_SMTP_PASSWORD: ${{ secrets.ALLOY_QA_SMTP_PASSWORD }}
-      ALLOY_QA_SMTP_FROM: ${{ secrets.ALLOY_QA_SMTP_FROM }}
