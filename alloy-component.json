@@ -1,0 +1,8 @@
+{
+  "schemaVersion": "1.0",
+  "repository": {"nameWithOwner": "Alloy-Market-Inc/wp-plugin-alloymetalpriceapi", "defaultBranch": "release"},
+  "component": {"slug": "alloy-metal-price-api", "type": "plugin", "directory": "AlloyMetalPriceAPI", "displayName": "AlloyMetalPriceAPI", "lifecycle": "production"},
+  "package": {"artifactPath": "build/AlloyMetalPriceAPI.zip", "installCommands": ["npm ci"], "validateCommand": "npm run validate:release", "packageCommand": "npm run package", "publishCommand": "npm run publish-release --"},
+  "delivery": {"broker": "update-service-deployment-requests-v1", "target": "staging", "stopAfterStagingAcceptance": true, "productionAction": "separate_promotion_required", "acceptance": {"mode": "passive", "criticalPaths": ["/", "/gold-calculator/", "/platinum-calculator/"], "componentChecks": ["private-updater"], "formSubmission": "prohibited"}, "rollback": "previous-immutable-package-then-checkpoint"},
+  "credentials": {"componentRepository": ["UPDATE_SERVICE_PUBLISHER_TOKEN", "UPDATE_SERVICE_READ_TOKEN_STAGING"]}
+}

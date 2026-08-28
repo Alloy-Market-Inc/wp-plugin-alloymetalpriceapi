@@ -135,17 +135,18 @@ Normal release flow:
 2. Confirm the plugin header and `package.json` contain the same semantic
    version.
 3. Create and push the matching `vX.Y.Z` tag on that `release` commit.
-4. GitHub Actions rebuilds, validates, packages, and publishes the immutable
-   ZIP as the staging candidate.
-5. MARCOM automation installs the candidate on staging, runs the plugin's
-   critical acceptance contract, and promotes only the accepted checksum.
+4. The thin repository workflow calls MARCOM's versioned shared publisher,
+   which rebuilds, validates, packages, and publishes the immutable ZIP.
+5. The Update Service creates the deployment request; the protected MARCOM
+   executor installs it on staging and runs passive component acceptance.
 
 The tag workflow rejects non-`release` commits, mismatched versions, missing
 assets, malformed packages, and missing credentials. Merging alone does not
-publish or deploy. Production cannot read an unpromoted candidate; after
-acceptance, installation is handled by Smart Plugin Manager or the approved
-hotfix command. GitHub retains the QA result and redacted evidence, and failures
-leave production unchanged.
+publish or deploy. This repository receives only publisher and staging-read
+credentials and has no WordPress, WP Engine, executor, promotion, or MARCOM
+checkout credential. Production requires a separate approved gate. The former
+caller is retained verbatim as `publish-release.legacy.yml.disabled`; its
+secret records are preserved but it is inactive and unreferenced.
 The `integration` branch remains non-deployable.
 
 Source CSS lives in:
